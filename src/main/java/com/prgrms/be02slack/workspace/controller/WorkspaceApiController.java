@@ -1,9 +1,9 @@
 package com.prgrms.be02slack.workspace.controller;
 
-import com.prgrms.be02slack.workspace.service.WorkspaceService;
-
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.prgrms.be02slack.workspace.service.WorkspaceService;
 
 @RestController
 @RequestMapping("api/v1/workspaces")

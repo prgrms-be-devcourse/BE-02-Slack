@@ -1,13 +1,13 @@
 package com.prgrms.be02slack.workspace.entity;
 
-import com.prgrms.be02slack.common.entity.BaseTime;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
+import com.prgrms.be02slack.common.entity.BaseTime;
 
 @Entity
 public class Workspace extends BaseTime {
