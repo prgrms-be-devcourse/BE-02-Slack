@@ -1,6 +1,7 @@
 package com.prgrms.be02slack.workspace.entity;
 
 import com.prgrms.be02slack.common.entity.BaseTime;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
