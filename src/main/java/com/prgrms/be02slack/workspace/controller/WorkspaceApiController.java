@@ -22,10 +22,7 @@ public class WorkspaceApiController {
   }
 
   @PutMapping("{key}")
-  public void update(
-      @PathVariable String key,
-      @Valid @RequestBody WorkspaceUpdateRequest request
-  ) {
+  public void update(@PathVariable String key, @Valid @RequestBody WorkspaceUpdateRequest request) {
     final var workspace = WorkspaceUpdateRequest.toEntity(request);
     workspaceService.update(key, workspace);
   }
