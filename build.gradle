@@ -2,6 +2,18 @@ plugins {
     id 'org.springframework.boot' version '2.6.8'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
+    id "org.asciidoctor.convert" version "1.5.9.2"
+}
+
+asciidoctor {
+    dependsOn test
+}
+
+bootJar {
+    dependsOn asciidoctor
+    from("./build/asciidoc/html5") {
+        into 'static/docs'
+    }
 }
 
 group = 'com.prgrms'
@@ -22,6 +34,7 @@ dependencies {
     runtimeOnly 'mysql:mysql-connector-java'
     testImplementation 'org.springframework.boot:spring-boot-starter-test:2.6.8'
     testImplementation 'org.springframework.security:spring-security-test:5.7.1'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc:2.0.6.RELEASE'
 }
 
 tasks.named('test') {
