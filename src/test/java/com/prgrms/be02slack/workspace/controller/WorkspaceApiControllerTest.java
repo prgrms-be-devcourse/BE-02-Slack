@@ -7,7 +7,6 @@ import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.DisplayName;
@@ -92,10 +91,9 @@ class WorkspaceApiControllerTest {
       void ItResponseOk() throws Exception {
         //given
         final var workspaceKey = "testKey";
-        final var requestMap = Map.of(
-            "name", "testName",
-            "url", "testUrl"
-        );
+        final var requestMap = new HashMap<>();
+        requestMap.put("name", "testName");
+        requestMap.put("url", "testUrl");
         final var requestBody = objectMapper.writeValueAsString(requestMap);
 
         //when
