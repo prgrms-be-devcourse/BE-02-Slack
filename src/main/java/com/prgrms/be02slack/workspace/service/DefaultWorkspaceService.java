@@ -17,6 +17,7 @@ public class DefaultWorkspaceService implements WorkspaceService {
 
   private final IdEncoder idEncoder;
   private final WorkspaceRepository workspaceRepository;
+  private final String DEFAULT_WORKSPACE_NAME = "Slack";
 
   public DefaultWorkspaceService(
       IdEncoder idEncoder,
@@ -28,7 +29,7 @@ public class DefaultWorkspaceService implements WorkspaceService {
 
   @Override
   public Workspace create() {
-    final var workspace = new Workspace("Slack");
+    final var workspace = new Workspace(DEFAULT_WORKSPACE_NAME);
     final var createdWorkspace = workspaceRepository.save(workspace);
     createdWorkspace.makeDefaultUrl();
 
