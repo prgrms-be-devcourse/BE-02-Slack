@@ -27,6 +27,15 @@ public class DefaultWorkspaceService implements WorkspaceService {
   }
 
   @Override
+  public Workspace create() {
+    final var workspace = Workspace.createDefaultWorkspace();
+    final var createdWorkspace = workspaceRepository.save(workspace);
+    createdWorkspace.makeDefaultUrl();
+
+    return createdWorkspace;
+  }
+
+  @Override
   public void update(String key, Workspace updateWorkspace) {
     Assert.isTrue(isNotBlank(key), "Key must be provided");
     Assert.notNull(updateWorkspace, "Workspace must be provided");
