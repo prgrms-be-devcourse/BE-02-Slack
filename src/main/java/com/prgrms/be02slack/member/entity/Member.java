@@ -89,4 +89,8 @@ public class Member extends BaseTime {
       return new Member(this);
     }
   }
+
+  public static Builder builder() {
+    return new Builder();
+  }
 }
