@@ -171,4 +171,29 @@ class DefaultWorkspaceServiceTest {
       }
     }
   }
+
+  @Nested
+  @DisplayName("create 메서드는")
+  class DescribeCreate {
+
+    @Nested
+    @DisplayName("호출이 되면")
+    class ContextMethodCall {
+
+      @Test
+      @DisplayName("기본 워크스페이스를 생성한다.")
+      void itCreateNewWorkspace() {
+        //given
+        final var expectedWorkspace = new Workspace("Slack");
+        given(workspaceRepository.save(any())).willReturn(expectedWorkspace);
+
+        //when
+        final var workspace = defaultWorkspaceService.create();
+
+        //then
+        assertEquals(workspace.getName(), "Slack");
+        assertEquals(workspace.getUrl(), workspace.getName() + workspace.getId());
+      }
+    }
+  }
 }
