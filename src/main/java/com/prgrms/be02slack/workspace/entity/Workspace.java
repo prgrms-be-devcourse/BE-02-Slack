@@ -2,6 +2,7 @@ package com.prgrms.be02slack.workspace.entity;
 
 import static org.apache.logging.log4j.util.Strings.*;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -24,15 +25,20 @@ public class Workspace extends BaseTime {
   @Size(min = 1, max = 50)
   private String name;
 
-  @NotNull
   @Size(min = 1, max = 21)
+  @Column(unique = true)
   private String url;
 
   protected Workspace() {/*no-op*/}
 
+  public Workspace(String name) {
+    Assert.isTrue(isNotBlank(name), "Name must be provided");
+
+    this.name = name;
+  }
+
   public Workspace(String name, String url) {
     Assert.isTrue(isNotBlank(name), "Name must be provided");
-    Assert.isTrue(isNotBlank(url), "Url must be provided");
 
     this.name = name;
     this.url = url;
@@ -43,5 +49,21 @@ public class Workspace extends BaseTime {
 
     this.name = updateWorkspace.url;
     this.url = updateWorkspace.url;
+  }
+
+  public void makeDefaultUrl() {
+    this.url = this.name + this.id;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public Long getId() {
+    return id;
+  }
+
+  public String getUrl() {
+    return url;
   }
 }
