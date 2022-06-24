@@ -110,4 +110,65 @@ class DefaultWorkspaceServiceTest {
       }
     }
   }
+
+  @Nested
+  @DisplayName("findByKey 메서드는")
+  class DescribeFindByKey {
+
+    @Nested
+    @DisplayName("빈값이 전달되면")
+    class ContextWithNullOrEmptyString {
+
+      @ParameterizedTest
+      @NullAndEmptySource
+      @ValueSource(strings = {"\n", "\t", "", ""})
+      @DisplayName("IllegalArgumentException 에러를 던진다")
+      void ItThrowsIllegalArgumentException(String src) {
+        assertThrows(IllegalArgumentException.class, () -> defaultWorkspaceService.findByKey(src));
+      }
+    }
+
+    @Nested
+    @DisplayName("빈값이 아닌 값이 전달되고, 값이 존재하면")
+    class ContextWithExist {
+
+      @Test
+      @DisplayName("해당 값을 디코딩한 id값 을 가진 엔티티를 반환한다")
+      void ItReturnWorkspace() {
+        //given
+        final var savedWorkspaceName = "test";
+        final var savedWorkspaceUrl = "test";
+        final var savedWorkspace = new Workspace(savedWorkspaceName, savedWorkspaceUrl);
+        given(idEncoder.decode(anyString())).willReturn(1L);
+        given(workspaceRepository.findById(anyLong())).willReturn(Optional.of(savedWorkspace));
+
+        //when
+        final var foundWorkspace = defaultWorkspaceService.findByKey("ABC123ABC123");
+
+        //then
+        final var foundWorkspaceName = ReflectionTestUtils.getField(foundWorkspace, "name");
+        final var foundWorkspaceUrl = ReflectionTestUtils.getField(foundWorkspace, "url");
+        assertEquals(savedWorkspaceName, foundWorkspaceName);
+        assertEquals(savedWorkspaceUrl, foundWorkspaceUrl);
+
+      }
+    }
+
+    @Nested
+    @DisplayName("빈값이 아닌 값이 전달되고, 값이 존재하지 않으면")
+    class ContextWithNotExist {
+
+      @Test
+      @DisplayName("해당 값을 디코딩한 id값 을 가진 엔티티를 반환한다")
+      void ItReturnWorkspace() {
+        //given
+        given(idEncoder.decode(anyString())).willReturn(1L);
+        given(workspaceRepository.findById(anyLong())).willReturn(Optional.empty());
+
+        //when, then
+        assertThrows(IllegalArgumentException.class,
+            () -> defaultWorkspaceService.findByKey("ABC123ABC123"));
+      }
+    }
+  }
 }
