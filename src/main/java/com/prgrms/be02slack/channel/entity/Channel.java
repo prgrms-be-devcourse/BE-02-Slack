@@ -1,6 +1,7 @@
 package com.prgrms.be02slack.channel.entity;
 
 import com.prgrms.be02slack.common.entity.BaseTime;
+import com.prgrms.be02slack.member.entity.Member;
 import com.prgrms.be02slack.workspace.entity.Workspace;
 
 import javax.persistence.Entity;
@@ -34,18 +35,19 @@ public class Channel extends BaseTime {
   protected Channel() {/*no-op*/}
 
   public Channel(String name, String description, boolean isPrivate,
-      Workspace workspace) {
+      Workspace workspace, Member owner) {
     this.name = name;
     this.description = description;
     this.isPrivate = isPrivate;
     this.workspace = workspace;
+    this.owner = owner;
   }
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "workspace_id")
   private Workspace workspace;
 
-  /**
-   소유자와의 연관관계 필요
-   */
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "member_id")
+  private Member owner;
 }
