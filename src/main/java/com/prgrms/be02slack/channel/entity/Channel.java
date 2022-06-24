@@ -35,12 +35,12 @@ public class Channel extends BaseTime {
   protected Channel() {/*no-op*/}
 
   public Channel(String name, String description, boolean isPrivate,
-      Workspace workspace, Member member) {
+      Workspace workspace, Member owner) {
     this.name = name;
     this.description = description;
     this.isPrivate = isPrivate;
     this.workspace = workspace;
-    this.member = member;
+    this.owner = owner;
   }
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -49,5 +49,5 @@ public class Channel extends BaseTime {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "member_id")
-  private Member member;
+  private Member owner;
 }
