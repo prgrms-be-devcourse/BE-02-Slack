@@ -30,4 +30,9 @@ public class Workspace extends BaseTime {
     this.name = name;
     this.url = url;
   }
+
+  public void update(Workspace workspace) {
+    this.name = workspace.url;
+    this.url = workspace.url;
+  }
 }
