@@ -17,6 +17,8 @@ import com.prgrms.be02slack.common.entity.BaseTime;
 @Entity
 public class Workspace extends BaseTime {
 
+  private static final String DEFAULT_WORKSPACE_NAME = "Slack";
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -49,6 +51,10 @@ public class Workspace extends BaseTime {
 
     this.name = updateWorkspace.url;
     this.url = updateWorkspace.url;
+  }
+
+  public static Workspace createDefaultWorkspace() {
+    return new Workspace(DEFAULT_WORKSPACE_NAME);
   }
 
   public void makeDefaultUrl() {
