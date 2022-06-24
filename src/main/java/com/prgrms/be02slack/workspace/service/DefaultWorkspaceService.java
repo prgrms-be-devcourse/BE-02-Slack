@@ -38,4 +38,14 @@ public class DefaultWorkspaceService implements WorkspaceService {
 
     saved.update(updateWorkspace);
   }
+
+  @Override
+  public Workspace findByKey(String key) {
+    Assert.isTrue(isNotBlank(key), "Key must be provided");
+
+    final var id = idEncoder.decode(key);
+
+    return workspaceRepository.findById(id)
+        .orElseThrow(() -> new NotFoundException("Workspace not found"));
+  }
 }
