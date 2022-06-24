@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -20,9 +21,10 @@ public class Member extends BaseTime {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long Id;
+  private Long id;
 
   @NotNull
+  @Email
   private String email;
 
   @NotNull
@@ -35,6 +37,8 @@ public class Member extends BaseTime {
 
   @Enumerated(EnumType.STRING)
   private Role role;
+
+  @Enumerated(EnumType.ORDINAL)
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "workspace_id")
