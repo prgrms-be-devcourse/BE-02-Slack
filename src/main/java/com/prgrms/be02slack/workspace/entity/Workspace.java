@@ -1,11 +1,15 @@
 package com.prgrms.be02slack.workspace.entity;
 
+import static org.apache.logging.log4j.util.Strings.*;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
+import org.springframework.util.Assert;
 
 import com.prgrms.be02slack.common.entity.BaseTime;
 
@@ -27,12 +31,17 @@ public class Workspace extends BaseTime {
   protected Workspace() {/*no-op*/}
 
   public Workspace(String name, String url) {
+    Assert.isTrue(isNotBlank(name), "Name must be provided");
+    Assert.isTrue(isNotBlank(url), "Url must be provided");
+
     this.name = name;
     this.url = url;
   }
 
-  public void update(Workspace workspace) {
-    this.name = workspace.url;
-    this.url = workspace.url;
+  public void update(Workspace updateWorkspace) {
+    Assert.notNull(updateWorkspace, "Workspace must be provided");
+
+    this.name = updateWorkspace.url;
+    this.url = updateWorkspace.url;
   }
 }

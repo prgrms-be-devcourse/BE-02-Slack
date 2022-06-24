@@ -27,15 +27,15 @@ public class DefaultWorkspaceService implements WorkspaceService {
   }
 
   @Override
-  public void update(String key, Workspace workspace) {
+  public void update(String key, Workspace updateWorkspace) {
     Assert.isTrue(isNotBlank(key), "Key must be provided");
-    Assert.notNull(workspace, "Workspace must be provided");
+    Assert.notNull(updateWorkspace, "Workspace must be provided");
 
     final var id = idEncoder.decode(key);
 
     final var saved = workspaceRepository.findById(id)
         .orElseThrow(() -> new NotFoundException("Workspace not found"));
 
-    saved.update(workspace);
+    saved.update(updateWorkspace);
   }
 }
