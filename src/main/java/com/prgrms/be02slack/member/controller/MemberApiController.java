@@ -9,9 +9,9 @@ import com.prgrms.be02slack.member.service.MemberService;
 @RequestMapping("api/v1/members")
 public class MemberApiController {
 
-  private final MemberService memeberService;
+  private final MemberService memberService;
 
-  public MemberApiController(MemberService memeberService) {
-    this.memeberService = memeberService;
+  public MemberApiController(MemberService memberService) {
+    this.memberService = memberService;
   }
 }
