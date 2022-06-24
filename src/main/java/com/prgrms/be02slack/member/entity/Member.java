@@ -38,8 +38,6 @@ public class Member extends BaseTime {
   @Enumerated(EnumType.STRING)
   private Role role;
 
-  @Enumerated(EnumType.ORDINAL)
-
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "workspace_id")
   private Workspace workspace;
