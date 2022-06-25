@@ -34,13 +34,12 @@ public class Channel extends BaseTime {
 
   protected Channel() {/*no-op*/}
 
-  public Channel(String name, String description, boolean isPrivate,
-      Workspace workspace, Member owner) {
-    this.name = name;
-    this.description = description;
-    this.isPrivate = isPrivate;
-    this.workspace = workspace;
-    this.owner = owner;
+  private Channel(Builder builder) {
+    this.name = builder.name;
+    this.description = builder.description;
+    this.isPrivate = builder.isPrivate;
+    this.workspace = builder.workspace;
+    this.owner = builder.owner;
   }
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -50,4 +49,45 @@ public class Channel extends BaseTime {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "member_id")
   private Member owner;
+
+  private class Builder {
+    private String name;
+    private String description;
+    private boolean isPrivate;
+    private Workspace workspace;
+    private Member owner;
+
+    public Builder builder() {
+      return new Builder();
+    }
+
+    public Builder name(String name) {
+      this.name = name;
+      return this;
+    }
+
+    public Builder description(String description) {
+      this.description = description;
+      return this;
+    }
+
+    public Builder isPrivate(boolean isPrivate) {
+      this.isPrivate = isPrivate;
+      return this;
+    }
+
+    public Builder workspace(Workspace workspace) {
+      this.workspace = workspace;
+      return this;
+    }
+
+    public Builder owner(Member member) {
+      this.owner = owner;
+      return this;
+    }
+
+    public Channel build() {
+      return new Channel(this);
+    }
+  }
 }
