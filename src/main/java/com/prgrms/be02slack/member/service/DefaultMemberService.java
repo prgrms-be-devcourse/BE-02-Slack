@@ -24,13 +24,25 @@ public class DefaultMemberService implements MemberService {
     this.workspaceService = workspaceService;
   }
 
-  public Member findByEmailAndWorkspaceKey(String key, String email) {
-    Assert.isTrue(isNotBlank(key), "Key must be provided");
-    Assert.isTrue(isNotBlank(email), "Workspace must be provided");
+  @Override
+  public Member findByEmailAndWorkspaceKey(String encodedWorkspaceId, String email) {
+    Assert.isTrue(isNotBlank(encodedWorkspaceId), "id must be provided");
+    Assert.isTrue(isNotBlank(email), "email must be provided");
 
-    final var findWorkspace = workspaceService.findByKey(key);
+    final var findWorkspace = workspaceService.findByKey(encodedWorkspaceId);
 
     return memberRepository.findByEmailAndWorkspace(email, findWorkspace)
         .orElseThrow(() -> new NotFoundException("member notfound"));
+  }
+
+  @Override
+  public boolean isDuplicatedMemberName(String encodedWorkspaceId, String channelName) {
+    Assert.isTrue(isNotBlank(encodedWorkspaceId), "id must be provided");
+    Assert.isTrue(isNotBlank(channelName), "channelName must be provided");
+
+    final var workspace = workspaceService.findByKey(encodedWorkspaceId);
+
+    return memberRepository.findByNameAndWorkspace(channelName, workspace)
+            .isEmpty();
   }
 }
