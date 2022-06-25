@@ -2,17 +2,25 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
 <body>
 <div align="center" style="font-size: 15px">
-    <img src="https://images.velog.io/images/combi_jihoon/post/97535549-ceb5-44bd-b473-0ff816beb7e1/Slack_logo_new.png" width="150" alt=""/>
+    <img src="https://images.velog.io/images/combi_jihoon/post/97535549-ceb5-44bd-b473-0ff816beb7e1/Slack_logo_new.png"
+         width="150" alt=""/>
     <br><br>
     <h1 style="font-size: 30px; padding-right: 30px; padding-left: 30px;">이메일 주소 확인</h1>
-    <p style="font-size: 17px; padding-right: 30px; padding-left: 30px;">아래 확인 코드를 Slack 가입 창이 있는 브라우저 창에 입력하세요.</p>
+    <p style="font-size: 17px; padding-right: 30px; padding-left: 30px;">아래 확인 코드를 Slack 가입 창이 있는
+        브라우저 창에 입력하세요.</p>
     <div style="padding-right: 30px; padding-left: 30px; margin: 32px 0 40px;">
-    <table style="border-collapse: collapse; border: 0; background-color: #F4F4F4; height: 70px; table-layout: fixed; word-wrap: break-word; border-radius: 6px;">
-    <h3 th:text="${code}"></h3>
-    <tbody><tr><td style="text-align: center; vertical-align: middle; font-size: 30px;">
-    </td></tr></tbody>
-    </table></div>
-    <a style="text-decoration: none; color: #434245;" rel="noreferrer noopener" target=\"_blank\">Slack Clone, Team Ray</a>
+        <table style="border-collapse: collapse; border: 0; background-color: #F4F4F4; height: 70px; table-layout: fixed; word-wrap: break-word; border-radius: 6px;">
+            <h3 th:text="${code}"></h3>
+            <tbody>
+            <tr>
+                <td style="text-align: center; vertical-align: middle; font-size: 30px;">
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <a style="text-decoration: none; color: #434245;" rel="noreferrer noopener" target=\"_blank\">Slack
+        Clone, Team Ray</a>
 </div>
 </body>
 </html>

@@ -10,24 +10,24 @@ import org.thymeleaf.templatemode.TemplateMode;
 @Configuration
 public class ThymeleafConfig {
 
-	@Bean
-	public TemplateEngine htmlTemplateEngine() {
-		TemplateEngine templateEngine = new SpringTemplateEngine();
-		templateEngine.addTemplateResolver(springResourceTemplateResolver());
+  @Bean
+  public TemplateEngine htmlTemplateEngine() {
+    TemplateEngine templateEngine = new SpringTemplateEngine();
+    templateEngine.addTemplateResolver(springResourceTemplateResolver());
 
-		return templateEngine;
-	}
+    return templateEngine;
+  }
 
-	@Bean
-	public SpringResourceTemplateResolver springResourceTemplateResolver() {
-		SpringResourceTemplateResolver springResourceTemplateResolver = new SpringResourceTemplateResolver();
-		springResourceTemplateResolver.setOrder(1);
-		springResourceTemplateResolver.setPrefix("classpath:templates/");
-		springResourceTemplateResolver.setSuffix(".html");
-		springResourceTemplateResolver.setTemplateMode(TemplateMode.HTML);
-		springResourceTemplateResolver.setCharacterEncoding("UTF-8");
-		springResourceTemplateResolver.setCacheable(false);
+  @Bean
+  public SpringResourceTemplateResolver springResourceTemplateResolver() {
+    SpringResourceTemplateResolver springResourceTemplateResolver = new SpringResourceTemplateResolver();
+    springResourceTemplateResolver.setOrder(1);
+    springResourceTemplateResolver.setPrefix("classpath:templates/");
+    springResourceTemplateResolver.setSuffix(".html");
+    springResourceTemplateResolver.setTemplateMode(TemplateMode.HTML);
+    springResourceTemplateResolver.setCharacterEncoding("UTF-8");
+    springResourceTemplateResolver.setCacheable(false);
 
-		return springResourceTemplateResolver;
-	}
+    return springResourceTemplateResolver;
+  }
 }

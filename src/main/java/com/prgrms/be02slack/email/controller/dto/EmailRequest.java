@@ -7,16 +7,16 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 
 public class EmailRequest {
 
-	@Email
-	@NotBlank
-	private final String email;
+  @Email
+  @NotBlank
+  private final String email;
 
-	@JsonCreator
-	public EmailRequest(String email) {
-		this.email = email;
-	}
+  @JsonCreator
+  public EmailRequest(String email) {
+    this.email = email;
+  }
 
-	public String getEmail() {
-		return email;
-	}
+  public String getEmail() {
+    return email;
+  }
 }

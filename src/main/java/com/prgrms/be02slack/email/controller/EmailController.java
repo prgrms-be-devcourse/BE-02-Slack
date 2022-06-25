@@ -17,15 +17,15 @@ import com.prgrms.be02slack.email.service.EmailService;
 @RequestMapping("api/v1/email")
 public class EmailController {
 
-	private final EmailService emailService;
+  private final EmailService emailService;
 
-	public EmailController(EmailService emailService) {
-		this.emailService = emailService;
-	}
+  public EmailController(EmailService emailService) {
+    this.emailService = emailService;
+  }
 
-	@PostMapping
-	@ResponseStatus(HttpStatus.OK)
-	public void send(@Valid @RequestBody EmailRequest request) throws MessagingException {
-		emailService.sendMail(request);
-	}
+  @PostMapping
+  @ResponseStatus(HttpStatus.OK)
+  public void send(@Valid @RequestBody EmailRequest request) throws MessagingException {
+    emailService.sendMail(request);
+  }
 }

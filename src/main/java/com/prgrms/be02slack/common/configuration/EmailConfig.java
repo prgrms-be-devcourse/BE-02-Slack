@@ -13,47 +13,47 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 @PropertySource(value = "classpath:email.properties")
 public class EmailConfig {
 
-	@Value("${spring.mail.host}")
-	private String host;
+  @Value("${spring.mail.host}")
+  private String host;
 
-	@Value("${spring.mail.port}")
-	private int port;
+  @Value("${spring.mail.port}")
+  private int port;
 
-	@Value("${spring.mail.username}")
-	private String username;
+  @Value("${spring.mail.username}")
+  private String username;
 
-	@Value("${spring.mail.password}")
-	private String password;
+  @Value("${spring.mail.password}")
+  private String password;
 
-	@Value("${spring.mail.properties.mail.smtp.auth}")
-	private boolean auth;
+  @Value("${spring.mail.properties.mail.smtp.auth}")
+  private boolean auth;
 
-	@Value("${spring.mail.properties.mail.smtp.starttls.enable}")
-	private boolean enable;
+  @Value("${spring.mail.properties.mail.smtp.starttls.enable}")
+  private boolean enable;
 
-	@Value("${spring.mail.properties.mail.smtp.starttls.required}")
-	private boolean required;
+  @Value("${spring.mail.properties.mail.smtp.starttls.required}")
+  private boolean required;
 
-	@Bean
-	public JavaMailSender javaMailSender() {
-		JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
-		javaMailSender.setHost(host);
-		javaMailSender.setPort(port);
-		javaMailSender.setUsername(username);
-		javaMailSender.setPassword(password);
-		javaMailSender.setDefaultEncoding("UTF-8");
-		javaMailSender.setJavaMailProperties(getMailProperties());
+  @Bean
+  public JavaMailSender javaMailSender() {
+    JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
+    javaMailSender.setHost(host);
+    javaMailSender.setPort(port);
+    javaMailSender.setUsername(username);
+    javaMailSender.setPassword(password);
+    javaMailSender.setDefaultEncoding("UTF-8");
+    javaMailSender.setJavaMailProperties(getMailProperties());
 
-		return javaMailSender;
-	}
+    return javaMailSender;
+  }
 
-	private Properties getMailProperties() {
-		Properties properties = new Properties();
-		properties.put("mail.smtp.auth", auth);
-		properties.put("mail.transport.protocol", "smtp");
-		properties.put("mail.smtp.starttls.enable", enable);
-		properties.put("mail.smtp.starttls.required", required);
+  private Properties getMailProperties() {
+    Properties properties = new Properties();
+    properties.put("mail.smtp.auth", auth);
+    properties.put("mail.transport.protocol", "smtp");
+    properties.put("mail.smtp.starttls.enable", enable);
+    properties.put("mail.smtp.starttls.required", required);
 
-		return properties;
-	}
+    return properties;
+  }
 }
