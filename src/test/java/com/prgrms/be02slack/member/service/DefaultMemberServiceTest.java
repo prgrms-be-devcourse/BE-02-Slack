@@ -122,4 +122,90 @@ class DefaultMemberServiceTest {
       }
     }
   }
+
+  @Nested
+  @DisplayName("checkMemberName 메서드는")
+  class DescribeCheckMemberName {
+
+    @Nested
+    @DisplayName("비어있는 key값을 인자로 받으면")
+    class ContextNullEmptyKeyArgument {
+
+      @ParameterizedTest
+      @NullAndEmptySource
+      @ValueSource(strings = {"\t", "\n"})
+      @DisplayName("IllegalArgumentException을 던진다.")
+      void itTrowIllegalArgumentException(String workspacekey) {
+        //given
+        final String channelName = "ABC123";
+
+        //then
+        Assertions.assertThatThrownBy(
+                () -> memberService.checkMemberName(workspacekey, channelName))
+            .isInstanceOf(IllegalArgumentException.class);
+      }
+    }
+
+    @Nested
+    @DisplayName("비어있는 channelName값을 인자로 받으면")
+    class ContextNullEmptyNameArgument {
+
+      @ParameterizedTest
+      @NullAndEmptySource
+      @ValueSource(strings = {"\t", "\n"})
+      @DisplayName("IllegalArgumentException을 던진다.")
+      void itTrowIllegalArgumentException(String channelName) {
+        //given
+        final String validWorkspaceKey = "ABC123";
+
+        //then
+        Assertions.assertThatThrownBy(
+                () -> memberService.checkMemberName(validWorkspaceKey, channelName))
+            .isInstanceOf(IllegalArgumentException.class);
+      }
+    }
+
+    @Nested
+    @DisplayName("유효한 workspacekey와 channelName값을 인자로 받으면")
+    class ContextValidArgument {
+
+      @Test
+      @DisplayName("해당 이름을 가진 사용자가 존재할 경우 false를 반환한다.")
+      void itReturnFalse() {
+        //given
+        final String validWorkspaceKey = "ABC123";
+        final String validChannelName = "hello";
+        final Optional<Member> member = Optional.of(
+            Member.builder()
+                .name("test")
+                .build()
+        );
+
+        when(repository.findByNameAndWorkspace(any(), any())).thenReturn(member);
+
+        //when
+        final boolean expected = memberService.checkMemberName(validWorkspaceKey, validChannelName);
+
+        //then
+        Assertions.assertThat(false).isEqualTo(expected);
+      }
+
+      @Test
+      @DisplayName("해당 이름을 가진 사용자가 존재하지 않을 경우 true를 반환한다.")
+      void itReturnTrue() {
+        //given
+        final String validWorkspaceKey = "ABC123";
+        final String validChannelName = "hello";
+        final Optional<Member> member = Optional.empty();
+
+        when(repository.findByNameAndWorkspace(any(), any())).thenReturn(member);
+
+        //when
+        final boolean expected = memberService.checkMemberName(validWorkspaceKey, validChannelName);
+
+        //then
+        Assertions.assertThat(true).isEqualTo(expected);
+      }
+    }
+  }
 }
