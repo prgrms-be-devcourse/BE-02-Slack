@@ -93,4 +93,8 @@ public class Member extends BaseTime {
   public static Builder builder() {
     return new Builder();
   }
+
+  public String getName() {
+    return name;
+  }
 }
