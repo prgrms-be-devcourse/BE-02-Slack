@@ -19,7 +19,8 @@ public class DefaultChannelService implements ChannelService {
 
   public DefaultChannelService(
       ChannelRepository channelRepository,
-      WorkspaceRepository workspaceRepository, IdEncoder idEncoder) {
+      WorkspaceRepository workspaceRepository,
+      IdEncoder idEncoder) {
     this.channelRepository = channelRepository;
     this.workspaceRepository = workspaceRepository;
     this.idEncoder = idEncoder;
