@@ -6,5 +6,5 @@ public interface MemberService {
 
   Member findByEmailAndWorkspaceKey(String key, String email);
 
-  boolean checkMemberName(String workspaceKey, String channelName);
+  boolean isDuplicatedMemberName(String encodedWorkspaceId, String channelName);
 }
