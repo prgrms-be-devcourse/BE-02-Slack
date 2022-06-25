@@ -160,13 +160,13 @@ class DefaultWorkspaceServiceTest {
 
       @Test
       @DisplayName("해당 값을 디코딩한 id값 을 가진 엔티티를 반환한다")
-      void ItReturnWorkspace() {
+      void ItReturnsNotFoundException() {
         //given
         given(idEncoder.decode(anyString())).willReturn(1L);
         given(workspaceRepository.findById(anyLong())).willReturn(Optional.empty());
 
         //when, then
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(NotFoundException.class,
             () -> defaultWorkspaceService.findByKey("ABC123ABC123"));
       }
     }
