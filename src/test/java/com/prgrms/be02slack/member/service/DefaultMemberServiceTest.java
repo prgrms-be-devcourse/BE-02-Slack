@@ -141,7 +141,7 @@ class DefaultMemberServiceTest {
 
         //then
         Assertions.assertThatThrownBy(
-                () -> memberService.checkMemberName(workspacekey, channelName))
+                () -> memberService.isDuplicatedMemberName(workspacekey, channelName))
             .isInstanceOf(IllegalArgumentException.class);
       }
     }
@@ -160,7 +160,7 @@ class DefaultMemberServiceTest {
 
         //then
         Assertions.assertThatThrownBy(
-                () -> memberService.checkMemberName(validWorkspaceKey, channelName))
+                () -> memberService.isDuplicatedMemberName(validWorkspaceKey, channelName))
             .isInstanceOf(IllegalArgumentException.class);
       }
     }
@@ -184,7 +184,8 @@ class DefaultMemberServiceTest {
         when(repository.findByNameAndWorkspace(any(), any())).thenReturn(member);
 
         //when
-        final boolean expected = memberService.checkMemberName(validWorkspaceKey, validChannelName);
+        final boolean expected =
+            memberService.isDuplicatedMemberName(validWorkspaceKey, validChannelName);
 
         //then
         Assertions.assertThat(false).isEqualTo(expected);
@@ -201,7 +202,8 @@ class DefaultMemberServiceTest {
         when(repository.findByNameAndWorkspace(any(), any())).thenReturn(member);
 
         //when
-        final boolean expected = memberService.checkMemberName(validWorkspaceKey, validChannelName);
+        final boolean expected =
+            memberService.isDuplicatedMemberName(validWorkspaceKey, validChannelName);
 
         //then
         Assertions.assertThat(true).isEqualTo(expected);
