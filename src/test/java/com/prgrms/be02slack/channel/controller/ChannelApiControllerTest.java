@@ -3,6 +3,7 @@ package com.prgrms.be02slack.channel.controller;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.HashMap;
@@ -100,7 +101,7 @@ class ChannelApiControllerTest {
 
         //when
         MockHttpServletRequestBuilder request = RestDocumentationRequestBuilders.post(
-                CREATE_CHANNEL_URL)
+                API_URL + "/{workspaceId}", "testWorkspaceId")
             .contentType(MediaType.APPLICATION_JSON)
             .content(requestBody);
 
@@ -110,6 +111,9 @@ class ChannelApiControllerTest {
         verify(channelService).create(anyString(), any(ChannelSaveRequest.class));
         response.andExpect(status().isOk())
             .andDo(document("Create channel",
+                pathParameters(
+                    parameterWithName("workspaceId").description("workspace id")
+                ),
                 requestFields(
                     fieldWithPath("name")
                         .type(JsonFieldType.STRING)
