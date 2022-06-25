@@ -15,15 +15,10 @@ public class ChannelSaveRequest {
   @JsonProperty("isPrivate")
   private boolean isPrivate;
 
-  @NotBlank
-  private String workspaceId;
-
-  public ChannelSaveRequest(String name, String description, boolean isPrivate,
-      String workspaceId) {
+  public ChannelSaveRequest(String name, String description, boolean isPrivate) {
     this.name = name;
     this.description = description;
     this.isPrivate = isPrivate;
-    this.workspaceId = workspaceId;
   }
 
   public String getName() {
@@ -36,9 +31,5 @@ public class ChannelSaveRequest {
 
   public boolean isPrivate() {
     return isPrivate;
-  }
-
-  public String getWorkspaceId() {
-    return workspaceId;
   }
 }

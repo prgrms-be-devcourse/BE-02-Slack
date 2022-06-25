@@ -46,7 +46,7 @@ class DefaultChannelServiceTest {
     void ItSavesChannelThenReturnsEncodedId() {
       //given
       ChannelSaveRequest channelSaveRequest = new ChannelSaveRequest("testName", "testDescription",
-          false, "testWorkspaceId");
+          false);
       Channel channel = Channel.builder()
           .name(channelSaveRequest.getName())
           .description(channelSaveRequest.getDescription())
@@ -64,7 +64,7 @@ class DefaultChannelServiceTest {
           .willReturn("encodedTestId");
 
       //when
-      String encodedChannelId = defaultChannelService.create(channelSaveRequest);
+      String encodedChannelId = defaultChannelService.create("workspaceId", channelSaveRequest);
 
       //then
       verify(idEncoder).decode(anyString());
@@ -82,7 +82,7 @@ class DefaultChannelServiceTest {
       @DisplayName("IllegalArgumentException 에러를 발생시킨다")
       void ItThrowsIllegalArgumentException() {
         assertThrows(IllegalArgumentException.class,
-            () -> defaultChannelService.create(null));
+            () -> defaultChannelService.create("workspaceId", null));
       }
     }
   }
@@ -96,7 +96,7 @@ class DefaultChannelServiceTest {
     void ItThrowsNotfoundException() {
       //given
       ChannelSaveRequest channelSaveRequest = new ChannelSaveRequest("testName", "testDescription",
-          false, "testWorkspaceId");
+          false);
 
       given(idEncoder.decode(anyString()))
           .willReturn(1L);
@@ -105,7 +105,7 @@ class DefaultChannelServiceTest {
 
       //when, then
       assertThrows(NotFoundException.class,
-          () -> defaultChannelService.create(channelSaveRequest));
+          () -> defaultChannelService.create("workspaceId", channelSaveRequest));
     }
   }
 }

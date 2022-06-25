@@ -1,5 +1,7 @@
 package com.prgrms.be02slack.channel.service;
 
+import static org.apache.logging.log4j.util.Strings.*;
+
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -31,11 +33,12 @@ public class DefaultChannelService implements ChannelService {
    * 2. 테스트 수정 필요
    */
   @Override
-  public String create(ChannelSaveRequest channelSaveRequest) {
+  public String create(String workspaceId, ChannelSaveRequest channelSaveRequest) {
+    Assert.isTrue(isNotBlank(workspaceId), "WorkspaceId must be provided");
     Assert.notNull(channelSaveRequest, "ChannelSaveRequest must be provided");
 
-    long workspaceId = idEncoder.decode(channelSaveRequest.getWorkspaceId());
-    Workspace workspace = workspaceRepository.findById(workspaceId)
+    long decodedWorkspaceId = idEncoder.decode(workspaceId);
+    Workspace workspace = workspaceRepository.findById(decodedWorkspaceId)
         .orElseThrow(() -> new NotFoundException("Workspace not found"));
 
     // 멤버 조회 로직 구현 필요

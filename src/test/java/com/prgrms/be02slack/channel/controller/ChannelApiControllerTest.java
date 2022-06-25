@@ -41,8 +41,8 @@ import com.prgrms.be02slack.channel.service.ChannelService;
 @MockBeans({@MockBean(JpaMetamodelMappingContext.class)})
 @AutoConfigureRestDocs
 class ChannelApiControllerTest {
-  private static final String API_URL = "/api/v1/channels";
-  private static final String CREATE_CHANNEL_URL = API_URL;
+  private static final String API_URL = "/api/v1/";
+  private static final String CREATE_CHANNEL_URL = API_URL + "testWorkspaceId";
 
   @Autowired
   private ObjectMapper objectMapper;
@@ -53,6 +53,17 @@ class ChannelApiControllerTest {
   @MockBean
   private ChannelService channelService;
 
+  static class WorkspaceIdSourceBlank implements ArgumentsProvider {
+    @Override
+    public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
+      return Stream.of(
+          Arguments.of(" "),
+          Arguments.of("\t"),
+          Arguments.of("\n")
+      );
+    }
+  }
+
   static class NameSourceOutOfRange implements ArgumentsProvider {
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
@@ -62,18 +73,6 @@ class ChannelApiControllerTest {
           Arguments.of("\t"),
           Arguments.of("\n"),
           Arguments.of("a".repeat(81))
-      );
-    }
-  }
-
-  static class WorkspaceBlank implements ArgumentsProvider {
-    @Override
-    public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
-      return Stream.of(
-          Arguments.of((Object)null),
-          Arguments.of(""),
-          Arguments.of("\t"),
-          Arguments.of("\n")
       );
     }
   }
@@ -89,14 +88,13 @@ class ChannelApiControllerTest {
       @DisplayName("인코딩된 id를 응답한다")
       void ItResponseOk() throws Exception {
         //given
-        given(channelService.create(any(ChannelSaveRequest.class)))
+        given(channelService.create(anyString(), any(ChannelSaveRequest.class)))
             .willReturn("testId");
 
         HashMap<String, Object> requestMap = new HashMap<>();
         requestMap.put("name", "testName");
         requestMap.put("description", "testDescription");
         requestMap.put("isPrivate", false);
-        requestMap.put("workspaceId", "workspaceId");
 
         String requestBody = objectMapper.writeValueAsString(requestMap);
 
@@ -109,7 +107,7 @@ class ChannelApiControllerTest {
         ResultActions response = mockMvc.perform(request);
 
         //then
-        verify(channelService).create(any(ChannelSaveRequest.class));
+        verify(channelService).create(anyString(), any(ChannelSaveRequest.class));
         response.andExpect(status().isOk())
             .andDo(document("Create channel",
                 requestFields(
@@ -121,12 +119,38 @@ class ChannelApiControllerTest {
                         .description("channel description"),
                     fieldWithPath("isPrivate")
                         .type(JsonFieldType.BOOLEAN)
-                        .description("whether the channel is open to the public"),
-                    fieldWithPath("workspaceId")
-                        .type(JsonFieldType.STRING)
-                        .description("workspace of channel")
+                        .description("whether the channel is open to the public")
                 )
             ));
+      }
+    }
+
+    @Nested
+    @DisplayName("workspaceId 가 빈 값 이거나 공백이라면")
+    class ContextWithWorkspaceIdBlank {
+
+      @ParameterizedTest
+      @ArgumentsSource(WorkspaceIdSourceBlank.class)
+      @DisplayName("BadRequest 를 응답한다")
+      void ItResponseBadRequest(String workspaceId) throws Exception {
+        //given
+        HashMap<Object, Object> requestMap = new HashMap<>();
+        requestMap.put("name", "testName");
+        requestMap.put("description", "testDescription");
+        requestMap.put("isPrivate", false);
+
+        String requestBody = objectMapper.writeValueAsString(requestMap);
+
+        //when
+        MockHttpServletRequestBuilder request = RestDocumentationRequestBuilders.post(
+                API_URL + workspaceId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestBody);
+
+        ResultActions response = mockMvc.perform(request);
+
+        //then
+        response.andExpect(status().isBadRequest());
       }
     }
 
@@ -143,37 +167,6 @@ class ChannelApiControllerTest {
         requestMap.put("name", name);
         requestMap.put("description", "testDescription");
         requestMap.put("isPrivate", false);
-        requestMap.put("workspaceId", "workspaceId");
-
-        String requestBody = objectMapper.writeValueAsString(requestMap);
-
-        //when
-        MockHttpServletRequestBuilder request = RestDocumentationRequestBuilders.post(
-                CREATE_CHANNEL_URL)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(requestBody);
-
-        ResultActions response = mockMvc.perform(request);
-
-        //then
-        response.andExpect(status().isBadRequest());
-      }
-    }
-
-    @Nested
-    @DisplayName("workspaceId 가 null 이거나 공백 또는 빈 값이라면")
-    class ContextWithWorkspaceIdBlank {
-
-      @ParameterizedTest
-      @ArgumentsSource(WorkspaceBlank.class)
-      @DisplayName("BadRequest 를 응답한다")
-      void ItResponseBadRequest(String workspaceId) throws Exception {
-        //given
-        HashMap<Object, Object> requestMap = new HashMap<>();
-        requestMap.put("name", "testName");
-        requestMap.put("description", "testDescription");
-        requestMap.put("isPrivate", false);
-        requestMap.put("workspaceId", workspaceId);
 
         String requestBody = objectMapper.writeValueAsString(requestMap);
 
