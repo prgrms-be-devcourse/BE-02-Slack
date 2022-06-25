@@ -36,11 +36,11 @@ public class DefaultMemberService implements MemberService {
   }
 
   @Override
-  public boolean checkMemberName(String workspaceKey, String channelName) {
-    Assert.isTrue(isNotBlank(workspaceKey), "Key must be provided");
+  public boolean checkMemberName(String key, String channelName) {
+    Assert.isTrue(isNotBlank(key), "Key must be provided");
     Assert.isTrue(isNotBlank(channelName), "channelName must be provided");
 
-    final var workspace = workspaceService.findByKey(workspaceKey);
+    final var workspace = workspaceService.findByKey(key);
 
     return memberRepository.findByNameAndWorkspace(channelName, workspace)
             .isEmpty();
