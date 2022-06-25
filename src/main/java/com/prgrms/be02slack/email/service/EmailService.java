@@ -10,10 +10,7 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
-import com.prgrms.be02slack.common.exception.NotFoundException;
-import com.prgrms.be02slack.common.exception.UnverifiedEmailException;
 import com.prgrms.be02slack.email.controller.dto.EmailRequest;
-import com.prgrms.be02slack.member.controller.dto.VerificationRequest;
 import com.prgrms.be02slack.email.repository.EmailRepository;
 
 @Service
