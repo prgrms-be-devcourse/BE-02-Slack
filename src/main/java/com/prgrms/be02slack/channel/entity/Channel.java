@@ -50,16 +50,20 @@ public class Channel extends BaseTime {
   @JoinColumn(name = "member_id")
   private Member owner;
 
+  public Long getId() {
+    return id;
+  }
+
+  public static Builder builder() {
+    return new Builder();
+  }
+
   public static class Builder {
     private String name;
     private String description;
     private boolean isPrivate;
     private Workspace workspace;
     private Member owner;
-
-    public static Builder builder() {
-      return new Builder();
-    }
 
     public Builder name(String name) {
       this.name = name;
