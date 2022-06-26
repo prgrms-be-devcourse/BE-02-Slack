@@ -59,7 +59,7 @@ public class DefaultMemberService implements MemberService {
 
   @Override
   public AuthResponse verify(VerificationRequest request) {
-    Assert.notNull(request, "request is not null");
+    Assert.notNull(request, "Request must not be null");
 
     emailService.verifyCode(request);
 
