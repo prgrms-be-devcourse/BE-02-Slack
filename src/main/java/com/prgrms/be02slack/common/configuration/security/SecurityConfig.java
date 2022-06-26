@@ -8,17 +8,10 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 
 import com.prgrms.be02slack.security.AccessDeniedHandlerImpl;
 import com.prgrms.be02slack.security.AuthenticationEntryPointImpl;
-import com.prgrms.be02slack.security.TokenProvider;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-
-  private final TokenProvider tokenProvider;
-
-  public SecurityConfig(TokenProvider tokenProvider) {
-    this.tokenProvider = tokenProvider;
-  }
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
