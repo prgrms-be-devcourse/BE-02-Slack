@@ -78,7 +78,7 @@ public class EmailService {
       throw new NotFoundException("Verification Code not found");
     }
 
-    if (foundCode != request.getVerificationCode()) {
+    if (!foundCode.equals(request.getVerificationCode())) {
       throw new UnverifiedEmailException("Incorret Vericiation Code");
     }
   }
