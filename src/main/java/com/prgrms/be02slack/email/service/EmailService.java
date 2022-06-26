@@ -10,8 +10,11 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import com.prgrms.be02slack.common.exception.NotFoundException;
+import com.prgrms.be02slack.common.exception.UnverifiedEmailException;
 import com.prgrms.be02slack.email.controller.dto.EmailRequest;
 import com.prgrms.be02slack.email.repository.EmailRepository;
+import com.prgrms.be02slack.member.controller.dto.VerificationRequest;
 
 @Service
 public class EmailService {
@@ -66,5 +69,17 @@ public class EmailService {
       }
     }
     return code.toString();
+  }
+
+  public void verifyCode(VerificationRequest request) {
+    String foundCode = emailRepository.findCodeByEmail(request.getEmail());
+
+    if (foundCode == null) {
+      throw new NotFoundException("Verification Code not found");
+    }
+
+    if (foundCode != request.getVerificationCode()) {
+      throw new UnverifiedEmailException("Incorret Vericiation Code");
+    }
   }
 }

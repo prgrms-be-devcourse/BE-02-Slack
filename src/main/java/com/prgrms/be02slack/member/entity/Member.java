@@ -52,6 +52,10 @@ public class Member extends BaseTime {
     this.workspace = builder.workspace;
   }
 
+  public String getEmail() {
+    return email;
+  }
+
   public static class Builder {
 
     private String email;

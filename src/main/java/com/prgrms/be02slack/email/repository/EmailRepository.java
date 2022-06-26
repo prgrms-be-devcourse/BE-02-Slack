@@ -12,4 +12,8 @@ public class EmailRepository {
   public void saveCode(String email, String code) {
     map.put(email, code);
   }
+
+  public String findCodeByEmail(String email) {
+    return map.get(email);
+  }
 }
