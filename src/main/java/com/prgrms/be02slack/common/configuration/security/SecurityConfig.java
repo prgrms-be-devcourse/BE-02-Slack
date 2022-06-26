@@ -1,5 +1,6 @@
 package com.prgrms.be02slack.common.configuration.security;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -32,14 +33,24 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
           .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
           .and()
         .exceptionHandling()
-          .accessDeniedHandler(new AccessDeniedHandlerImpl())
+          .accessDeniedHandler(accessDeniedHandlerImpl())
           .and()
         .exceptionHandling()
-          .authenticationEntryPoint(new AuthenticationEntryPointImpl())
+          .authenticationEntryPoint(authenticationEntryPointImpl())
           .and()
         .authorizeRequests()
           .anyRequest().permitAll()
           .and();
+  }
+
+  @Bean
+  public AccessDeniedHandlerImpl accessDeniedHandlerImpl() {
+    return new AccessDeniedHandlerImpl();
+  }
+
+  @Bean
+  public AuthenticationEntryPointImpl authenticationEntryPointImpl() {
+    return new AuthenticationEntryPointImpl();
   }
 }
 
