@@ -4,8 +4,6 @@ public class AuthResponse {
   private String token;
   private String tokenType = "Bearer";
 
-  protected AuthResponse() {}
-
   public AuthResponse(String token) {
     this.token = token;
   }
