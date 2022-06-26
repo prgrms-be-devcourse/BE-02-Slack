@@ -1,5 +1,6 @@
 package com.prgrms.be02slack.member.service;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
@@ -19,9 +20,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import com.prgrms.be02slack.common.exception.NotFoundException;
+import com.prgrms.be02slack.email.service.EmailService;
+import com.prgrms.be02slack.member.controller.dto.VerificationRequest;
+import com.prgrms.be02slack.common.dto.AuthResponse;
 import com.prgrms.be02slack.member.entity.Member;
 import com.prgrms.be02slack.member.entity.Role;
 import com.prgrms.be02slack.member.repository.MemberRepository;
+import com.prgrms.be02slack.security.TokenProvider;
 import com.prgrms.be02slack.workspace.entity.Workspace;
 import com.prgrms.be02slack.workspace.service.WorkspaceService;
 
@@ -33,6 +38,12 @@ class DefaultMemberServiceTest {
 
   @Mock
   WorkspaceService workspaceService;
+
+  @Mock
+  EmailService emailService;
+
+  @Mock
+  TokenProvider tokenProvider;
 
   @InjectMocks
   DefaultMemberService memberService;
@@ -188,7 +199,7 @@ class DefaultMemberServiceTest {
             memberService.isDuplicatedMemberName(validWorkspaceKey, validChannelName);
 
         //then
-        Assertions.assertThat(false).isEqualTo(expected);
+        assertThat(false).isEqualTo(expected);
       }
 
       @Test
@@ -206,7 +217,95 @@ class DefaultMemberServiceTest {
             memberService.isDuplicatedMemberName(validWorkspaceKey, validChannelName);
 
         //then
-        Assertions.assertThat(true).isEqualTo(expected);
+        assertThat(true).isEqualTo(expected);
+      }
+    }
+  }
+
+  @Nested
+  @DisplayName("verify 메서드는")
+  class DescribeVerify {
+
+    @Nested
+    @DisplayName("인자에 null 값이 전달되면")
+    class ContextWithVerificationRequestNull {
+
+      @Test
+      @DisplayName("IllegalArgumentException 에러를 발생시킨다.")
+      void ItResponseIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class,
+            () -> memberService.verify(null));
+      }
+    }
+
+    @Nested
+    @DisplayName("해당 이메일이 속한 워크스페이스가 없을 경우")
+    class ContextWithNotIncludedAnyWorkspace {
+
+      @Test
+      @DisplayName("멤버를 생성하고 토큰을 발급한다")
+      void ItResponseCreateMemberAndIssueToken() {
+        //given
+        final VerificationRequest verificationRequest =
+            new VerificationRequest("test@test.com", "test");
+        final Workspace workspace = Workspace.createDefaultWorkspace();
+        final Member member = Member.builder()
+            .email("test@test.com")
+            .name("test")
+            .displayName("test")
+            .role(Role.OWNER)
+            .workspace(workspace)
+            .build();
+        final AuthResponse verificationResponse =
+            new AuthResponse("testToken");
+
+        doNothing().when(emailService).verifyCode(verificationRequest);
+        given(repository.findByEmail(anyString())).willReturn(Optional.empty());
+        given(workspaceService.create()).willReturn(workspace);
+        given(repository.save(any(Member.class))).willReturn(member);
+        given(tokenProvider.createToken(anyString())).willReturn("testToken");
+
+        //when
+        AuthResponse response = memberService.verify(verificationRequest);
+
+        //then
+        verify(workspaceService).create();
+        verify(repository).save(any(Member.class));
+        verify(tokenProvider).createToken(anyString());
+        assertThat(response).usingRecursiveComparison().isEqualTo(verificationResponse);
+      }
+    }
+
+    @Nested
+    @DisplayName("해당 이메일이 속한 워크스페이스가 있을 경우")
+    class ContextWithIncludedAnyWorkspace {
+
+      @Test
+      @DisplayName("토큰을 발급한다")
+      void ItResponseIssueToken() {
+        //given
+        final VerificationRequest verificationRequest =
+            new VerificationRequest("test@test.com", "test");
+        final Workspace workspace = Workspace.createDefaultWorkspace();
+        final Member member = Member.builder()
+            .email("test@test.com")
+            .name("test")
+            .displayName("test")
+            .role(Role.OWNER)
+            .workspace(workspace)
+            .build();
+        final AuthResponse verificationResponse = new AuthResponse("testToken");
+
+        doNothing().when(emailService).verifyCode(verificationRequest);
+        given(repository.findByEmail(anyString())).willReturn(Optional.of(member));
+        given(tokenProvider.createToken(anyString())).willReturn("testToken");
+
+        //when
+        AuthResponse response = memberService.verify(verificationRequest);
+
+        //then
+        verify(tokenProvider).createToken(anyString());
+        assertThat(response).usingRecursiveComparison().isEqualTo(verificationResponse);
       }
     }
   }
