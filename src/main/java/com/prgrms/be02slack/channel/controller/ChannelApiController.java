@@ -15,7 +15,7 @@ import com.prgrms.be02slack.channel.service.ChannelService;
 
 @Validated
 @RestController
-@RequestMapping("api/v1/{workspaceId}")
+@RequestMapping("api/v1/workspaces/{workspaceId}/channels")
 public class ChannelApiController {
   private final ChannelService channelService;
 

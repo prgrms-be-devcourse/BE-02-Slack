@@ -43,7 +43,7 @@ import com.prgrms.be02slack.channel.service.ChannelService;
 @AutoConfigureRestDocs
 class ChannelApiControllerTest {
   private static final String API_URL = "/api/v1/";
-  private static final String CREATE_CHANNEL_URL = API_URL + "testWorkspaceId";
+  private static final String CREATE_CHANNEL_URL = API_URL + "workspaces/testWorkspaceId/channels";
 
   @Autowired
   private ObjectMapper objectMapper;
@@ -101,7 +101,7 @@ class ChannelApiControllerTest {
 
         //when
         MockHttpServletRequestBuilder request = RestDocumentationRequestBuilders.post(
-                API_URL + "/{workspaceId}", "testWorkspaceId")
+                API_URL + "workspaces/{workspaceId}/channels", "testWorkspaceId")
             .contentType(MediaType.APPLICATION_JSON)
             .content(requestBody);
 
@@ -147,7 +147,7 @@ class ChannelApiControllerTest {
 
         //when
         MockHttpServletRequestBuilder request = RestDocumentationRequestBuilders.post(
-                API_URL + workspaceId)
+                API_URL + "workspaces/" + workspaceId + "/channels")
             .contentType(MediaType.APPLICATION_JSON)
             .content(requestBody);
 
