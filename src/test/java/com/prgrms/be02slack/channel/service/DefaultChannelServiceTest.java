@@ -22,6 +22,7 @@ import com.prgrms.be02slack.channel.controller.dto.ChannelSaveRequest;
 import com.prgrms.be02slack.channel.entity.Channel;
 import com.prgrms.be02slack.channel.repository.ChannelRepository;
 import com.prgrms.be02slack.common.dto.ApiResponse;
+import com.prgrms.be02slack.common.exception.NotFoundException;
 import com.prgrms.be02slack.common.util.IdEncoder;
 import com.prgrms.be02slack.member.service.DefaultMemberService;
 import com.prgrms.be02slack.workspace.entity.Workspace;
@@ -104,6 +105,29 @@ class DefaultChannelServiceTest {
       void ItThrowsIllegalArgumentException(String workspaceId) {
         assertThrows(IllegalArgumentException.class,
             () -> defaultChannelService.verifyName(workspaceId, "testName"));
+      }
+    }
+
+    @Nested
+    @DisplayName("WorkspaceId에 해당하는 workspace 가 존재하지 않는 경우")
+    class ContextWithNotExistWorkspace {
+
+      @Test
+      @DisplayName("NotFoundException 에러를 발생시킨다")
+      void ItThrowsNotfoundException() {
+        //given
+        ChannelSaveRequest channelSaveRequest = new ChannelSaveRequest("testName",
+            "testDescription",
+            false);
+
+        given(idEncoder.decode(anyString()))
+            .willReturn(1L);
+        given(workspaceRepository.findById(anyLong()))
+            .willReturn(Optional.empty());
+
+        //when, then
+        assertThrows(NotFoundException.class,
+            () -> defaultChannelService.create("workspaceId", channelSaveRequest));
       }
     }
   }
