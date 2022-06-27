@@ -271,7 +271,7 @@ class DefaultMemberServiceTest {
         //then
         verify(workspaceService).create();
         verify(repository).save(any(Member.class));
-        verify(tokenProvider).createToken(anyString());
+        verify(tokenProvider).createLoginToken(anyString());
         assertThat(response).usingRecursiveComparison().isEqualTo(verificationResponse);
       }
     }
@@ -304,7 +304,7 @@ class DefaultMemberServiceTest {
         AuthResponse response = memberService.verify(verificationRequest);
 
         //then
-        verify(tokenProvider).createToken(anyString());
+        verify(tokenProvider).createLoginToken(anyString());
         assertThat(response).usingRecursiveComparison().isEqualTo(verificationResponse);
       }
     }
