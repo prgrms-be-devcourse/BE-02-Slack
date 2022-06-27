@@ -40,4 +40,24 @@ public class TokenProviderTest {
     assertThat(claims.getSubject()).isEqualTo(email);
     assertThat(claims.get("type")).isEqualTo("Login");
   }
+
+  @Test
+  void createMemberTokenTest() {
+    //given
+    final String email = "test@test.com";
+    final String encodedWorkspaceId = "TEST002";
+    given(jwtConfig.getTokenSecret()).willReturn("testTokenSecretKey");
+    given(jwtConfig.getTokenExpirationMsec()).willReturn(1000000L);
+
+    //when, then
+    String createdToken = tokenProvider.createMemberToken(email, encodedWorkspaceId);
+    Claims claims = Jwts.parser()
+        .setSigningKey(jwtConfig.getTokenSecret())
+        .parseClaimsJws(createdToken)
+        .getBody();
+
+    assertThat(claims.getSubject()).isEqualTo(email);
+    assertThat(claims.get("type")).isEqualTo("Member");
+    assertThat(claims.get("encodedWorkspaceId")).isEqualTo("TEST002");
+  }
 }
