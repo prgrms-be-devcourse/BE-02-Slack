@@ -4,7 +4,6 @@ spring:
     username: root
     password: root1234!
     driver-class-name: com.mysql.cj.jdbc.Driver
-
   jpa:
     database: mysql
     open-in-view: false
@@ -14,6 +13,13 @@ spring:
     properties:
       hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
       hibernate.format_sql: true
+  thymeleaf:
+    prefix: classpath:templates/
+    suffix: .html
+    mode: HTML5
+    cache: false
+    encoding: UTF-8
+    template-resolver-order: 1
 jwt:
   tokenSecret: EENY5W0eegTf1naQB2eDeyCLl5kRS2b8xa5c4qLdS0hmVjtbvo8tOyhPMcAmtPuQ
   tokenExpirationMsec: 1800
