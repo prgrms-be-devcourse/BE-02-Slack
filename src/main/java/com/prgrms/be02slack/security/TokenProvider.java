@@ -2,7 +2,10 @@ package com.prgrms.be02slack.security;
 
 import java.util.Date;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.prgrms.be02slack.common.configuration.security.JwtConfig;
 
@@ -23,11 +26,13 @@ public class TokenProvider {
     this.jwtConfig = jwtConfig;
   }
 
-  public String createToken(String email) {
+  public String createLoginToken(String email) {
+    Claims claims = Jwts.claims().setSubject(email);
+    claims.put("type", "Login");
     Date now = new Date();
 
     return Jwts.builder()
-        .setSubject(email)
+        .setClaims(claims)
         .setIssuedAt(new Date())
         .setExpiration(new Date(now.getTime() + jwtConfig.getTokenExpirationMsec()))
         .signWith(SignatureAlgorithm.HS512, jwtConfig.getTokenSecret())
@@ -55,6 +60,30 @@ public class TokenProvider {
         .getBody();
 
     return claims.getSubject();
+  }
+
+  public String getTypeFromToken(String token) {
+    return Jwts.parser()
+        .setSigningKey(jwtConfig.getTokenSecret())
+        .parseClaimsJws(token)
+        .getBody()
+        .get("type").toString();
+  }
+
+  public String getEncodedWorkspaceIdFromToken(String token) {
+    return Jwts.parser()
+        .setSigningKey(jwtConfig.getTokenSecret())
+        .parseClaimsJws(token)
+        .getBody()
+        .get("encodedWorkspaceId").toString();
+  }
+
+  public String resolveToken(HttpServletRequest request) {
+    String bearerToken = request.getHeader("Authorization");
+    if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+      return bearerToken.substring(7);
+    }
+    return null;
   }
 
   public boolean validateToken(String authToken) {
