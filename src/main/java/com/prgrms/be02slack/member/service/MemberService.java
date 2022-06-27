@@ -8,7 +8,7 @@ import com.prgrms.be02slack.common.dto.AuthResponse;
 public interface MemberService {
   Member findByEmailAndWorkspaceKey(String key, String email);
 
-  boolean isDuplicatedMemberName(String encodedWorkspaceId, String channelName);
+  boolean isDuplicatedWithOtherMemberName(String encodedWorkspaceId, String channelName);
 
   AuthResponse verify(VerificationRequest request);
 }

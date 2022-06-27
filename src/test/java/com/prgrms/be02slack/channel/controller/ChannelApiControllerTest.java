@@ -1,5 +1,6 @@
 package com.prgrms.be02slack.channel.controller;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
@@ -28,12 +29,14 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.prgrms.be02slack.channel.controller.dto.ChannelSaveRequest;
 import com.prgrms.be02slack.channel.service.ChannelService;
+import com.prgrms.be02slack.common.dto.ApiResponse;
 
 @WebMvcTest(
     controllers = ChannelApiController.class,
@@ -42,8 +45,7 @@ import com.prgrms.be02slack.channel.service.ChannelService;
 @MockBeans({@MockBean(JpaMetamodelMappingContext.class)})
 @AutoConfigureRestDocs
 class ChannelApiControllerTest {
-  private static final String API_URL = "/api/v1/";
-  private static final String CREATE_CHANNEL_URL = API_URL + "workspaces/testWorkspaceId/channels";
+  private static final String API_URL = "/api/v1/workspaces/";
 
   @Autowired
   private ObjectMapper objectMapper;
@@ -101,7 +103,7 @@ class ChannelApiControllerTest {
 
         //when
         MockHttpServletRequestBuilder request = RestDocumentationRequestBuilders.post(
-                API_URL + "workspaces/{workspaceId}/channels", "testWorkspaceId")
+                API_URL + "{workspaceId}/channels", "testWorkspaceId")
             .contentType(MediaType.APPLICATION_JSON)
             .content(requestBody);
 
@@ -147,7 +149,7 @@ class ChannelApiControllerTest {
 
         //when
         MockHttpServletRequestBuilder request = RestDocumentationRequestBuilders.post(
-                API_URL + "workspaces/" + workspaceId + "/channels")
+                API_URL + "{workspaceId}/channels", workspaceId)
             .contentType(MediaType.APPLICATION_JSON)
             .content(requestBody);
 
@@ -176,7 +178,7 @@ class ChannelApiControllerTest {
 
         //when
         MockHttpServletRequestBuilder request = RestDocumentationRequestBuilders.post(
-                CREATE_CHANNEL_URL)
+                API_URL + "{workspaceId}/channels", "testWorkspaceId")
             .contentType(MediaType.APPLICATION_JSON)
             .content(requestBody);
 
@@ -184,6 +186,139 @@ class ChannelApiControllerTest {
 
         //then
         response.andExpect(status().isBadRequest());
+      }
+    }
+  }
+
+  @Nested
+  @DisplayName("verifyName 메서드는")
+  class DescribeVerifyName {
+
+    @Nested
+    @DisplayName("유효한 값이 전달되면")
+    class ContextWithValidData {
+      @Test
+      @DisplayName("성공 ApiResponse 를 응답한다")
+      void ItResponseSuccessApiResponse() throws Exception {
+        //given
+        given(channelService.verifyName(anyString(), anyString()))
+            .willReturn(ApiResponse.success());
+
+        MockHttpServletRequestBuilder request = RestDocumentationRequestBuilders.get(
+                API_URL + "{workspaceId}/channels/exists", "testWorkspaceId")
+            .param("name", "testName");
+
+        ResultActions response = mockMvc.perform(request);
+
+        //then
+        verify(channelService).verifyName(anyString(), anyString());
+        response.andExpect(status().isOk())
+            .andDo(document("Verify channel name",
+                pathParameters(
+                    parameterWithName("workspaceId").description("workspace id")
+                ),
+                requestParameters(
+                    parameterWithName("name").description("channel name")
+                )
+            ));
+      }
+    }
+
+    @Nested
+    @DisplayName("workspaceId 가 빈 값 이거나 공백이라면")
+    class ContextWithWorkspaceIdBlank {
+
+      @ParameterizedTest
+      @ArgumentsSource(WorkspaceIdSourceBlank.class)
+      @DisplayName("BadRequest 를 응답한다")
+      void ItResponseBadRequest(String workspaceId) throws Exception {
+        //given
+        //when
+        MockHttpServletRequestBuilder request = RestDocumentationRequestBuilders.get(
+                API_URL + "{workspaceId}/channels/exists", workspaceId)
+            .param("name", "testName");
+
+        ResultActions response = mockMvc.perform(request);
+
+        //then
+        response.andExpect(status().isBadRequest());
+      }
+    }
+
+    @Nested
+    @DisplayName("name 의 길이가 범위를 벗어나면")
+    class ContextWithNameOutOfRange {
+
+      @ParameterizedTest
+      @ArgumentsSource(NameSourceOutOfRange.class)
+      @DisplayName("BadRequest 를 응답한다")
+      void ItResponseBadRequest(String name) throws Exception {
+        //given
+        //when
+        MockHttpServletRequestBuilder request = RestDocumentationRequestBuilders.get(
+                API_URL + "{workspaceId}/channels/exists", "testWorkspaceId")
+            .param("name", name);
+
+        ResultActions response = mockMvc.perform(request);
+
+        //then
+        response.andExpect(status().isBadRequest());
+      }
+    }
+
+    @Nested
+    @DisplayName("name 이 같은 워크스페이스내에 다른 채널의 이름과 같다면")
+    class ContextWithNameIsDuplicatedWithTheNameOfAnotherChannelInTheSameWorkspace {
+      @Test
+      @DisplayName("실패 ApiResponse 를 응답한다")
+      void ItResponseFailApiResponse() throws Exception {
+        //given
+        ApiResponse expectedResponse = ApiResponse.fail(
+            "Name is duplicated with the name of another channel in the same workspace");
+        given(channelService.verifyName(anyString(), anyString()))
+            .willReturn(expectedResponse);
+
+        //when
+        MockHttpServletRequestBuilder request = RestDocumentationRequestBuilders.get(
+                API_URL + "{workspaceId}/channels/exists", "testWorkspaceId")
+            .param("name", "testName");
+
+        MvcResult mvcResult = mockMvc.perform(request)
+            .andReturn();
+
+        //then
+        ApiResponse response = objectMapper.readValue(
+            mvcResult.getResponse().getContentAsString(), ApiResponse.class);
+        assertThat(response.getResult()).isEqualTo(expectedResponse.getResult());
+        assertThat(response.getMessage()).isEqualTo(expectedResponse.getMessage());
+      }
+    }
+
+    @Nested
+    @DisplayName("name 이 같은 워크스페이스내에 다른 멤버의 이름과 같다면")
+    class ContextWithNameIsDuplicatedWithTheNameOfAnotherMemberInTheSameWorkspace {
+      @Test
+      @DisplayName("실패 ApiResponse 를 응답한다")
+      void ItResponseFailApiResponse() throws Exception {
+        //given
+        ApiResponse expectedResponse = ApiResponse.fail(
+            "Name is duplicated with the name of another member in the same workspace");
+        given(channelService.verifyName(anyString(), anyString()))
+            .willReturn(expectedResponse);
+
+        //when
+        MockHttpServletRequestBuilder request = RestDocumentationRequestBuilders.get(
+                API_URL + "{workspaceId}/channels/exists", "testWorkspaceId")
+            .param("name", "testName");
+
+        MvcResult mvcResult = mockMvc.perform(request)
+            .andReturn();
+
+        //then
+        ApiResponse response = objectMapper.readValue(
+            mvcResult.getResponse().getContentAsString(), ApiResponse.class);
+        assertThat(response.getResult()).isEqualTo(expectedResponse.getResult());
+        assertThat(response.getMessage()).isEqualTo(expectedResponse.getMessage());
       }
     }
   }
