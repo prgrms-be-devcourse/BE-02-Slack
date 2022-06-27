@@ -1,5 +1,6 @@
 package com.prgrms.be02slack.member.entity;
 
 public enum Role {
-  OWNER, USER
+  ROLE_OWNER,
+  ROLE_USER
 }
