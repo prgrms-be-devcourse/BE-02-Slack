@@ -47,7 +47,7 @@ public class DefaultMemberService implements MemberService {
   }
 
   @Override
-  public boolean isDuplicatedWithOtherMemberName(Long decodedWorkspaceId, String channelName) {
+  public boolean isDuplicateMemberName(Long decodedWorkspaceId, String channelName) {
     Assert.notNull(decodedWorkspaceId, "decodedWorkspaceId must be provided");
     Assert.isTrue(isNotBlank(channelName), "channelName must be provided");
 

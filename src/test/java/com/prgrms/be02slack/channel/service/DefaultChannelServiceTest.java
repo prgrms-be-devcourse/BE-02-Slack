@@ -65,7 +65,7 @@ class DefaultChannelServiceTest {
           .willReturn(Optional.of(Workspace.createDefaultWorkspace()));
       given(channelRepository.existsByWorkspace_IdAndName(anyLong(), anyString()))
           .willReturn(false);
-      given(defaultMemberService.isDuplicatedWithOtherMemberName(anyLong(), anyString()))
+      given(defaultMemberService.isDuplicateMemberName(anyLong(), anyString()))
           .willReturn(false);
       given(channelRepository.save(any(Channel.class)))
           .willReturn(channel);
@@ -120,7 +120,7 @@ class DefaultChannelServiceTest {
 
   @Nested
   @DisplayName("name 이 다른 채널 이름과 중복이라면")
-  class ContextWithNameIsDuplicatedWithNameOfAnotherChannel {
+  class ContextWithNameIsDuplicateWithNameOfAnotherChannel {
 
     @Test
     @DisplayName("NameDuplicateException 에러를 발생시킨다")
@@ -144,7 +144,7 @@ class DefaultChannelServiceTest {
 
   @Nested
   @DisplayName("name 이 다른 멤버 이름과 중복이라면")
-  class ContextWithNameIsDuplicatedWithNameOfAnotherMember {
+  class ContextWithNameIsDuplicateWithNameOfAnotherMember {
 
     @Test
     @DisplayName("NameDuplicateException 에러를 발생시킨다")
@@ -159,7 +159,7 @@ class DefaultChannelServiceTest {
           .willReturn(Optional.of(Workspace.createDefaultWorkspace()));
       given(channelRepository.existsByWorkspace_IdAndName(anyLong(), anyString()))
           .willReturn(false);
-      given(defaultMemberService.isDuplicatedWithOtherMemberName(anyLong(), anyString()))
+      given(defaultMemberService.isDuplicateMemberName(anyLong(), anyString()))
           .willReturn(true);
 
       //when, then
