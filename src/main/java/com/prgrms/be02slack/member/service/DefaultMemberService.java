@@ -51,7 +51,7 @@ public class DefaultMemberService implements MemberService {
     Assert.notNull(decodedWorkspaceId, "decodedWorkspaceId must be provided");
     Assert.isTrue(isNotBlank(channelName), "channelName must be provided");
 
-    return memberRepository.findByNameAndWorkspaceId(channelName, decodedWorkspaceId).isEmpty();
+    return memberRepository.findByNameAndWorkspace_Id(channelName, decodedWorkspaceId).isEmpty();
   }
 
   @Override

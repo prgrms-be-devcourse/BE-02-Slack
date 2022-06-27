@@ -74,6 +74,6 @@ public class DefaultChannelService implements ChannelService {
   }
 
   private boolean isDuplicatedWithOtherChannelName(Long decodedWorkspaceId, String name) {
-    return channelRepository.existsByWorkspaceIdAndName(decodedWorkspaceId, name);
+    return channelRepository.existsByWorkspace_IdAndName(decodedWorkspaceId, name);
   }
 }

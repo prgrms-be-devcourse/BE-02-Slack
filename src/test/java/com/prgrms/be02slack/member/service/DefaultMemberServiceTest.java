@@ -190,7 +190,7 @@ class DefaultMemberServiceTest {
                 .build()
         );
 
-        when(repository.findByNameAndWorkspaceId(any(), any())).thenReturn(member);
+        when(repository.findByNameAndWorkspace_Id(any(), any())).thenReturn(member);
 
         //when
         final boolean expected =
@@ -208,7 +208,7 @@ class DefaultMemberServiceTest {
         final String validChannelName = "hello";
         final Optional<Member> member = Optional.empty();
 
-        when(repository.findByNameAndWorkspaceId(any(), any())).thenReturn(member);
+        when(repository.findByNameAndWorkspace_Id(any(), any())).thenReturn(member);
 
         //when
         final boolean expected =

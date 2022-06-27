@@ -63,7 +63,7 @@ class DefaultChannelServiceTest {
           .willReturn(1L);
       given(workspaceRepository.findById(anyLong()))
           .willReturn(Optional.of(Workspace.createDefaultWorkspace()));
-      given(channelRepository.existsByWorkspaceIdAndName(anyLong(), anyString()))
+      given(channelRepository.existsByWorkspace_IdAndName(anyLong(), anyString()))
           .willReturn(false);
       given(defaultMemberService.isDuplicatedWithOtherMemberName(anyLong(), anyString()))
           .willReturn(false);
@@ -133,7 +133,7 @@ class DefaultChannelServiceTest {
           .willReturn(1L);
       given(workspaceRepository.findById(anyLong()))
           .willReturn(Optional.of(Workspace.createDefaultWorkspace()));
-      given(channelRepository.existsByWorkspaceIdAndName(anyLong(), anyString()))
+      given(channelRepository.existsByWorkspace_IdAndName(anyLong(), anyString()))
           .willReturn(true);
 
       //when, then
@@ -157,7 +157,7 @@ class DefaultChannelServiceTest {
           .willReturn(1L);
       given(workspaceRepository.findById(anyLong()))
           .willReturn(Optional.of(Workspace.createDefaultWorkspace()));
-      given(channelRepository.existsByWorkspaceIdAndName(anyLong(), anyString()))
+      given(channelRepository.existsByWorkspace_IdAndName(anyLong(), anyString()))
           .willReturn(false);
       given(defaultMemberService.isDuplicatedWithOtherMemberName(anyLong(), anyString()))
           .willReturn(true);
