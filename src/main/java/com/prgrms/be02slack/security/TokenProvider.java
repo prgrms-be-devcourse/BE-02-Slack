@@ -34,6 +34,20 @@ public class TokenProvider {
         .compact();
   }
 
+  public String createMemberToken(String email, String encodedWorkspaceId) {
+    Claims claims = Jwts.claims().setSubject(email);
+    claims.put("type", "Member");
+    claims.put("encodedWorkspaceId", encodedWorkspaceId);
+    Date now = new Date();
+
+    return Jwts.builder()
+        .setClaims(claims)
+        .setIssuedAt(new Date())
+        .setExpiration(new Date(now.getTime() + jwtConfig.getTokenExpirationMsec()))
+        .signWith(SignatureAlgorithm.HS512, jwtConfig.getTokenSecret())
+        .compact();
+  }
+
   public String getEmailFromToken(String token) {
     Claims claims = Jwts.parser()
         .setSigningKey(jwtConfig.getTokenSecret())
