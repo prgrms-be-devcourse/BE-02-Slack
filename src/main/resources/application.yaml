@@ -22,4 +22,4 @@ spring:
     template-resolver-order: 1
 jwt:
   tokenSecret: EENY5W0eegTf1naQB2eDeyCLl5kRS2b8xa5c4qLdS0hmVjtbvo8tOyhPMcAmtPuQ
-  tokenExpirationMsec: 1800
+  tokenExpirationMsec: 1800000

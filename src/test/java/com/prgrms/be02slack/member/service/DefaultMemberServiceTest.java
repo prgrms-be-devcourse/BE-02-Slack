@@ -67,7 +67,7 @@ class DefaultMemberServiceTest {
         when(workspaceService.findByKey(key)).thenReturn(findWorkspace);
         when(repository.findByEmailAndWorkspace(email, findWorkspace)).thenReturn(Optional.empty());
 
-        Assertions.assertThatThrownBy(() -> memberService.findByEmailAndWorkspaceKey(key, email))
+        Assertions.assertThatThrownBy(() -> memberService.findByEmailAndWorkspaceKey(email, key))
             .isInstanceOf(NotFoundException.class);
       }
     }
@@ -82,7 +82,7 @@ class DefaultMemberServiceTest {
       @DisplayName("IllegalArgumentException 을 반환한다.")
       void ItThrowIllegalArgumentException(String key) {
         final String email = "test@test.com";
-        Assertions.assertThatThrownBy(() -> memberService.findByEmailAndWorkspaceKey(key, email))
+        Assertions.assertThatThrownBy(() -> memberService.findByEmailAndWorkspaceKey(email, key))
             .isInstanceOf(IllegalArgumentException.class);
       }
     }
@@ -97,7 +97,7 @@ class DefaultMemberServiceTest {
       @DisplayName("IllegalArgumentException 을 반환한다.")
       void ItThrowIllegalArgumentException(String email) {
         final String key = "AAAADB24";
-        Assertions.assertThatThrownBy(() -> memberService.findByEmailAndWorkspaceKey(key, email))
+        Assertions.assertThatThrownBy(() -> memberService.findByEmailAndWorkspaceKey(email, key))
             .isInstanceOf(IllegalArgumentException.class);
       }
     }
@@ -117,7 +117,7 @@ class DefaultMemberServiceTest {
             .workspace(findWorkspace)
             .email(savedEmail)
             .displayName("test")
-            .role(Role.USER)
+            .role(Role.ROLE_USER)
             .build();
 
         given(workspaceService.findByKey(anyString())).willReturn(findWorkspace);
@@ -125,7 +125,7 @@ class DefaultMemberServiceTest {
             .willReturn(Optional.of(savedMember));
 
         //when
-        final var foundMember = memberService.findByEmailAndWorkspaceKey("test", savedEmail);
+        final var foundMember = memberService.findByEmailAndWorkspaceKey(savedEmail, "test");
 
         //then
         final var foundMemberEmail = ReflectionTestUtils.getField(foundMember, "email");
@@ -253,7 +253,7 @@ class DefaultMemberServiceTest {
             .email("test@test.com")
             .name("test")
             .displayName("test")
-            .role(Role.OWNER)
+            .role(Role.ROLE_OWNER)
             .workspace(workspace)
             .build();
         final AuthResponse verificationResponse =
@@ -263,7 +263,7 @@ class DefaultMemberServiceTest {
         given(repository.findByEmail(anyString())).willReturn(Optional.empty());
         given(workspaceService.create()).willReturn(workspace);
         given(repository.save(any(Member.class))).willReturn(member);
-        given(tokenProvider.createToken(anyString())).willReturn("testToken");
+        given(tokenProvider.createLoginToken(anyString())).willReturn("testToken");
 
         //when
         AuthResponse response = memberService.verify(verificationRequest);
@@ -271,7 +271,7 @@ class DefaultMemberServiceTest {
         //then
         verify(workspaceService).create();
         verify(repository).save(any(Member.class));
-        verify(tokenProvider).createToken(anyString());
+        verify(tokenProvider).createLoginToken(anyString());
         assertThat(response).usingRecursiveComparison().isEqualTo(verificationResponse);
       }
     }
@@ -291,20 +291,20 @@ class DefaultMemberServiceTest {
             .email("test@test.com")
             .name("test")
             .displayName("test")
-            .role(Role.OWNER)
+            .role(Role.ROLE_OWNER)
             .workspace(workspace)
             .build();
         final AuthResponse verificationResponse = new AuthResponse("testToken");
 
         doNothing().when(emailService).verifyCode(verificationRequest);
         given(repository.findByEmail(anyString())).willReturn(Optional.of(member));
-        given(tokenProvider.createToken(anyString())).willReturn("testToken");
+        given(tokenProvider.createLoginToken(anyString())).willReturn("testToken");
 
         //when
         AuthResponse response = memberService.verify(verificationRequest);
 
         //then
-        verify(tokenProvider).createToken(anyString());
+        verify(tokenProvider).createLoginToken(anyString());
         assertThat(response).usingRecursiveComparison().isEqualTo(verificationResponse);
       }
     }
