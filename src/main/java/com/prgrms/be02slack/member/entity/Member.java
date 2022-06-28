@@ -1,5 +1,11 @@
 package com.prgrms.be02slack.member.entity;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -9,10 +15,12 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import com.prgrms.be02slack.subscribeInfo.entity.SubscribeInfo;
 import com.prgrms.be02slack.common.entity.BaseTime;
 import com.prgrms.be02slack.workspace.entity.Workspace;
 
@@ -41,6 +49,9 @@ public class Member extends BaseTime {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "workspace_id")
   private Workspace workspace;
+
+  @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  private Set<SubscribeInfo> subscribeInfos = new HashSet<>();
 
   protected Member() {}
 
