@@ -9,11 +9,11 @@ import com.prgrms.be02slack.member.entity.Member;
 import com.prgrms.be02slack.member.service.MemberService;
 
 @Service
-public class CustomUserDetailsService implements UserDetailsService {
+public class DefaultUserDetailsService implements UserDetailsService {
 
   private final MemberService memberService;
 
-  public CustomUserDetailsService(MemberService memberService) {
+  public DefaultUserDetailsService(MemberService memberService) {
     this.memberService = memberService;
   }
 
