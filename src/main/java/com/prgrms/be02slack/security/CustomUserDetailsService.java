@@ -5,7 +5,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.prgrms.be02slack.common.util.IdEncoder;
 import com.prgrms.be02slack.member.entity.Member;
 import com.prgrms.be02slack.member.service.MemberService;
 
@@ -13,11 +12,9 @@ import com.prgrms.be02slack.member.service.MemberService;
 public class CustomUserDetailsService implements UserDetailsService {
 
   private final MemberService memberService;
-  private final IdEncoder idEncoder;
 
-  public CustomUserDetailsService(MemberService memberService, IdEncoder idEncoder) {
+  public CustomUserDetailsService(MemberService memberService) {
     this.memberService = memberService;
-    this.idEncoder = idEncoder;
   }
 
   @Override
