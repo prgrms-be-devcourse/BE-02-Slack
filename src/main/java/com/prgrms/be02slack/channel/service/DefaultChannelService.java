@@ -11,7 +11,7 @@ import com.prgrms.be02slack.channel.exception.NameDuplicateException;
 import com.prgrms.be02slack.channel.repository.ChannelRepository;
 import com.prgrms.be02slack.common.exception.NotFoundException;
 import com.prgrms.be02slack.common.util.IdEncoder;
-import com.prgrms.be02slack.member.service.DefaultMemberService;
+import com.prgrms.be02slack.member.service.MemberService;
 import com.prgrms.be02slack.workspace.entity.Workspace;
 import com.prgrms.be02slack.workspace.repository.WorkspaceRepository;
 
@@ -19,17 +19,14 @@ import com.prgrms.be02slack.workspace.repository.WorkspaceRepository;
 public class DefaultChannelService implements ChannelService {
   private final ChannelRepository channelRepository;
   private final WorkspaceRepository workspaceRepository;
-  private final DefaultMemberService defaultMemberService;
+  private final MemberService memberService;
   private final IdEncoder idEncoder;
 
-  public DefaultChannelService(
-      ChannelRepository channelRepository,
-      WorkspaceRepository workspaceRepository,
-      DefaultMemberService defaultMemberService,
-      IdEncoder idEncoder) {
+  public DefaultChannelService(ChannelRepository channelRepository,
+      WorkspaceRepository workspaceRepository, MemberService memberService, IdEncoder idEncoder) {
     this.channelRepository = channelRepository;
     this.workspaceRepository = workspaceRepository;
-    this.defaultMemberService = defaultMemberService;
+    this.memberService = memberService;
     this.idEncoder = idEncoder;
   }
 
@@ -67,7 +64,7 @@ public class DefaultChannelService implements ChannelService {
       throw new NameDuplicateException(
           "Name is duplicate with the name of another channel in the same workspace");
     }
-    if (defaultMemberService.isDuplicateMemberName(decodedWorkspaceId, name)) {
+    if (memberService.isDuplicateMemberName(decodedWorkspaceId, name)) {
       throw new NameDuplicateException(
           "Name is duplicate with the name of another member in the same workspace");
     }
