@@ -47,14 +47,11 @@ public class DefaultMemberService implements MemberService {
   }
 
   @Override
-  public boolean isDuplicatedMemberName(String encodedWorkspaceId, String channelName) {
-    Assert.isTrue(isNotBlank(encodedWorkspaceId), "id must be provided");
+  public boolean isDuplicateName(Long decodedWorkspaceId, String channelName) {
+    Assert.notNull(decodedWorkspaceId, "decodedWorkspaceId must be provided");
     Assert.isTrue(isNotBlank(channelName), "channelName must be provided");
 
-    final var workspace = workspaceService.findByKey(encodedWorkspaceId);
-
-    return memberRepository.findByNameAndWorkspace(channelName, workspace)
-            .isEmpty();
+    return memberRepository.findByNameAndWorkspace_Id(channelName, decodedWorkspaceId).isEmpty();
   }
 
   @Override

@@ -139,52 +139,50 @@ class DefaultMemberServiceTest {
   class DescribeCheckMemberName {
 
     @Nested
-    @DisplayName("비어있는 key값을 인자로 받으면")
-    class ContextNullEmptyKeyArgument {
+    @DisplayName("id 값이 null 이라면")
+    class ContextNullIdArgument {
 
-      @ParameterizedTest
-      @NullAndEmptySource
-      @ValueSource(strings = {"\t", "\n"})
-      @DisplayName("IllegalArgumentException을 던진다.")
-      void itTrowIllegalArgumentException(String workspacekey) {
+      @Test
+      @DisplayName("IllegalArgumentException 을 던진다.")
+      void itTrowIllegalArgumentException() {
         //given
         final String channelName = "ABC123";
 
         //then
         Assertions.assertThatThrownBy(
-                () -> memberService.isDuplicatedMemberName(workspacekey, channelName))
+                () -> memberService.isDuplicateName(null, channelName))
             .isInstanceOf(IllegalArgumentException.class);
       }
     }
 
     @Nested
-    @DisplayName("비어있는 channelName값을 인자로 받으면")
+    @DisplayName("비어있는 channelName 값을 인자로 받으면")
     class ContextNullEmptyNameArgument {
 
       @ParameterizedTest
       @NullAndEmptySource
       @ValueSource(strings = {"\t", "\n"})
-      @DisplayName("IllegalArgumentException을 던진다.")
+      @DisplayName("IllegalArgumentException 을 던진다.")
       void itTrowIllegalArgumentException(String channelName) {
         //given
-        final String validWorkspaceKey = "ABC123";
+        final Long validWorkspaceId = 123L;
 
         //then
         Assertions.assertThatThrownBy(
-                () -> memberService.isDuplicatedMemberName(validWorkspaceKey, channelName))
+                () -> memberService.isDuplicateName(validWorkspaceId, channelName))
             .isInstanceOf(IllegalArgumentException.class);
       }
     }
 
     @Nested
-    @DisplayName("유효한 workspacekey와 channelName값을 인자로 받으면")
+    @DisplayName("유효한 workspaceId 와 channelName 값을 인자로 받으면")
     class ContextValidArgument {
 
       @Test
-      @DisplayName("해당 이름을 가진 사용자가 존재할 경우 false를 반환한다.")
+      @DisplayName("해당 이름을 가진 사용자가 존재할 경우 false 를 반환한다.")
       void itReturnFalse() {
         //given
-        final String validWorkspaceKey = "ABC123";
+        final Long validWorkspaceId = 123L;
         final String validChannelName = "hello";
         final Optional<Member> member = Optional.of(
             Member.builder()
@@ -192,29 +190,29 @@ class DefaultMemberServiceTest {
                 .build()
         );
 
-        when(repository.findByNameAndWorkspace(any(), any())).thenReturn(member);
+        when(repository.findByNameAndWorkspace_Id(any(), any())).thenReturn(member);
 
         //when
         final boolean expected =
-            memberService.isDuplicatedMemberName(validWorkspaceKey, validChannelName);
+            memberService.isDuplicateName(validWorkspaceId, validChannelName);
 
         //then
         assertThat(false).isEqualTo(expected);
       }
 
       @Test
-      @DisplayName("해당 이름을 가진 사용자가 존재하지 않을 경우 true를 반환한다.")
+      @DisplayName("해당 이름을 가진 사용자가 존재하지 않을 경우 true 를 반환한다.")
       void itReturnTrue() {
         //given
-        final String validWorkspaceKey = "ABC123";
+        final Long validWorkspaceId = 123L;
         final String validChannelName = "hello";
         final Optional<Member> member = Optional.empty();
 
-        when(repository.findByNameAndWorkspace(any(), any())).thenReturn(member);
+        when(repository.findByNameAndWorkspace_Id(any(), any())).thenReturn(member);
 
         //when
         final boolean expected =
-            memberService.isDuplicatedMemberName(validWorkspaceKey, validChannelName);
+            memberService.isDuplicateName(validWorkspaceId, validChannelName);
 
         //then
         assertThat(true).isEqualTo(expected);

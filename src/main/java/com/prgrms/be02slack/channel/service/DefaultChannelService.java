@@ -7,9 +7,11 @@ import org.springframework.util.Assert;
 
 import com.prgrms.be02slack.channel.controller.dto.ChannelSaveRequest;
 import com.prgrms.be02slack.channel.entity.Channel;
+import com.prgrms.be02slack.channel.exception.NameDuplicateException;
 import com.prgrms.be02slack.channel.repository.ChannelRepository;
 import com.prgrms.be02slack.common.exception.NotFoundException;
 import com.prgrms.be02slack.common.util.IdEncoder;
+import com.prgrms.be02slack.member.service.MemberService;
 import com.prgrms.be02slack.workspace.entity.Workspace;
 import com.prgrms.be02slack.workspace.repository.WorkspaceRepository;
 
@@ -17,14 +19,14 @@ import com.prgrms.be02slack.workspace.repository.WorkspaceRepository;
 public class DefaultChannelService implements ChannelService {
   private final ChannelRepository channelRepository;
   private final WorkspaceRepository workspaceRepository;
+  private final MemberService memberService;
   private final IdEncoder idEncoder;
 
-  public DefaultChannelService(
-      ChannelRepository channelRepository,
-      WorkspaceRepository workspaceRepository,
-      IdEncoder idEncoder) {
+  public DefaultChannelService(ChannelRepository channelRepository,
+      WorkspaceRepository workspaceRepository, MemberService memberService, IdEncoder idEncoder) {
     this.channelRepository = channelRepository;
     this.workspaceRepository = workspaceRepository;
+    this.memberService = memberService;
     this.idEncoder = idEncoder;
   }
 
@@ -41,6 +43,8 @@ public class DefaultChannelService implements ChannelService {
     Workspace workspace = workspaceRepository.findById(decodedWorkspaceId)
         .orElseThrow(() -> new NotFoundException("Workspace not found"));
 
+    validateName(decodedWorkspaceId, channelSaveRequest.getName());
+
     // 멤버 조회 로직 구현 필요
 
     Channel channel = Channel.builder()
@@ -54,4 +58,20 @@ public class DefaultChannelService implements ChannelService {
 
     return idEncoder.encode(savedChannel.getId());
   }
+
+  private void validateName(long decodedWorkspaceId, String name) {
+    if (isDuplicateName(decodedWorkspaceId, name)) {
+      throw new NameDuplicateException(
+          "Name is duplicate with the name of another channel in the same workspace");
+    }
+    if (memberService.isDuplicateName(decodedWorkspaceId, name)) {
+      throw new NameDuplicateException(
+          "Name is duplicate with the name of another member in the same workspace");
+    }
+  }
+
+  private boolean isDuplicateName(Long decodedWorkspaceId, String name) {
+    return channelRepository.existsByWorkspace_IdAndName(decodedWorkspaceId, name);
+  }
 }
+
