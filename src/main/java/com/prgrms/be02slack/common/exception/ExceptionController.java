@@ -18,53 +18,55 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 public class ExceptionController {
 
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+  @Order(1)
   @ExceptionHandler(MethodArgumentNotValidException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
-  @Order(1)
+
   public void handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
     logger.warn("MethodArgumentNotValidException : ", e);
   }
 
+  @Order(2)
   @ExceptionHandler(MethodArgumentTypeMismatchException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
-  @Order(2)
   public void handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
     logger.warn("MethodArgumentTypeMismatchException : ", e);
   }
 
+  @Order(3)
   @ExceptionHandler(HttpMessageNotReadableException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
-  @Order(3)
   public void handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
     logger.warn("HttpMessageNotReadableException : ", e);
   }
 
+  @Order(4)
   @ExceptionHandler(value = {
       ConstraintViolationException.class,
       MissingPathVariableException.class})
   @ResponseStatus(HttpStatus.BAD_REQUEST)
-  @Order(4)
   public void handleConstraintViolationException(Exception e) {
     logger.warn("PathVariable is blank : ", e);
   }
 
+  @Order(5)
   @ExceptionHandler(NotFoundException.class)
   @ResponseStatus(HttpStatus.NOT_FOUND)
-  @Order(5)
   public void handleNotFoundException(NotFoundException e) {
     logger.warn("NotFoundException : ", e);
   }
 
+  @Order(6)
   @ExceptionHandler(RuntimeException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
-  @Order(6)
   public void handleRuntimeException(RuntimeException e) {
     logger.error("RuntimeException : ", e);
   }
 
+  @Order(7)
   @ExceptionHandler(Exception.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
-  @Order(7)
   public void handleException(Exception e) {
     logger.error("Exception :", e);
   }
