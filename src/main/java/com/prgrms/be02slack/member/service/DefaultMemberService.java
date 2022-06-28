@@ -36,7 +36,7 @@ public class DefaultMemberService implements MemberService {
   }
 
   @Override
-  public Member findByEmailAndWorkspaceKey(String encodedWorkspaceId, String email) {
+  public Member findByEmailAndWorkspaceKey(String email, String encodedWorkspaceId) {
     Assert.isTrue(isNotBlank(encodedWorkspaceId), "id must be provided");
     Assert.isTrue(isNotBlank(email), "email must be provided");
 
@@ -66,7 +66,7 @@ public class DefaultMemberService implements MemberService {
     final String email = request.getEmail();
     final Member member = memberRepository.findByEmail(email).orElseGet(() -> createMember(email));
 
-    return new AuthResponse(tokenProvider.createToken(member.getEmail()));
+    return new AuthResponse(tokenProvider.createLoginToken(member.getEmail()));
   }
 
   private Member createMember(String email) {
@@ -78,7 +78,7 @@ public class DefaultMemberService implements MemberService {
         .email(email)
         .name(defaultName)
         .displayName(defaultName)
-        .role(Role.OWNER)
+        .role(Role.ROLE_OWNER)
         .workspace(workspace)
         .build();
 
