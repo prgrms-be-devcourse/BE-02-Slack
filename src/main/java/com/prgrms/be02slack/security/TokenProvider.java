@@ -28,7 +28,7 @@ public class TokenProvider {
 
   public String createLoginToken(String email) {
     Claims claims = Jwts.claims().setSubject(email);
-    claims.put("type", "Login");
+    claims.put("type", TokenType.Login.name());
     Date now = new Date();
 
     return Jwts.builder()
@@ -41,7 +41,7 @@ public class TokenProvider {
 
   public String createMemberToken(String email, String encodedWorkspaceId) {
     Claims claims = Jwts.claims().setSubject(email);
-    claims.put("type", "Member");
+    claims.put("type", TokenType.Member.name());
     claims.put("encodedWorkspaceId", encodedWorkspaceId);
     Date now = new Date();
 
