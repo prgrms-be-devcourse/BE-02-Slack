@@ -150,7 +150,7 @@ class DefaultMemberServiceTest {
 
         //then
         Assertions.assertThatThrownBy(
-                () -> memberService.isDuplicateMemberName(null, channelName))
+                () -> memberService.isDuplicateName(null, channelName))
             .isInstanceOf(IllegalArgumentException.class);
       }
     }
@@ -169,7 +169,7 @@ class DefaultMemberServiceTest {
 
         //then
         Assertions.assertThatThrownBy(
-                () -> memberService.isDuplicateMemberName(validWorkspaceId, channelName))
+                () -> memberService.isDuplicateName(validWorkspaceId, channelName))
             .isInstanceOf(IllegalArgumentException.class);
       }
     }
@@ -194,7 +194,7 @@ class DefaultMemberServiceTest {
 
         //when
         final boolean expected =
-            memberService.isDuplicateMemberName(validWorkspaceId, validChannelName);
+            memberService.isDuplicateName(validWorkspaceId, validChannelName);
 
         //then
         assertThat(false).isEqualTo(expected);
@@ -212,7 +212,7 @@ class DefaultMemberServiceTest {
 
         //when
         final boolean expected =
-            memberService.isDuplicateMemberName(validWorkspaceId, validChannelName);
+            memberService.isDuplicateName(validWorkspaceId, validChannelName);
 
         //then
         assertThat(true).isEqualTo(expected);

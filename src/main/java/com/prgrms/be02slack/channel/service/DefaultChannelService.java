@@ -60,17 +60,18 @@ public class DefaultChannelService implements ChannelService {
   }
 
   private void validateName(long decodedWorkspaceId, String name) {
-    if (isDuplicateChannelName(decodedWorkspaceId, name)) {
+    if (isDuplicateName(decodedWorkspaceId, name)) {
       throw new NameDuplicateException(
           "Name is duplicate with the name of another channel in the same workspace");
     }
-    if (memberService.isDuplicateMemberName(decodedWorkspaceId, name)) {
+    if (memberService.isDuplicateName(decodedWorkspaceId, name)) {
       throw new NameDuplicateException(
           "Name is duplicate with the name of another member in the same workspace");
     }
   }
 
-  private boolean isDuplicateChannelName(Long decodedWorkspaceId, String name) {
+  private boolean isDuplicateName(Long decodedWorkspaceId, String name) {
     return channelRepository.existsByWorkspace_IdAndName(decodedWorkspaceId, name);
   }
 }
+
