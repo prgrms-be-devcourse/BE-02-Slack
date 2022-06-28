@@ -2,6 +2,7 @@ package com.prgrms.be02slack.common.configuration.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -11,7 +12,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.prgrms.be02slack.security.AccessDeniedHandlerImpl;
 import com.prgrms.be02slack.security.AuthenticationEntryPointImpl;
-import com.prgrms.be02slack.security.CustomUserDetailsService;
+import com.prgrms.be02slack.security.DefaultUserDetailsService;
 import com.prgrms.be02slack.security.TokenAuthenticationFilter;
 import com.prgrms.be02slack.security.TokenProvider;
 
@@ -20,9 +21,9 @@ import com.prgrms.be02slack.security.TokenProvider;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
   private final TokenProvider tokenProvider;
-  private final CustomUserDetailsService customUserDetailsService;
+  private final DefaultUserDetailsService customUserDetailsService;
 
-  public SecurityConfig(TokenProvider tokenProvider, CustomUserDetailsService customUserDetailsService) {
+  public SecurityConfig(TokenProvider tokenProvider, DefaultUserDetailsService customUserDetailsService) {
     this.tokenProvider = tokenProvider;
     this.customUserDetailsService = customUserDetailsService;
   }
@@ -77,4 +78,3 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     authenticationManagerBuilder.userDetailsService(customUserDetailsService);
   }
 }
-

@@ -16,16 +16,15 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.prgrms.be02slack.member.entity.Role;
+
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
-  private final String TOKEN_LOGIN_TYPE = "Login";
-  private final String ROLE_GUEST = "ROLE_GUEST";
-
   private final TokenProvider tokenProvider;
-  private final CustomUserDetailsService customUserDetailsService;
+  private final DefaultUserDetailsService customUserDetailsService;
 
   public TokenAuthenticationFilter(TokenProvider tokenProvider,
-      CustomUserDetailsService customUserDetailsService) {
+      DefaultUserDetailsService customUserDetailsService) {
     this.tokenProvider = tokenProvider;
     this.customUserDetailsService = customUserDetailsService;
   }
@@ -40,11 +39,11 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
       final String email = tokenProvider.getEmailFromToken(token);
       final String tokenType = tokenProvider.getTypeFromToken(token);
 
-      if (tokenType.equals(TOKEN_LOGIN_TYPE)) {
+      if (tokenType.equals(TokenType.Login.name())) {
         authentication = new UsernamePasswordAuthenticationToken(
             email,
             null,
-            Collections.singletonList(new SimpleGrantedAuthority(ROLE_GUEST))
+            Collections.singletonList(new SimpleGrantedAuthority(Role.ROLE_GUEST.name()))
         );
       } else {
         String tokenPayloadStr = email + " " + tokenType;
