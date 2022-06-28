@@ -72,9 +72,4 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
   public TokenAuthenticationFilter tokenAuthenticationFilter() {
     return new TokenAuthenticationFilter(tokenProvider, customUserDetailsService);
   }
-
-  @Override
-  public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
-    authenticationManagerBuilder.userDetailsService(customUserDetailsService);
-  }
 }
