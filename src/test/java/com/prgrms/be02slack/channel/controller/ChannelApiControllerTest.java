@@ -35,6 +35,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.prgrms.be02slack.channel.controller.dto.ChannelSaveRequest;
+import com.prgrms.be02slack.channel.exception.NameDuplicateException;
 import com.prgrms.be02slack.channel.service.ChannelService;
 import com.prgrms.be02slack.common.configuration.security.SecurityConfig;
 
@@ -190,6 +191,37 @@ class ChannelApiControllerTest {
 
         //then
         response.andExpect(status().isBadRequest());
+      }
+    }
+
+    @Nested
+    @DisplayName("name 이 멤버 이름 또는 다른 채널 이름과 중복이라면")
+    class ContextWithNameIsDuplicated {
+
+      @Test
+      @DisplayName("Conflict 를 응답한다")
+      void ItResponseConflict() throws Exception {
+        //given
+        HashMap<Object, Object> requestMap = new HashMap<>();
+        requestMap.put("name", "testName");
+        requestMap.put("description", "testDescription");
+        requestMap.put("isPrivate", false);
+
+        String requestBody = objectMapper.writeValueAsString(requestMap);
+
+        given(channelService.create(anyString(), any(ChannelSaveRequest.class)))
+            .willThrow(new NameDuplicateException());
+
+        //when
+        MockHttpServletRequestBuilder request = RestDocumentationRequestBuilders.post(
+                CREATE_CHANNEL_URL)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestBody);
+
+        ResultActions response = mockMvc.perform(request);
+
+        //then
+        response.andExpect(status().isConflict());
       }
     }
   }
