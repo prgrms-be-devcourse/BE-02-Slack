@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import com.prgrms.be02slack.channel.exception.NameDuplicateException;
+
 @ControllerAdvice
 public class ExceptionController {
 
@@ -68,5 +70,10 @@ public class ExceptionController {
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public void handleException(Exception e) {
     logger.error("Exception :", e);
+  }
+
+  @ExceptionHandler(value = NameDuplicateException.class)
+  @ResponseStatus(HttpStatus.CONFLICT)
+  public void handleNameDuplicateException(Exception e) {
   }
 }

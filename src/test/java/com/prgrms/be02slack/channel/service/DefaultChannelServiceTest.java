@@ -17,9 +17,11 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import com.prgrms.be02slack.channel.controller.dto.ChannelSaveRequest;
 import com.prgrms.be02slack.channel.entity.Channel;
+import com.prgrms.be02slack.channel.exception.NameDuplicateException;
 import com.prgrms.be02slack.channel.repository.ChannelRepository;
 import com.prgrms.be02slack.common.exception.NotFoundException;
 import com.prgrms.be02slack.common.util.IdEncoder;
+import com.prgrms.be02slack.member.service.DefaultMemberService;
 import com.prgrms.be02slack.workspace.entity.Workspace;
 import com.prgrms.be02slack.workspace.repository.WorkspaceRepository;
 
@@ -33,6 +35,9 @@ class DefaultChannelServiceTest {
 
   @Mock
   private ChannelRepository channelRepository;
+
+  @Mock
+  private DefaultMemberService defaultMemberService;
 
   @InjectMocks
   private DefaultChannelService defaultChannelService;
@@ -58,6 +63,10 @@ class DefaultChannelServiceTest {
           .willReturn(1L);
       given(workspaceRepository.findById(anyLong()))
           .willReturn(Optional.of(Workspace.createDefaultWorkspace()));
+      given(channelRepository.existsByWorkspace_IdAndName(anyLong(), anyString()))
+          .willReturn(false);
+      given(defaultMemberService.isDuplicateName(anyLong(), anyString()))
+          .willReturn(false);
       given(channelRepository.save(any(Channel.class)))
           .willReturn(channel);
       given(idEncoder.encode(anyLong()))
@@ -105,6 +114,56 @@ class DefaultChannelServiceTest {
 
       //when, then
       assertThrows(NotFoundException.class,
+          () -> defaultChannelService.create("workspaceId", channelSaveRequest));
+    }
+  }
+
+  @Nested
+  @DisplayName("name 이 다른 채널 이름과 중복이라면")
+  class ContextWithNameIsDuplicateWithNameOfAnotherChannel {
+
+    @Test
+    @DisplayName("NameDuplicateException 에러를 발생시킨다")
+    void ItThrowsNameDuplicateException() {
+      //given
+      ChannelSaveRequest channelSaveRequest = new ChannelSaveRequest("testName", "testDescription",
+          false);
+
+      given(idEncoder.decode(anyString()))
+          .willReturn(1L);
+      given(workspaceRepository.findById(anyLong()))
+          .willReturn(Optional.of(Workspace.createDefaultWorkspace()));
+      given(channelRepository.existsByWorkspace_IdAndName(anyLong(), anyString()))
+          .willReturn(true);
+
+      //when, then
+      assertThrows(NameDuplicateException.class,
+          () -> defaultChannelService.create("workspaceId", channelSaveRequest));
+    }
+  }
+
+  @Nested
+  @DisplayName("name 이 다른 멤버 이름과 중복이라면")
+  class ContextWithNameIsDuplicateWithNameOfAnotherMember {
+
+    @Test
+    @DisplayName("NameDuplicateException 에러를 발생시킨다")
+    void ItThrowsNameDuplicateException() {
+      //given
+      ChannelSaveRequest channelSaveRequest = new ChannelSaveRequest("testName", "testDescription",
+          false);
+
+      given(idEncoder.decode(anyString()))
+          .willReturn(1L);
+      given(workspaceRepository.findById(anyLong()))
+          .willReturn(Optional.of(Workspace.createDefaultWorkspace()));
+      given(channelRepository.existsByWorkspace_IdAndName(anyLong(), anyString()))
+          .willReturn(false);
+      given(defaultMemberService.isDuplicateName(anyLong(), anyString()))
+          .willReturn(true);
+
+      //when, then
+      assertThrows(NameDuplicateException.class,
           () -> defaultChannelService.create("workspaceId", channelSaveRequest));
     }
   }

@@ -1,9 +1,14 @@
 package com.prgrms.be02slack.channel.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.prgrms.be02slack.common.entity.BaseTime;
 import com.prgrms.be02slack.member.entity.Member;
+import com.prgrms.be02slack.subscribeInfo.entity.SubscribeInfo;
 import com.prgrms.be02slack.workspace.entity.Workspace;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -12,6 +17,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -49,6 +55,9 @@ public class Channel extends BaseTime {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "member_id")
   private Member owner;
+
+  @OneToMany(mappedBy = "channel", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  private List<SubscribeInfo> subscribeInfos = new ArrayList<>();
 
   public Long getId() {
     return id;
