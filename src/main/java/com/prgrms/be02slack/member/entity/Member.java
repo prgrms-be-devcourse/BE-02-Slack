@@ -69,8 +69,8 @@ public class Member extends BaseTime {
     return role.name();
   }
 
-  public List<SubscribeInfo> getSubscribeInfos() {
-    return subscribeInfos;
+  public void addSubscribeInfo(SubscribeInfo subscribeInfo) {
+    subscribeInfos.add(subscribeInfo);
   }
 
   public static class Builder {

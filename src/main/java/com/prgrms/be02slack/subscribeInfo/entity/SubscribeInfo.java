@@ -43,14 +43,8 @@ public class SubscribeInfo {
     Assert.notNull(member, "Member must be provided");
 
     final var subscribeInfo = new SubscribeInfo(channel, member);
-
-    subscribeInfo.getChannel()
-        .getSubscribeInfos()
-        .add(subscribeInfo);
-
-    subscribeInfo.getMember()
-        .getSubscribeInfos()
-        .add(subscribeInfo);
+    channel.addSubscribeInfo(subscribeInfo);
+    member.addSubscribeInfo(subscribeInfo);
 
     return subscribeInfo;
   }
