@@ -69,6 +69,10 @@ public class Member extends BaseTime {
     return role.name();
   }
 
+  public List<SubscribeInfo> getSubscribeInfos() {
+    return subscribeInfos;
+  }
+
   public static class Builder {
 
     private String email;
