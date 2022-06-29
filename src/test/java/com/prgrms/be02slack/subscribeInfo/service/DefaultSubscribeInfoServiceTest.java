@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+import java.util.List;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -11,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import com.prgrms.be02slack.channel.entity.Channel;
 import com.prgrms.be02slack.member.entity.Member;
@@ -115,8 +118,16 @@ class DefaultSubscribeInfoServiceTest {
         subscribeInfoService.subscribe(channel, member);
 
         //then
-        assertEquals(channel.getSubscribeInfos().size(), 1);
-        assertEquals(member.getSubscribeInfos().size(), 1);
+        final var channelSubscribeInfos =
+            (List<SubscribeInfo>) ReflectionTestUtils.getField(channel, "subscribeInfos");
+        final var memberSubscribeInfos =
+            (List<SubscribeInfo>) ReflectionTestUtils.getField(member, "subscribeInfos");
+
+        assert channelSubscribeInfos != null;
+        assert memberSubscribeInfos != null;
+
+        assertEquals(channelSubscribeInfos.size(), 1);
+        assertEquals(memberSubscribeInfos.size(), 1);
         verify(subscribeInfoRepository).save(any(SubscribeInfo.class));
       }
     }
