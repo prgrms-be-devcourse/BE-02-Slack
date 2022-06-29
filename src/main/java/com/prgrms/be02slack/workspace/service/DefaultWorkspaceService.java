@@ -2,6 +2,8 @@ package com.prgrms.be02slack.workspace.service;
 
 import static org.apache.logging.log4j.util.Strings.*;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -18,12 +20,11 @@ public class DefaultWorkspaceService implements WorkspaceService {
   private final IdEncoder idEncoder;
   private final WorkspaceRepository workspaceRepository;
 
-  public DefaultWorkspaceService(
-      IdEncoder idEncoder,
-      WorkspaceRepository workspaceRepository
-  ) {
+  public DefaultWorkspaceService(IdEncoder idEncoder,
+                                 WorkspaceRepository workspaceRepository) {
     this.idEncoder = idEncoder;
     this.workspaceRepository = workspaceRepository;
+    ;
   }
 
   @Override
@@ -43,7 +44,8 @@ public class DefaultWorkspaceService implements WorkspaceService {
     final var id = idEncoder.decode(key);
 
     final var saved = workspaceRepository.findById(id)
-        .orElseThrow(() -> new NotFoundException("Workspace not found"));
+                                         .orElseThrow(
+                                             () -> new NotFoundException("Workspace not found"));
 
     saved.update(updateWorkspace);
   }
@@ -55,6 +57,15 @@ public class DefaultWorkspaceService implements WorkspaceService {
     final var id = idEncoder.decode(key);
 
     return workspaceRepository.findById(id)
-        .orElseThrow(() -> new NotFoundException("Workspace not found"));
+                              .orElseThrow(() -> new NotFoundException("Workspace not found"));
+  }
+
+  @Override
+  public List<Workspace> findAllByMemberEmail(String memberEmail) {
+    final var foundWorkspaces = this.workspaceRepository.findAllByMemberEmail(memberEmail);
+
+    Assert.notEmpty(foundWorkspaces, "email with no matching member");
+
+    return foundWorkspaces;
   }
 }
