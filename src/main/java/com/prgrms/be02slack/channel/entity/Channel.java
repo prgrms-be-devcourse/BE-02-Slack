@@ -1,7 +1,7 @@
 package com.prgrms.be02slack.channel.entity;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.prgrms.be02slack.common.entity.BaseTime;
 import com.prgrms.be02slack.member.entity.Member;
@@ -57,7 +57,7 @@ public class Channel extends BaseTime {
   private Member owner;
 
   @OneToMany(mappedBy = "channel", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-  private Set<SubscribeInfo> subscribeInfos = new HashSet<>();
+  private List<SubscribeInfo> subscribeInfos = new ArrayList<>();
 
   public Long getId() {
     return id;

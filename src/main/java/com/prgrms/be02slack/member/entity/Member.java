@@ -1,9 +1,7 @@
 package com.prgrms.be02slack.member.entity;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -51,7 +49,7 @@ public class Member extends BaseTime {
   private Workspace workspace;
 
   @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-  private Set<SubscribeInfo> subscribeInfos = new HashSet<>();
+  private List<SubscribeInfo> subscribeInfos = new ArrayList<>();
 
   protected Member() {}
 
