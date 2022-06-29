@@ -19,25 +19,28 @@ public class ExceptionController {
 
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+  @Order(1)
   @ExceptionHandler(MethodArgumentNotValidException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
-
   public void handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
     logger.warn("MethodArgumentNotValidException : ", e);
   }
 
+  @Order(2)
   @ExceptionHandler(MethodArgumentTypeMismatchException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public void handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
     logger.warn("MethodArgumentTypeMismatchException : ", e);
   }
 
+  @Order(3)
   @ExceptionHandler(HttpMessageNotReadableException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public void handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
     logger.warn("HttpMessageNotReadableException : ", e);
   }
 
+  @Order(4)
   @ExceptionHandler(value = {
       ConstraintViolationException.class,
       MissingPathVariableException.class})
@@ -46,18 +49,21 @@ public class ExceptionController {
     logger.warn("PathVariable is blank : ", e);
   }
 
+  @Order(5)
   @ExceptionHandler(NotFoundException.class)
   @ResponseStatus(HttpStatus.NOT_FOUND)
   public void handleNotFoundException(NotFoundException e) {
     logger.warn("NotFoundException : ", e);
   }
 
+  @Order(6)
   @ExceptionHandler(RuntimeException.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public void handleRuntimeException(RuntimeException e) {
     logger.error("RuntimeException : ", e);
   }
 
+  @Order(7)
   @ExceptionHandler(Exception.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public void handleException(Exception e) {
