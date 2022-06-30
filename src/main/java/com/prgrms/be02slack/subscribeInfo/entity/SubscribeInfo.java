@@ -8,6 +8,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import org.springframework.util.Assert;
+
 import com.prgrms.be02slack.channel.entity.Channel;
 import com.prgrms.be02slack.member.entity.Member;
 
@@ -25,4 +27,33 @@ public class SubscribeInfo {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "member_id")
   private Member member;
+
+  protected SubscribeInfo() {/*no-op*/}
+
+  private SubscribeInfo(Channel channel, Member member) {
+    Assert.notNull(channel, "Channel must be provided");
+    Assert.notNull(member, "Member must be provided");
+
+    this.channel = channel;
+    this.member = member;
+  }
+
+  public static SubscribeInfo subscribe(Channel channel, Member member) {
+    Assert.notNull(channel, "Channel must be provided");
+    Assert.notNull(member, "Member must be provided");
+
+    final var subscribeInfo = new SubscribeInfo(channel, member);
+    channel.addSubscribeInfo(subscribeInfo);
+    member.addSubscribeInfo(subscribeInfo);
+
+    return subscribeInfo;
+  }
+
+  public Channel getChannel() {
+    return channel;
+  }
+
+  public Member getMember() {
+    return member;
+  }
 }

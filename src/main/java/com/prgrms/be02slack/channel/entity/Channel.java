@@ -63,6 +63,10 @@ public class Channel extends BaseTime {
     return id;
   }
 
+  public void addSubscribeInfo(SubscribeInfo subscribeInfo) {
+    subscribeInfos.add(subscribeInfo);
+  }
+
   public static Builder builder() {
     return new Builder();
   }
