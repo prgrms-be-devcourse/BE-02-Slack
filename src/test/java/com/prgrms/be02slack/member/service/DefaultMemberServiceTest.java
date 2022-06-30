@@ -116,7 +116,6 @@ class DefaultMemberServiceTest {
         final var savedMember = Member.builder().name("test")
             .workspace(findWorkspace)
             .email(savedEmail)
-            .displayName("test")
             .role(Role.ROLE_USER)
             .build();
 
@@ -250,7 +249,6 @@ class DefaultMemberServiceTest {
         final Member member = Member.builder()
             .email("test@test.com")
             .name("test")
-            .displayName("test")
             .role(Role.ROLE_OWNER)
             .workspace(workspace)
             .build();
@@ -288,7 +286,6 @@ class DefaultMemberServiceTest {
         final Member member = Member.builder()
             .email("test@test.com")
             .name("test")
-            .displayName("test")
             .role(Role.ROLE_OWNER)
             .workspace(workspace)
             .build();

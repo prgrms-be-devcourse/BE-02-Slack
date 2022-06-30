@@ -74,7 +74,6 @@ public class DefaultMemberService implements MemberService {
     final Member member = Member.builder()
         .email(email)
         .name(defaultName)
-        .displayName(defaultName)
         .role(Role.ROLE_OWNER)
         .workspace(workspace)
         .build();
