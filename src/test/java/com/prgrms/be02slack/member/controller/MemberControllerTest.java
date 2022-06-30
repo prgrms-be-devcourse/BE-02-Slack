@@ -178,7 +178,7 @@ public class MemberControllerTest extends ControllerSetUp {
   @WithMockCustomLoginUser
   class DescribeEnterWorkspace {
 
-    private static final String ENTER_URI = "/enter/{encodedWorkspaceId}";
+    private static final String ENTER_URI = "/api/v1/workspaces/{encodedWorkspaceId}/enter";
 
     @Nested
     @DisplayName("유효한 값이 전달되면")
@@ -193,8 +193,7 @@ public class MemberControllerTest extends ControllerSetUp {
 
         //when
         final MockHttpServletRequestBuilder request =
-            RestDocumentationRequestBuilders.post(
-                    API_URL + ENTER_URI, encodedWorkspaceId)
+            RestDocumentationRequestBuilders.post(ENTER_URI, encodedWorkspaceId)
                 .contentType(MediaType.APPLICATION_JSON);
 
         final ResultActions response = mockMvc.perform(request);
