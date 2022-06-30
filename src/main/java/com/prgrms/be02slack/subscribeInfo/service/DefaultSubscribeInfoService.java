@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import com.prgrms.be02slack.channel.entity.Channel;
+import com.prgrms.be02slack.common.exception.NotFoundException;
 import com.prgrms.be02slack.member.entity.Member;
 import com.prgrms.be02slack.subscribeInfo.entity.SubscribeInfo;
 import com.prgrms.be02slack.subscribeInfo.repository.SubscribeInfoRepository;
@@ -13,6 +14,7 @@ import com.prgrms.be02slack.subscribeInfo.repository.SubscribeInfoRepository;
 @Transactional
 public class DefaultSubscribeInfoService implements SubscribeInfoService {
 
+  private static final String SUB_INFO_NOT_FOUND_MSG = "Subscribe information not found";
   private final SubscribeInfoRepository subscribeInfoRepository;
 
   public DefaultSubscribeInfoService(SubscribeInfoRepository subscribeInfoRepository) {
@@ -26,5 +28,15 @@ public class DefaultSubscribeInfoService implements SubscribeInfoService {
 
     final var subscribeInfo = SubscribeInfo.subscribe(channel, member);
     subscribeInfoRepository.save(subscribeInfo);
+  }
+
+  @Override
+  public void unsubscribe(Channel channel, Member member) {
+    Assert.notNull(channel, "Channel must be provided");
+    Assert.notNull(member, "Member must be provided");
+
+    final var subscribeInfo = subscribeInfoRepository.findByChannelAndMember(channel, member)
+        .orElseThrow(() -> new NotFoundException(SUB_INFO_NOT_FOUND_MSG));
+    subscribeInfoRepository.delete(subscribeInfo);
   }
 }
