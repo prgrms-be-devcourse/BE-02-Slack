@@ -16,7 +16,6 @@ import com.prgrms.be02slack.common.dto.AuthResponse;
 import com.prgrms.be02slack.member.service.MemberService;
 
 @RestController
-@RequestMapping("api/v1/members")
 public class MemberApiController {
 
   private final MemberService memberService;
@@ -25,13 +24,13 @@ public class MemberApiController {
     this.memberService = memberService;
   }
 
-  @PostMapping("verify")
+  @PostMapping("api/v1/members/verify")
   @ResponseStatus(HttpStatus.OK)
   public AuthResponse verify(@RequestBody @Valid VerificationRequest request) {
     return memberService.verify(request);
   }
 
-  @PostMapping("enter/{encodedWorkspaceId}")
+  @PostMapping("api/v1/workspaces/{encodedWorkspaceId}/enter")
   @ResponseStatus(HttpStatus.OK)
   public AuthResponse enterWorkspace(
       @AuthenticationPrincipal String email,
