@@ -11,4 +11,6 @@ public interface MemberService {
   boolean isDuplicateName(Long decodedWorkspaceId, String channelName);
 
   AuthResponse verify(VerificationRequest request);
+
+  AuthResponse enterWorkspace(String email, String encodedWorkspaceId);
 }

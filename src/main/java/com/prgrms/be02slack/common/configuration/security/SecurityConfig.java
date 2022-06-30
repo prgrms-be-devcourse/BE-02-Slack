@@ -53,6 +53,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
           .authenticationEntryPoint(authenticationEntryPointImpl())
           .and()
         .authorizeRequests()
+          .antMatchers("/api/v1/members/enter").hasAnyRole("GUEST")
           .anyRequest().permitAll()
           .and()
         .addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
