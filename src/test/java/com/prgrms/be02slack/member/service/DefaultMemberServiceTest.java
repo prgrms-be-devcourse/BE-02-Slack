@@ -6,6 +6,8 @@ import static org.mockito.BDDMockito.*;
 
 import java.util.Optional;
 
+import javax.validation.constraints.Null;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -16,6 +18,7 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -45,6 +48,7 @@ class DefaultMemberServiceTest {
   @Mock
   TokenProvider tokenProvider;
 
+  @Spy
   @InjectMocks
   DefaultMemberService memberService;
 
@@ -303,6 +307,74 @@ class DefaultMemberServiceTest {
 
         //then
         verify(tokenProvider).createLoginToken(anyString());
+        assertThat(response).usingRecursiveComparison().isEqualTo(verificationResponse);
+      }
+    }
+  }
+
+  @Nested
+  @DisplayName("enterWorkspace 메서드는")
+  class DescribeEnterWorkspace {
+
+    @Nested
+    @DisplayName("email이 비어있는 인자를 받으면")
+    class ContextWithKeyNullAndEmptySource {
+
+      @ParameterizedTest
+      @NullAndEmptySource
+      @ValueSource(strings = {"\t", "\n"})
+      @DisplayName("IllegalArgumentException을 반환한다")
+      void ItThrowIllegalArgumentException(String email) {
+        final String encodedWorkspaceId = "TESTID";
+        assertThatThrownBy(() -> memberService.enterWorkspace(email, encodedWorkspaceId))
+            .isInstanceOf(IllegalArgumentException.class);
+      }
+    }
+
+    @Nested
+    @DisplayName("encodedWorkspaceId아 비어있는 인자를 받으면")
+    class ContextWithEncodedWorkspaceIdNullAndEmptySource {
+
+      @ParameterizedTest
+      @NullAndEmptySource
+      @ValueSource(strings = {"\t", "\n"})
+      @DisplayName("IllegalArgumentException을 반환한다")
+      void ItThrowIllegalArgumentException(String encodedWorkspaceId) {
+        final String email = "test@test.com";
+        assertThatThrownBy(() -> memberService.enterWorkspace(email, encodedWorkspaceId))
+            .isInstanceOf(IllegalArgumentException.class);
+      }
+    }
+
+    @Nested
+    @DisplayName("유효한 email과 encodedWorkspaceId 값을 인자로 받으면")
+    class ContextValidArgument {
+
+      @Test
+      @DisplayName("토큰을 발급한다")
+      void ItResponseIssueToken() {
+        //given
+        final String email = "test@test.com";
+        final String encodedWorkspaceId = "TESTID";
+        final Workspace workspace = Workspace.createDefaultWorkspace();
+        final Member member = Member.builder()
+            .email(email)
+            .name("test")
+            .displayName("test")
+            .role(Role.ROLE_OWNER)
+            .workspace(workspace)
+            .build();
+        final AuthResponse verificationResponse = new AuthResponse("testToken");
+        doReturn(member).when(memberService).findByEmailAndWorkspaceKey(anyString(), anyString());
+        given(tokenProvider.createMemberToken(anyString(), anyString())).willReturn("testToken");
+
+        //when
+        Member member1 = memberService.findByEmailAndWorkspaceKey(email,
+            encodedWorkspaceId);
+        final AuthResponse response = memberService.enterWorkspace(email, encodedWorkspaceId);
+
+        //then
+        verify(tokenProvider).createMemberToken(anyString(), anyString());
         assertThat(response).usingRecursiveComparison().isEqualTo(verificationResponse);
       }
     }
