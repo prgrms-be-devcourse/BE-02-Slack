@@ -1,7 +1,6 @@
 package com.prgrms.be02slack.subscribeInfo.service;
 
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
