@@ -37,10 +37,6 @@ public class Member extends BaseTime {
   @Size(min = 1, max = 80)
   private String name;
 
-  @NotNull
-  @Size(min = 1, max = 80)
-  private String displayName;
-
   @Enumerated(EnumType.STRING)
   private Role role;
 
@@ -56,7 +52,6 @@ public class Member extends BaseTime {
   private Member(Builder builder) {
     this.email = builder.email;
     this.name = builder.name;
-    this.displayName = builder.displayName;
     this.role = builder.role;
     this.workspace = builder.workspace;
   }
@@ -73,7 +68,6 @@ public class Member extends BaseTime {
 
     private String email;
     private String name;
-    private String displayName;
     private Role role;
     private Workspace workspace;
 
@@ -84,11 +78,6 @@ public class Member extends BaseTime {
 
     public Builder name(String name) {
       this.name = name;
-      return this;
-    }
-
-    public Builder displayName(String displayName) {
-      this.displayName = displayName;
       return this;
     }
 
