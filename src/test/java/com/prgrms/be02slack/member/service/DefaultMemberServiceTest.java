@@ -332,7 +332,7 @@ class DefaultMemberServiceTest {
     }
 
     @Nested
-    @DisplayName("encodedWorkspaceId아 비어있는 인자를 받으면")
+    @DisplayName("encodedWorkspaceId가 비어있는 인자를 받으면")
     class ContextWithEncodedWorkspaceIdNullAndEmptySource {
 
       @ParameterizedTest
