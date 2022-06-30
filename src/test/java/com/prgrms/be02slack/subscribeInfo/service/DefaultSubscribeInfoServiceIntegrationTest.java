@@ -1,6 +1,16 @@
 package com.prgrms.be02slack.subscribeInfo.service;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -12,8 +22,15 @@ import com.prgrms.be02slack.member.repository.MemberRepository;
 import com.prgrms.be02slack.workspace.entity.Workspace;
 import com.prgrms.be02slack.workspace.repository.WorkspaceRepository;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest
 public class DefaultSubscribeInfoServiceIntegrationTest {
+
+  private static final Logger log = LoggerFactory.getLogger(
+      DefaultSubscribeInfoServiceIntegrationTest.class);
+
+  @Autowired
+  private EntityManager em;
 
   @Autowired
   private ChannelRepository channelRepository;
@@ -27,32 +44,60 @@ public class DefaultSubscribeInfoServiceIntegrationTest {
   @Autowired
   private SubscribeInfoService subscribeInfoService;
 
-  @Test
-  public void queryTest() {
-    final var workspace = Workspace.createDefaultWorkspace();
-    workspaceRepository.save(workspace);
+  private Member testMember;
+  private Channel testChannel;
 
-    final var member = Member.builder()
+  @BeforeEach
+  void setUp() {
+    Workspace testWorkspace = Workspace.createDefaultWorkspace();
+
+    workspaceRepository.save(testWorkspace);
+
+    testMember = Member.builder()
         .email("test@naver.com")
         .name("test")
         .displayName("test")
         .role(Role.ROLE_OWNER)
-        .workspace(workspace)
+        .workspace(testWorkspace)
         .build();
 
-    memberRepository.save(member);
+    memberRepository.save(testMember);
 
-    final var channel = Channel.builder()
-        .workspace(workspace)
+    testChannel = Channel.builder()
+        .workspace(testWorkspace)
         .description("test")
         .name("test")
         .isPrivate(true)
-        .owner(member)
+        .owner(testMember)
         .build();
 
-    channelRepository.save(channel);
+    channelRepository.save(testChannel);
+  }
+
+  @AfterEach
+  void tearDown() {
+    channelRepository.deleteAll();
+    memberRepository.deleteAll();
+    workspaceRepository.deleteAll();
+  }
+
+  @Order(1)
+  @Test
+  public void insertQueryTest() {
+    log.info("query start");
+    subscribeInfoService.subscribe(testChannel, testMember);
+    log.info("query end");
+  }
+
+  @Order(2)
+  @Test
+  void deleteQueryTest() {
+    //given
+    subscribeInfoService.subscribe(testChannel, testMember);
 
     //when
-    subscribeInfoService.subscribe(channel, member);
+    log.info("query start");
+    subscribeInfoService.unsubscribe(testChannel, testMember);
+    log.info("query end");
   }
 }
