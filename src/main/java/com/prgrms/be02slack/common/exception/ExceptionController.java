@@ -59,21 +59,23 @@ public class ExceptionController {
   }
 
   @Order(6)
+  @ExceptionHandler(value = NameDuplicateException.class)
+  @ResponseStatus(HttpStatus.CONFLICT)
+  public void handleNameDuplicateException(NameDuplicateException e) {
+    logger.warn("NameDuplicateException :", e);
+  }
+
+  @Order(7)
   @ExceptionHandler(RuntimeException.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public void handleRuntimeException(RuntimeException e) {
     logger.error("RuntimeException : ", e);
   }
 
-  @Order(7)
+  @Order(8)
   @ExceptionHandler(Exception.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public void handleException(Exception e) {
     logger.error("Exception :", e);
-  }
-
-  @ExceptionHandler(value = NameDuplicateException.class)
-  @ResponseStatus(HttpStatus.CONFLICT)
-  public void handleNameDuplicateException(Exception e) {
   }
 }
