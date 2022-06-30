@@ -66,6 +66,16 @@ public class DefaultMemberService implements MemberService {
     return new AuthResponse(tokenProvider.createLoginToken(member.getEmail()));
   }
 
+  @Override
+  public AuthResponse enterWorkspace(String email, String encodedWorkspaceId) {
+    Assert.isTrue(isNotBlank(email), "email must be provided");
+    Assert.isTrue(isNotBlank(encodedWorkspaceId), "encodedWorkspaceId must be provided");
+
+    final Member member = findByEmailAndWorkspaceKey(email, encodedWorkspaceId);
+
+    return new AuthResponse(tokenProvider.createMemberToken(member.getEmail(), encodedWorkspaceId));
+  }
+
   private Member createMember(String email) {
     final String[] splitEmail = email.split("@");
     final String defaultName = splitEmail[0];

@@ -3,6 +3,8 @@ package com.prgrms.be02slack.member.controller;
 import javax.validation.Valid;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,5 +29,13 @@ public class MemberApiController {
   @ResponseStatus(HttpStatus.OK)
   public AuthResponse verify(@RequestBody @Valid VerificationRequest request) {
     return memberService.verify(request);
+  }
+
+  @PostMapping("enter/{encodedWorkspaceId}")
+  @ResponseStatus(HttpStatus.OK)
+  public AuthResponse enterWorkspace(
+      @AuthenticationPrincipal String email,
+      @PathVariable String encodedWorkspaceId) {
+    return memberService.enterWorkspace(email, encodedWorkspaceId);
   }
 }
