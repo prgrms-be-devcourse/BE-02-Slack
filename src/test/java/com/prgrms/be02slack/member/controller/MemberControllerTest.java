@@ -178,7 +178,7 @@ public class MemberControllerTest extends ControllerSetUp {
   @WithMockCustomLoginUser
   class DescribeEnterWorkspace {
 
-    private static final String ENTER_URI = "/api/v1/workspaces/{encodedWorkspaceId}/enter";
+    private static final String ENTER_URI = "/api/v1/workspaces/{encodedWorkspaceId}/token";
 
     @Nested
     @DisplayName("유효한 값이 전달되면")
