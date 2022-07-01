@@ -20,6 +20,10 @@ import com.prgrms.be02slack.security.TokenProvider;
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
+  private static final String GUEST = "GUEST";
+  private static final String OWNER = "OWNER";
+  private static final String USER = "USER";
+
   private final TokenProvider tokenProvider;
   private final DefaultUserDetailsService customUserDetailsService;
 
@@ -53,7 +57,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
           .authenticationEntryPoint(authenticationEntryPointImpl())
           .and()
         .authorizeRequests()
-          .antMatchers("/api/v1/members/enter").hasAnyRole("GUEST")
+          .antMatchers(HttpMethod.POST, "/api/v1/workspaces/{encodedWorkspaceId}/token")
+            .hasAnyRole(GUEST)
           .anyRequest().permitAll()
           .and()
         .addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);

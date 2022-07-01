@@ -46,8 +46,9 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             Collections.singletonList(new SimpleGrantedAuthority(Role.ROLE_GUEST.name()))
         );
       } else {
-        String tokenPayloadStr = email + " " + tokenType;
-        UserDetails userDetails = customUserDetailsService.loadUserByUsername(tokenPayloadStr);
+        final String encodedWorkspaceId = tokenProvider.getEncodedWorkspaceIdFromToken(token);
+        final String tokenPayloadStr = email + " " + encodedWorkspaceId;
+        final UserDetails userDetails = customUserDetailsService.loadUserByUsername(tokenPayloadStr);
         authentication = new UsernamePasswordAuthenticationToken(
             userDetails,
             null,
