@@ -11,6 +11,6 @@ public @interface WithMockCustomLoginUser {
 
   String username() default "test@test.com";
 
-  String role() default "GUEST";
+  String role() default "ROLE_GUEST";
 
 }
