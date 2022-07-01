@@ -1,5 +1,7 @@
 package com.prgrms.be02slack.subscribeInfo.service;
 
+import static org.apache.logging.log4j.util.Strings.*;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -38,5 +40,21 @@ public class DefaultSubscribeInfoService implements SubscribeInfoService {
     final var subscribeInfo = subscribeInfoRepository.findByChannelAndMember(channel, member)
         .orElseThrow(() -> new NotFoundException(SUB_INFO_NOT_FOUND_MSG));
     subscribeInfoRepository.delete(subscribeInfo);
+  }
+
+  @Override
+  public boolean isExistsByChannelAndMemberEmail(Channel channel, String email) {
+    Assert.notNull(channel, "Channel must be provided");
+    Assert.isTrue(isNotBlank(email), "Email must be provided");
+
+    return subscribeInfoRepository.existsByChannelAndMemberEmail(channel, email).isPresent();
+  }
+
+  @Override
+  public boolean isExistsByChannelAndMemberName(Channel channel, String name) {
+    Assert.notNull(channel, "Channel must be provided");
+    Assert.isTrue(isNotBlank(name), "Name must be provided");
+
+    return subscribeInfoRepository.existsByChannelAndMemberName(channel, name).isPresent();
   }
 }

@@ -69,7 +69,7 @@ public class EmailControllerTest {
         final var email = "test@test.com";
         final var requestMap = new EmailRequest(email);
         final var requestBody = objectMapper.writeValueAsString(requestMap);
-        doNothing().when(emailService).sendMail(any(EmailRequest.class));
+        doNothing().when(emailService).setLoginMail(any(EmailRequest.class));
 
         //when
         final var request =
@@ -80,7 +80,7 @@ public class EmailControllerTest {
         final var response = mockMvc.perform(request);
 
         //then
-        verify(emailService).sendMail(any(EmailRequest.class));
+        verify(emailService).setLoginMail(any(EmailRequest.class));
         response.andExpect(status().isOk())
             .andDo(document("Send email",
                 preprocessRequest(prettyPrint()),
@@ -105,7 +105,7 @@ public class EmailControllerTest {
         //given
         final var requestMap = new EmailRequest(email);
         final var requestBody = objectMapper.writeValueAsString(requestMap);
-        doNothing().when(emailService).sendMail(any(EmailRequest.class));
+        doNothing().when(emailService).setLoginMail(any(EmailRequest.class));
 
         //when
         final var request =

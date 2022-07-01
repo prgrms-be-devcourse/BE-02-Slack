@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import com.prgrms.be02slack.common.exception.NotFoundException;
+import com.prgrms.be02slack.common.util.IdEncoder;
 import com.prgrms.be02slack.email.service.EmailService;
 import com.prgrms.be02slack.member.controller.dto.VerificationRequest;
 import com.prgrms.be02slack.common.dto.AuthResponse;
@@ -23,16 +24,17 @@ public class DefaultMemberService implements MemberService {
   private final WorkspaceService workspaceService;
   private final EmailService emailService;
   private final TokenProvider tokenProvider;
+  private final IdEncoder idEncoder;
 
   public DefaultMemberService(
       MemberRepository memberRepository,
-      WorkspaceService workspaceService,
-      EmailService emailService,
-      TokenProvider tokenProvider) {
+      WorkspaceService workspaceService, EmailService emailService,
+      TokenProvider tokenProvider, IdEncoder idEncoder) {
     this.memberRepository = memberRepository;
     this.workspaceService = workspaceService;
     this.emailService = emailService;
     this.tokenProvider = tokenProvider;
+    this.idEncoder = idEncoder;
   }
 
   @Override
@@ -43,6 +45,16 @@ public class DefaultMemberService implements MemberService {
     final var findWorkspace = workspaceService.findByKey(encodedWorkspaceId);
 
     return memberRepository.findByEmailAndWorkspace(email, findWorkspace)
+        .orElseThrow(() -> new NotFoundException("member notfound"));
+  }
+
+  @Override
+  public Member findByNameAndWorkspaceKey(String name, String encodedWorkspaceId) {
+    Assert.isTrue(isNotBlank(encodedWorkspaceId), "id must be provided");
+    Assert.isTrue(isNotBlank(name), "name must be provided");
+
+    Long decodedWorkspaceId = idEncoder.decode(encodedWorkspaceId);
+    return memberRepository.findByNameAndWorkspace_Id(name, decodedWorkspaceId)
         .orElseThrow(() -> new NotFoundException("member notfound"));
   }
 
@@ -74,6 +86,43 @@ public class DefaultMemberService implements MemberService {
     final Member member = findByEmailAndWorkspaceKey(email, encodedWorkspaceId);
 
     return new AuthResponse(tokenProvider.createMemberToken(member.getEmail(), encodedWorkspaceId));
+  }
+
+  public boolean isExistsByNameAndWorkspaceKey(String name, String encodedWorkspaceId) {
+    Assert.isTrue(isNotBlank(name), "Name must be provided");
+    Assert.isTrue(isNotBlank(encodedWorkspaceId), "Id must be provided");
+
+    long decodedWorkspaceId = idEncoder.decode(encodedWorkspaceId);
+    return memberRepository.existsByNameAndWorkspace_Id(name, decodedWorkspaceId);
+  }
+
+  @Override
+  public boolean isExistsByEmailAndWorkspaceKey(String email, String encodedWorkspaceId) {
+    Assert.isTrue(isNotBlank(email), "Email must be provided");
+    Assert.isTrue(isNotBlank(encodedWorkspaceId), "Id must be provided");
+
+    long decodedWorkspaceId = idEncoder.decode(encodedWorkspaceId);
+    return memberRepository.existsByEmailAndWorkspace_Id(email, decodedWorkspaceId);
+  }
+
+  @Override
+  public Member save(String name, String email, Role role, String workspaceId, String displayName) {
+    Assert.isTrue(isNotBlank(name), "Name must be provided");
+    Assert.isTrue(isNotBlank(email), "Email must be provided");
+    Assert.notNull(role, "Role must not be null");
+    Assert.isTrue(isNotBlank(workspaceId), "WorkspaceId must be provided");
+    Assert.isTrue(isNotBlank(displayName), "DisplayName must be provided");
+
+    Workspace workspace = workspaceService.findByKey(workspaceId);
+    Member member = Member.builder()
+        .name(name)
+        .email(email)
+        .role(role)
+        .workspace(workspace)
+        .displayName(displayName)
+        .build();
+
+    return memberRepository.save(member);
   }
 
   private Member createMember(String email) {

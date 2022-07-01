@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+</head>
+<table style="background-color: #ffffff; padding-top: 20px; color: #434245; width: 100%; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; border: 0; text-align: center; border-collapse: collapse;">
+    <tbody>
+    <tr>
+        <td style="vertical-align: top; padding: 0;">
+            <center>
+                <table style="border: 0; border-collapse: collapse; margin: 0 auto; background: white; border-radius: 8px; margin-bottom: 16px;">
+                    <tbody>
+                    <tr>
+                        <td style="width: 546px; vertical-align: top; padding-top: 32px;">
+                            <div style="max-width: 600px; margin: 0 auto;">
+                                <img
+                                        width="120"
+                                        height="36"
+                                        style="margin-top: 0; margin-right: 0; margin-bottom: 32px; margin-left: 0px; padding-right: 30px; padding-left: 30px;"
+                                        src="https://w1655771291-kbi780485.slack.com/x-p3689244279941-3728766133714-3729386039330/img/slack_logo_240.png"
+                                        alt="Slack 로고"
+                                />
+                                <!--[if mso]>
+</td>
+<td style="padding: 0; margin: 0; font-size: 20px; height: 20px;">&nbsp;</td>
+</tr>
+<tr>
+<td colspan="3" style="padding: 0; margin: 0; font-size: 20px; height: 20px; height: 20px;">&nbsp;</td>
+</tr>
+</table>
+<![endif]-->
+                                <!--[if mso]>
+<table cellpadding="0" cellspacing="0" border="0" style="padding: 0; margin: 0; width: 100%;">
+<tr>
+<td colspan="3" style="padding: 0; margin: 0; font-size: 20px; height: 20px;" height="20">&nbsp;</td>
+</tr>
+<tr>
+<td style="padding: 0; margin: 0;">&nbsp;</td>
+<td style="padding: 0; margin: 0;" width="540">
+<![endif]-->
+                                <h1 style="font-size: 30px; padding-right: 30px; padding-left: 30px;">Slack에서 팀 참여</h1>
+                                <p style="font-size: 17px; padding-right: 30px; padding-left: 30px;">
+                                    <strong th:text="${sender}"></strong> 님이 고객님을 <strong th:text="${workspaceName}"></strong>(이)라는
+                                    워크스페이스에서 Slack을 함께 사용하도록 초대했습니다.
+                                </p>
+                                <!--[if mso]>
+</td>
+<td style="padding: 0; margin: 0; font-size: 20px; height: 20px;">&nbsp;</td>
+</tr>
+<tr>
+<td colspan="3" style="padding: 0; margin: 0; font-size: 20px; height: 20px; height: 20px;">&nbsp;</td>
+</tr>
+</table>
+<![endif]-->
+                                <!--[if mso]>
+<table cellpadding="0" cellspacing="0" border="0" style="padding: 0; margin: 0; width: 100%;">
+<tr>
+<td colspan="3" style="padding: 0; margin: 0; font-size: 20px; height: 20px;" height="20">&nbsp;</td>
+</tr>
+<tr>
+<td style="padding: 0; margin: 0;">&nbsp;</td>
+<td style="padding: 0; margin: 0;" width="540">
+<![endif]-->
+                                <div style="padding-right: 30px; padding-left: 30px; padding-bottom: 30px;">
+                                    <h4 style="display: none;" th:text="|워크스페이스 이름: ${workspaceName}|"></h4>
+                                    <table style="text-align: center; table-layout: fixed; border: 1px solid #a0a0a2; border-radius: 8px; padding: 40px 0; margin-top: 20px; width: 100%; border-collapse: separate;">
+                                        <tbody>
+                                        <tr>
+                                            <td style="vertical-align: middle;">
+                                                <!--[if mso]>
+<table cellpadding="0" cellspacing="0" border="0" style="padding: 0; margin: 0; width: 100%;">
+<tr>
+<td colspan="3" style="padding: 0; margin: 0; font-size: 20px; height: 20px;" height="20">&nbsp;</td>
+</tr>
+<tr>
+<td style="padding: 0; margin: 0;">&nbsp;</td>
+<td style="padding: 0; margin: 0;" width="38">
+<![endif]-->
+                                                <div
+                                                        style="
+                                                                    margin: auto;
+                                                                    height: 38px;
+                                                                    width: 38px;
+                                                                    min-width: 38px;
+                                                                    border-radius: 4px;
+                                                                    color: #ffffff;
+                                                                    font-size: 18px;
+                                                                    line-height: 38px;
+                                                                    mso-line-height-rule: exactly;
+                                                                    mso-text-raise: 10px;
+                                                                    vertical-align: middle;
+                                                                    text-align: center;
+                                                                    background-color: #0576b9;
+                                                                "
+                                                        th:text="${#strings.substring(workspaceName,0, 1)}" >
+                                                </div>
+                                                <!--[if mso]>
+</td>
+<td style="padding: 0; margin: 0; font-size: 20px; height: 20px;">&nbsp;</td>
+</tr>
+<tr>
+<td colspan="3" style="padding: 0; margin: 0; font-size: 20px; height: 20px; height: 20px;">&nbsp;</td>
+</tr>
+</table>
+<![endif]-->
+                                                <!--[if mso]>
+<table cellpadding="0" cellspacing="0" border="0" style="padding: 0; margin: 0; width: 100%;">
+<tr>
+<td colspan="3" style="padding: 0; margin: 0; font-size: 20px; height: 20px;" height="20">&nbsp;</td>
+</tr>
+<tr>
+<td style="padding: 0; margin: 0;">&nbsp;</td>
+<td style="padding: 0; margin: 0;" width="420">
+<![endif]-->
+                                                <h3
+                                                        style="
+                                                                    font-weight: 900;
+                                                                    padding-top: 10px;
+                                                                    margin-bottom: 7px;
+                                                                    font-size: 21px;
+                                                                    font-size: 21px;
+                                                                    margin-bottom: 2px;
+                                                                    width: 70%;
+                                                                    margin: auto;
+                                                                    text-align: center;
+                                                                    margin-top: 0;
+                                                                "
+                                                        th:text="${workspaceName}">
+
+                                                </h3>
+                                                <!--[if mso]>
+</td>
+<td style="padding: 0; margin: 0; font-size: 20px; height: 20px;">&nbsp;</td>
+</tr>
+<tr>
+<td colspan="3" style="padding: 0; margin: 0; font-size: 20px; height: 20px; height: 20px;">&nbsp;</td>
+</tr>
+</table>
+<![endif]-->
+                                                <h4 style="margin-bottom: 2px; font-size: 17px; margin-bottom: 25px;">
+                                                </h4>
+                                                <table style="width: 100%; text-align: center;">
+                                                    <tbody>
+                                                    <tr style="width: 100%;">
+                                                        <td style="width: 100%;">
+                                                                            <span style="display: inline-block; position: relative; border-radius: 4px; background-color: #611f69;">
+                                                                                <a
+                                                                                        class="button_link plum restyle_button"
+                                                                                        th:href="@{/api/v1/workspaces/{workspaceId}/channels/{channelId}/invite(token=${token}, workspaceId=${workspaceId}, channelId=${channelId})}";
+                                                                                        style="
+                                                                                        border-top: 13px solid;
+                                                                                        border-bottom: 13px solid;
+                                                                                        border-right: 24px solid;
+                                                                                        border-left: 24px solid;
+                                                                                        border-color: #611f69;
+                                                                                        border-radius: 4px;
+                                                                                        background-color: #611f69;
+                                                                                        color: #ffffff;
+                                                                                        font-size: 16px;
+                                                                                        line-height: 18px;
+                                                                                        word-break: break-word;
+                                                                                        font-weight: bold;
+                                                                                        font-size: 14px;
+                                                                                        border-top: 20px solid;
+                                                                                        border-bottom: 20px solid;
+                                                                                        border-color: #611f69;
+                                                                                        line-height: 14px;
+                                                                                        letter-spacing: 0.8px;
+                                                                                        text-transform: uppercase;
+                                                                                        box-sizing: border-box;
+                                                                                        display: inline-block;
+                                                                                        text-align: center;
+                                                                                        font-weight: 900;
+                                                                                        text-decoration: none !important;
+                                                                                    "
+                                                                                        rel="noopener noreferrer"
+                                                                                        target="_blank"
+                                                                                >
+                                                                                    지금 참여
+                                                                                </a>
+                                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!--[if mso]>
+</td>
+<td style="padding: 0; margin: 0; font-size: 20px; height: 20px;">&nbsp;</td>
+</tr>
+<tr>
+<td colspan="3" style="padding: 0; margin: 0; font-size: 20px; height: 20px; height: 20px;">&nbsp;</td>
+</tr>
+</table>
+<![endif]-->
+                                <!--[if mso]>
+<table cellpadding="0" cellspacing="0" border="0" style="padding: 0; margin: 0; width: 100%;">
+<tr>
+<td colspan="3" style="padding: 0; margin: 0; font-size: 20px; height: 20px;" height="20">&nbsp;</td>
+</tr>
+<tr>
+<td style="padding: 0; margin: 0;">&nbsp;</td>
+<td style="padding: 0; margin: 0;" width="540">
+<![endif]-->
+                                <!--[if mso]>
+</td>
+<td style="padding: 0; margin: 0; font-size: 20px; height: 20px;">&nbsp;</td>
+</tr>
+<tr>
+<td colspan="3" style="padding: 0; margin: 0; font-size: 20px; height: 20px; height: 20px;">&nbsp;</td>
+</tr>
+</table>
+<![endif]-->
+                                <!--[if mso]>
+<table cellpadding="0" cellspacing="0" border="0" style="padding: 0; margin: 0; width: 100%;">
+<tr>
+<td colspan="3" style="padding: 0; margin: 0; font-size: 20px; height: 20px;" height="20">&nbsp;</td>
+</tr>
+<tr>
+<td style="padding: 0; margin: 0;">&nbsp;</td>
+<td style="padding: 0; margin: 0;" width="540">
+<![endif]-->
+
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </center>
+        </td>
+    </tr>
+    <tr>
+        <td style="font-size: 15px; color: #717274; text-align: center; width: 100%;">
+            <!--[if mso]>
+<table cellpadding="0" cellspacing="0" border="0" style="padding: 0; margin: 0; width: 100%;">
+<tr>
+    <td colspan="3" style="padding: 0; margin: 0; font-size: 20px; height: 20px;" height="20">&nbsp;</td>
+</tr>
+<tr>
+    <td style="padding: 0; margin: 0;">&nbsp;</td>
+    <td style="padding: 0; margin: 0;" width="540">
+<![endif]-->
+            <center>
+                <table style="margin: 20px auto 0; background-color: white; border: 0; text-align: center; border-collapse: collapse;">
+                    <tbody>
+                    <tr>
+                        <td style="width: 546px; vertical-align: top; padding: 0px;">
+                            <div style="max-width: 600px; margin: 0 auto;">
+                                <div style="padding: 0 50px;">
+                                    <img
+                                            width="120"
+                                            height="36"
+                                            style="margin-top: 0; margin-right: 0; margin-bottom: 32px; margin-left: 0px;"
+                                            src="https://w1655771291-kbi780485.slack.com/x-p3689244279941-3728766133714-3729386039330/img/slack_logo_240.png"
+                                            alt="Slack 로고"
+                                    />
+                                    <p style="vertical-align: middle; text-align: right;">
+                                        Clone, Team Ray
+                                    </p>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </center>
+            <!--[if mso]>
+    </td>
+    <td style="padding: 0; margin: 0; font-size: 20px; height: 20px;">&nbsp;</td>
+</tr>
+<tr>
+    <td colspan="3" style="padding: 0; margin: 0; font-size: 20px; height: 20px; height: 20px;">&nbsp;</td>
+</tr>
+</table>
+<![endif]-->
+        </td>
+    </tr>
+    </tbody>
+</table>

@@ -32,7 +32,7 @@ public class EmailService {
     this.emailRepository = emailRepository;
   }
 
-  public void sendMail(EmailRequest request) throws
+  public void setLoginMail(EmailRequest request) throws
       MessagingException {
     String email = request.getEmail();
     String code = createCode();
@@ -40,15 +40,42 @@ public class EmailService {
     MimeMessage message = javaMailSender.createMimeMessage();
     message.addRecipients(MimeMessage.RecipientType.TO, email);
     message.setSubject("Slack 확인 코드: " + code);
-    message.setText(setContext(code), "utf-8", "html");
+    message.setText(setLoginContext(code), "utf-8", "html");
     javaMailSender.send(message);
     emailRepository.saveCode(email, code);
   }
 
-  private String setContext(String code) {
+  private String setLoginContext(String code) {
     Context context = new Context();
     context.setVariable("code", code);
-    return templateEngine.process("mail", context);
+    return templateEngine.process("loginMail", context);
+  }
+
+  public void sendInviteEmail(
+      EmailRequest request, String token, String workspaceId,
+      String channelId, String workspaceName, String sender) throws
+      MessagingException {
+    String email = request.getEmail();
+
+    MimeMessage message = javaMailSender.createMimeMessage();
+    message.addRecipients(MimeMessage.RecipientType.TO, email);
+    message.setSubject(sender + "님이 Slack에서 함께 작업할 수 있도록 고객님을 초대했습니다.");
+    message.setText(setInviteContext(token, workspaceId, channelId, workspaceName, sender), "utf-8",
+        "html");
+    javaMailSender.send(message);
+  }
+
+  private String setInviteContext(
+      String token, String workspaceId,
+      String channelId, String workspaceName, String sender) {
+    Context context = new Context();
+    context.setVariable("token", token);
+    context.setVariable("workspaceId", workspaceId);
+    context.setVariable("channelId", channelId);
+    context.setVariable("workspaceName", workspaceName);
+    context.setVariable("sender", sender);
+
+    return templateEngine.process("inviteMail", context);
   }
 
   private String createCode() {
