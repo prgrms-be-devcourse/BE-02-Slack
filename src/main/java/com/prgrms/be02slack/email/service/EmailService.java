@@ -32,7 +32,7 @@ public class EmailService {
     this.emailRepository = emailRepository;
   }
 
-  public void setLoginMail(EmailRequest request) throws
+  public void sendLoginMail(EmailRequest request) throws
       MessagingException {
     String email = request.getEmail();
     String code = createCode();
@@ -51,7 +51,7 @@ public class EmailService {
     return templateEngine.process("loginMail", context);
   }
 
-  public void sendInviteEmail(
+  public void sendInviteMail(
       EmailRequest request, String token, String workspaceId,
       String channelId, String workspaceName, String sender) throws
       MessagingException {

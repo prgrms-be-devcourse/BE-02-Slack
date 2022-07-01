@@ -337,7 +337,7 @@ class DefaultChannelServiceTest {
 
         //then
         verify(tokenProvider).createLoginToken(anyString());
-        verify(emailService).sendInviteEmail(any(EmailRequest.class), anyString(), anyString(),
+        verify(emailService).sendInviteMail(any(EmailRequest.class), anyString(), anyString(),
             anyString(), anyString(), anyString());
       }
     }

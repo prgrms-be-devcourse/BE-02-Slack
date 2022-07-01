@@ -189,7 +189,7 @@ public class DefaultChannelService implements ChannelService {
       String channelId, String sender) throws MessagingException {
     String loginToken = tokenProvider.createLoginToken(email);
 
-    emailService.sendInviteEmail(new EmailRequest(email), loginToken, workspaceId,
+    emailService.sendInviteMail(new EmailRequest(email), loginToken, workspaceId,
         channelId, workspaceName, sender);
   }
 
