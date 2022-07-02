@@ -44,7 +44,8 @@ public class DefaultChannelService implements ChannelService {
   public DefaultChannelService(
       ChannelRepository channelRepository,
       WorkspaceService workspaceService,
-      MemberService memberService, IdEncoder idEncoder,
+      MemberService memberService,
+      IdEncoder idEncoder,
       TokenProvider tokenProvider,
       SubscribeInfoService subscribeInfoService,
       EmailService emailService) {
@@ -62,7 +63,8 @@ public class DefaultChannelService implements ChannelService {
    * 2. 테스트 수정 필요
    */
   @Override
-  public String create(String workspaceId, ChannelSaveRequest channelSaveRequest) {
+  public String create(String workspaceId,
+      ChannelSaveRequest channelSaveRequest) {
     Assert.isTrue(isNotBlank(workspaceId), "WorkspaceId must be provided");
     Assert.notNull(channelSaveRequest, "ChannelSaveRequest must be provided");
 
@@ -86,7 +88,9 @@ public class DefaultChannelService implements ChannelService {
   }
 
   @Override
-  public void invite(String workspaceId, String channelId, InviteRequest inviteRequest)
+  public void invite(String workspaceId,
+      String channelId,
+      InviteRequest inviteRequest)
       throws MessagingException {
     Assert.isTrue(isNotBlank(workspaceId), "WorkspaceId must be provided");
     Assert.isTrue(isNotBlank(channelId), "ChannelId must be provided");
@@ -127,7 +131,9 @@ public class DefaultChannelService implements ChannelService {
   }
 
   @Override
-  public AuthResponse participate(String workspaceId, String channelId, String token) {
+  public AuthResponse participate(String workspaceId,
+      String channelId,
+      String token) {
     Assert.isTrue(isNotBlank(workspaceId), "WorkspaceId must be provided");
     Assert.isTrue(isNotBlank(channelId), "ChannelId must be provided");
     Assert.isTrue(isNotBlank(token), "Token must be provided");
@@ -169,14 +175,17 @@ public class DefaultChannelService implements ChannelService {
     return err;
   }
 
-  private boolean isSubscriber(Channel channel, String inviteeInfo, boolean isInviteeInfoEmail) {
+  private boolean isSubscriber(Channel channel,
+      String inviteeInfo,
+      boolean isInviteeInfoEmail) {
     if (isInviteeInfoEmail) {
       return subscribeInfoService.isExistsByChannelAndMemberEmail(channel, inviteeInfo);
     }
     return subscribeInfoService.isExistsByChannelAndMemberName(channel, inviteeInfo);
   }
 
-  private boolean isMemberOfWorkspace(String inviteeInfo, String workspaceId,
+  private boolean isMemberOfWorkspace(String inviteeInfo,
+      String workspaceId,
       boolean inviteeInfoIsEmail) {
     if (inviteeInfoIsEmail) {
       return memberService.isExistsByEmailAndWorkspaceKey(inviteeInfo, workspaceId);
@@ -185,15 +194,19 @@ public class DefaultChannelService implements ChannelService {
   }
 
   private void sendInviteEmail(
-      String email, String workspaceId, String workspaceName,
-      String channelId, String sender) throws MessagingException {
+      String email,
+      String workspaceId,
+      String workspaceName,
+      String channelId,
+      String sender) throws MessagingException {
     String loginToken = tokenProvider.createLoginToken(email);
 
     emailService.sendInviteMail(new EmailRequest(email), loginToken, workspaceId,
         channelId, workspaceName, sender);
   }
 
-  private Member findMemberByWorkspaceAndEmailOrName(String workspaceId, String inviteeInfo,
+  private Member findMemberByWorkspaceAndEmailOrName(String workspaceId,
+      String inviteeInfo,
       boolean inviteeInfoIsEmail) {
     if (inviteeInfoIsEmail) {
       return memberService.findByEmailAndWorkspaceKey(inviteeInfo, workspaceId);
@@ -201,7 +214,8 @@ public class DefaultChannelService implements ChannelService {
     return memberService.findByNameAndWorkspaceKey(inviteeInfo, workspaceId);
   }
 
-  private void validateName(long decodedWorkspaceId, String name) {
+  private void validateName(long decodedWorkspaceId,
+      String name) {
     if (isDuplicateName(decodedWorkspaceId, name)) {
       throw new NameDuplicateException(
           "Name is duplicate with the name of another channel in the same workspace");
@@ -212,7 +226,8 @@ public class DefaultChannelService implements ChannelService {
     }
   }
 
-  private boolean isDuplicateName(Long decodedWorkspaceId, String name) {
+  private boolean isDuplicateName(Long decodedWorkspaceId,
+      String name) {
     return channelRepository.existsByWorkspace_IdAndName(decodedWorkspaceId, name);
   }
 }

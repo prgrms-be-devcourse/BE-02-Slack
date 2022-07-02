@@ -52,8 +52,12 @@ public class EmailService {
   }
 
   public void sendInviteMail(
-      EmailRequest request, String token, String workspaceId,
-      String channelId, String workspaceName, String sender) throws
+      EmailRequest request,
+      String token,
+      String workspaceId,
+      String channelId,
+      String workspaceName,
+      String sender) throws
       MessagingException {
     String email = request.getEmail();
 
@@ -66,8 +70,11 @@ public class EmailService {
   }
 
   private String setInviteContext(
-      String token, String workspaceId,
-      String channelId, String workspaceName, String sender) {
+      String token,
+      String workspaceId,
+      String channelId,
+      String workspaceName,
+      String sender) {
     Context context = new Context();
     context.setVariable("token", token);
     context.setVariable("workspaceId", workspaceId);
