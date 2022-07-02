@@ -28,10 +28,11 @@ public class DirectMessageChannel extends BaseTime {
   private Member secondMember;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "workspace_id")
+  @JoinColumn(name = "리workspace_id")
   private Workspace workspace;
 
-  protected DirectMessageChannel() {}
+  protected DirectMessageChannel() {
+  }
 
   public DirectMessageChannel(Member firstMember, Member secondMember, Workspace workspace) {
     this.firstMember = firstMember;

@@ -9,5 +9,7 @@ import com.prgrms.be02slack.member.entity.Member;
 
 public interface DirectMessageChannelRepository extends JpaRepository<DirectMessageChannel, Long> {
 
-  Optional<DirectMessageChannel> findByFirstMemberAndSecondMember(Member firstMember, Member secondMember);
+  Optional<DirectMessageChannel> findByFirstMemberAndSecondMember(
+      Member firstMember,
+      Member secondMember);
 }

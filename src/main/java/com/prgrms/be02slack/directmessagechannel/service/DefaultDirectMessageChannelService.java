@@ -17,7 +17,7 @@ import com.prgrms.be02slack.workspace.service.WorkspaceService;
 
 @Service
 @Transactional
-public class DefaultDirectMessageChannelService implements DirectMessageChannelService{
+public class DefaultDirectMessageChannelService implements DirectMessageChannelService {
 
   private final DirectMessageChannelRepository directMessageChannelRepository;
   private final WorkspaceService workspaceService;
@@ -49,9 +49,11 @@ public class DefaultDirectMessageChannelService implements DirectMessageChannelS
 
     final DirectMessageChannel directMessageChannel =
         directMessageChannelRepository.findByFirstMemberAndSecondMember(sender, receiver)
-        .orElseGet(() -> directMessageChannelRepository
-            .findByFirstMemberAndSecondMember(receiver, sender)
-            .orElseGet(() -> new DirectMessageChannel(sender, receiver, workspace)));
+            .orElseGet(() -> directMessageChannelRepository
+                .findByFirstMemberAndSecondMember(receiver, sender)
+                .orElseGet(() -> new DirectMessageChannel(sender, receiver, workspace)
+                )
+            );
 
     return idEncoder.encode(directMessageChannel.getId());
   }
