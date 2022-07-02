@@ -3,6 +3,7 @@ package com.prgrms.be02slack.member.service;
 import static org.apache.logging.log4j.util.Strings.*;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import com.prgrms.be02slack.common.exception.NotFoundException;
@@ -17,6 +18,7 @@ import com.prgrms.be02slack.workspace.entity.Workspace;
 import com.prgrms.be02slack.workspace.service.WorkspaceService;
 
 @Service
+@Transactional
 public class DefaultMemberService implements MemberService {
 
   private final MemberRepository memberRepository;
