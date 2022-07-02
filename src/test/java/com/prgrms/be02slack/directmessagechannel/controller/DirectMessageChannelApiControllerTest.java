@@ -12,13 +12,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.MockBeans;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.MockMvc;
@@ -26,13 +23,12 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.prgrms.be02slack.common.configuration.security.SecurityConfig;
 import com.prgrms.be02slack.directmessagechannel.service.DirectMessageChannelService;
-import com.prgrms.be02slack.member.entity.Member;
 import com.prgrms.be02slack.util.ControllerSetUp;
 
 @WebMvcTest(controllers = DirectMessageChannelApiController.class)
 @MockBeans({@MockBean(JpaMetamodelMappingContext.class)})
+@AutoConfigureRestDocs
 public class DirectMessageChannelApiControllerTest extends ControllerSetUp {
 
   private static final String DM_CHANNEL_URL =
@@ -87,7 +83,7 @@ public class DirectMessageChannelApiControllerTest extends ControllerSetUp {
     class ContextBlankWorkspaceId {
 
       @ParameterizedTest
-      @ValueSource(strings = {"\t", "\n", " "})
+      @ValueSource(strings = {"\t", " "})
       @DisplayName("BadRequest를 반환한다.")
       void itReturnBadRequest(String workspaceId) throws Exception {
         //given
