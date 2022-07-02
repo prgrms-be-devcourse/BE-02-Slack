@@ -160,8 +160,8 @@ public class DefaultChannelService implements ChannelService {
 
   private boolean isValidEmail(String email) {
     boolean err = false;
-    String regex = "^[_a-z0-9-]+(.[_a-z0-9-]+)*@(?:\\w+\\.)+\\w+$";
-    Pattern p = Pattern.compile(regex);
+    String emailRegex = "^[_a-z0-9-]+(.[_a-z0-9-]+)*@(?:\\w+\\.)+\\w+$";
+    Pattern p = Pattern.compile(emailRegex);
     Matcher m = p.matcher(email);
     if (m.matches()) {
       err = true;
