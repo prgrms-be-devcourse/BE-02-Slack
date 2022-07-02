@@ -19,7 +19,8 @@ public class DirectMessageChannelApiController {
 
   private final DirectMessageChannelService directMessageChannelService;
 
-  public DirectMessageChannelApiController(DirectMessageChannelService directMessageChannelService) {
+  public DirectMessageChannelApiController(
+      DirectMessageChannelService directMessageChannelService) {
     this.directMessageChannelService = directMessageChannelService;
   }
 
