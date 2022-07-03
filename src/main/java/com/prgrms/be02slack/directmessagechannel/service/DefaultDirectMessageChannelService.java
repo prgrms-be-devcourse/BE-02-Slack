@@ -2,12 +2,16 @@ package com.prgrms.be02slack.directmessagechannel.service;
 
 import static org.apache.logging.log4j.util.Strings.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import com.prgrms.be02slack.common.util.IdEncoder;
+import com.prgrms.be02slack.directmessagechannel.controller.dto.DirectMessageChannelResponse;
 import com.prgrms.be02slack.directmessagechannel.entity.DirectMessageChannel;
 import com.prgrms.be02slack.directmessagechannel.repository.DirectMessageChannelRepository;
 import com.prgrms.be02slack.member.entity.Member;
@@ -52,5 +56,20 @@ public class DefaultDirectMessageChannelService implements DirectMessageChannelS
             .orElseGet(() -> new DirectMessageChannel(sender, receiver, workspace));
 
     return idEncoder.encode(directMessageChannel.getId());
+  }
+
+  @Override
+  public List<DirectMessageChannelResponse> getChannels(Member member) {
+    Assert.notNull(member, "member must be provided");
+
+    return directMessageChannelRepository.findAllByMember(member).stream()
+        .map(c -> {
+          String encodedDMChannelId = idEncoder.encode(c.getId());
+          return c.getFirstMember().equals(member) ?
+              new DirectMessageChannelResponse(c.getSecondMember().getName(),
+                  encodedDMChannelId) :
+              new DirectMessageChannelResponse(c.getFirstMember().getName(),
+                  encodedDMChannelId);
+        }).collect(Collectors.toList());
   }
 }
