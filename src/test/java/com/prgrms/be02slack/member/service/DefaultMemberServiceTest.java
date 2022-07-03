@@ -734,7 +734,7 @@ class DefaultMemberServiceTest {
         ReflectionTestUtils.setField(member, "workspace", workspace);
         final String encodedMemberId = "TESTID";
         final MemberResponse memberResponse = MemberResponse.builder()
-            .id("TESTID")
+            .encodedMemberId("TESTID")
             .email("test@test.com")
             .name("test")
             .displayName("test")

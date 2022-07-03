@@ -228,7 +228,7 @@ public class MemberControllerTest extends ControllerSetUp {
   @WithMockCustomLoginMember
   class DescribeGetOne {
 
-    private static final String GET_ONE_URL = "/api/v1/members/{encodedMemberId}";
+    private static final String GET_ONE_URI = "/api/v1/members/{encodedMemberId}";
 
     @Nested
     @DisplayName("유효한 값이 전달되면")
@@ -239,8 +239,8 @@ public class MemberControllerTest extends ControllerSetUp {
       void ItResponseMemberInfo() throws Exception {
         //given
         final String encodedMemberId = "TESTID";
-        MemberResponse memberResponse = MemberResponse.builder()
-            .id("TESTID")
+        final MemberResponse memberResponse = MemberResponse.builder()
+            .encodedMemberId("TESTID")
             .email("test@test.com")
             .name("test")
             .displayName("test")
@@ -250,14 +250,14 @@ public class MemberControllerTest extends ControllerSetUp {
 
         //when
         final MockHttpServletRequestBuilder request =
-            RestDocumentationRequestBuilders.get(GET_ONE_URL, encodedMemberId);
+            RestDocumentationRequestBuilders.get(GET_ONE_URI, encodedMemberId);
 
         final ResultActions response = mockMvc.perform(request);
 
         //then
         verify(memberService).getOne(any(Member.class), anyString());
         response.andExpect(status().isOk())
-            .andExpect(jsonPath("id").value(memberResponse.getId()))
+            .andExpect(jsonPath("encodedMemberId").value(memberResponse.getEncodedMemberId()))
             .andExpect(jsonPath("email").value(memberResponse.getEmail()))
             .andExpect(jsonPath("name").value(memberResponse.getName()))
             .andExpect(jsonPath("displayName").value(memberResponse.getDisplayName()))
@@ -269,7 +269,7 @@ public class MemberControllerTest extends ControllerSetUp {
                     parameterWithName("encodedMemberId").description("Encoded Member Id")
                 ),
                 responseFields(
-                    fieldWithPath("id").type(JsonFieldType.STRING).description("인코딩된 멤버 id"),
+                    fieldWithPath("encodedMemberId").type(JsonFieldType.STRING).description("인코딩된 멤버 id"),
                     fieldWithPath("email").type(JsonFieldType.STRING).description("이메일"),
                     fieldWithPath("name").type(JsonFieldType.STRING).description("이름"),
                     fieldWithPath("displayName").type(JsonFieldType.STRING).description("보여지는 이름"),
