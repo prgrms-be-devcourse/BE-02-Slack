@@ -1,6 +1,7 @@
 package com.prgrms.be02slack.member.controller;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -37,7 +38,7 @@ public class MemberApiController {
   @ResponseStatus(HttpStatus.OK)
   public AuthResponse enterWorkspace(
       @AuthenticationPrincipal String email,
-      @PathVariable String encodedWorkspaceId) {
+      @PathVariable @NotBlank String encodedWorkspaceId) {
     return memberService.enterWorkspace(email, encodedWorkspaceId);
   }
 
@@ -45,7 +46,7 @@ public class MemberApiController {
   @ResponseStatus(HttpStatus.OK)
   public MemberResponse getOne(
       @CurrentMember Member member,
-      @PathVariable String encodedMemberId) {
+      @PathVariable @NotBlank String encodedMemberId) {
     return memberService.getOne(member, encodedMemberId);
   }
 }

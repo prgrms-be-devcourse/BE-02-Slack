@@ -5,22 +5,22 @@ import com.prgrms.be02slack.member.entity.Role;
 
 public class MemberResponse {
 
-  private final String id;
+  private final String encodedMemberId;
   private final String email;
   private final String name;
   private final String displayName;
   private final Role role;
 
   private MemberResponse(Builder builder) {
-    this.id = builder.id;
+    this.encodedMemberId = builder.encodedMemberId;
     this.email = builder.email;
     this.name = builder.name;
     this.displayName = builder.displayName;
     this.role = builder.role;
   }
 
-  public String getId() {
-    return id;
+  public String getEncodedMemberId() {
+    return encodedMemberId;
   }
 
   public String getEmail() {
@@ -44,14 +44,14 @@ public class MemberResponse {
   }
 
   public static class Builder {
-    private String id;
+    private String encodedMemberId;
     private String email;
     private String name;
     private String displayName;
     private Role role;
 
-    public Builder id(String id) {
-      this.id = id;
+    public Builder encodedMemberId(String encodedMemberId) {
+      this.encodedMemberId = encodedMemberId;
       return this;
     }
 
@@ -82,7 +82,7 @@ public class MemberResponse {
 
   public static MemberResponse from(Member member, String encodedMemberId) {
     return MemberResponse.builder()
-        .id(encodedMemberId)
+        .encodedMemberId(encodedMemberId)
         .email(member.getEmail())
         .name(member.getName())
         .displayName(member.getDisplayName())
