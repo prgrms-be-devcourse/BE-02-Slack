@@ -74,7 +74,7 @@ public class DirectMessageChannelServiceTest {
 
       @ParameterizedTest
       @NullAndEmptySource
-      @ValueSource(strings = {"\t", "\n"})
+      @ValueSource(strings = {"\t", "\n", " "})
       @DisplayName("IllegalArgumentException을 반환한다.")
       void itThrowIllegalArgumentException(String workspaceId) {
         //given
@@ -93,7 +93,7 @@ public class DirectMessageChannelServiceTest {
 
       @ParameterizedTest
       @NullAndEmptySource
-      @ValueSource(strings = {"\t", "\n"})
+      @ValueSource(strings = {"\t", "\n", " "})
       @DisplayName("IllegalArgumentException을 반환한다.")
       void itThrowIllegalArgumentException(String receiverEmail) {
         //given
