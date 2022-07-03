@@ -50,4 +50,12 @@ public class DirectMessageChannel extends BaseTime {
   public Long getId() {
     return id;
   }
+
+  public Member getFirstMember() {
+    return firstMember;
+  }
+
+  public Member getSecondMember() {
+    return secondMember;
+  }
 }
