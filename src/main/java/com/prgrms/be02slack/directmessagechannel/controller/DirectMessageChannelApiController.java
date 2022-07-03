@@ -24,7 +24,7 @@ public class DirectMessageChannelApiController {
     this.directMessageChannelService = directMessageChannelService;
   }
 
-  @PostMapping()
+  @PostMapping
   public String create(
       @PathVariable @NotBlank String workspaceId,
       @RequestParam @NotBlank @Email String receiverEmail

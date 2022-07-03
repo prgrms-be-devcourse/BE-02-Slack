@@ -35,8 +35,7 @@ public class DirectMessageChannel extends BaseTime {
   @JoinColumn(name = "workspace_id")
   private Workspace workspace;
 
-  protected DirectMessageChannel() {
-  }
+  protected DirectMessageChannel() {}
 
   public DirectMessageChannel(Member firstMember, Member secondMember, Workspace workspace) {
     Assert.notNull(firstMember,  "firstMember must be provided");
