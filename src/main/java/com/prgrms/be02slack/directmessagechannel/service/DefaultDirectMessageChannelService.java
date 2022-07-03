@@ -12,6 +12,7 @@ import com.prgrms.be02slack.directmessagechannel.entity.DirectMessageChannel;
 import com.prgrms.be02slack.directmessagechannel.repository.DirectMessageChannelRepository;
 import com.prgrms.be02slack.member.entity.Member;
 import com.prgrms.be02slack.member.service.MemberService;
+import com.prgrms.be02slack.security.MemberDetails;
 import com.prgrms.be02slack.workspace.entity.Workspace;
 import com.prgrms.be02slack.workspace.service.WorkspaceService;
 
@@ -41,19 +42,17 @@ public class DefaultDirectMessageChannelService implements DirectMessageChannelS
     Assert.isTrue(isNotBlank(receiverEmail), "EncodedReceiverId must be provided");
 
     final Workspace workspace = workspaceService.findByKey(encodedWorkspaceId);
-    final String senderEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-    final Member sender =
-        memberService.findByEmailAndWorkspaceKey(senderEmail, encodedWorkspaceId);
+    final MemberDetails principal = (MemberDetails)SecurityContextHolder.getContext()
+        .getAuthentication()
+        .getPrincipal();
+    final Member sender = principal.getMember();
+
     final Member receiver =
         memberService.findByEmailAndWorkspaceKey(receiverEmail, encodedWorkspaceId);
 
     final DirectMessageChannel directMessageChannel =
         directMessageChannelRepository.findByFirstMemberAndSecondMember(sender, receiver)
-            .orElseGet(() -> directMessageChannelRepository
-                .findByFirstMemberAndSecondMember(receiver, sender)
-                .orElseGet(() -> new DirectMessageChannel(sender, receiver, workspace)
-                )
-            );
+            .orElseGet(() -> new DirectMessageChannel(sender, receiver, workspace));
 
     return idEncoder.encode(directMessageChannel.getId());
   }
