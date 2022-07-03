@@ -65,8 +65,24 @@ public class Member extends BaseTime {
     return email;
   }
 
+  public String getName() {
+    return name;
+  }
+
+  public String getDisplayName() {
+    return displayName;
+  }
+
+  public Role getRole() {
+    return role;
+  }
+
   public String getRoleName() {
     return role.name();
+  }
+
+  public Workspace getWorkspace() {
+    return workspace;
   }
 
   public void addSubscribeInfo(SubscribeInfo subscribeInfo) {

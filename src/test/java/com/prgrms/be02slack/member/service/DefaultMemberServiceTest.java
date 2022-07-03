@@ -23,6 +23,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import com.prgrms.be02slack.common.exception.NotFoundException;
 import com.prgrms.be02slack.common.util.IdEncoder;
 import com.prgrms.be02slack.email.service.EmailService;
+import com.prgrms.be02slack.member.controller.dto.MemberResponse;
 import com.prgrms.be02slack.member.controller.dto.VerificationRequest;
 import com.prgrms.be02slack.common.dto.AuthResponse;
 import com.prgrms.be02slack.member.entity.Member;
@@ -637,6 +638,116 @@ class DefaultMemberServiceTest {
 
         //then
         assertThat(isExists).isFalse();
+      }
+    }
+  }
+
+  @Nested
+  @DisplayName("getOne 메서드는")
+  class DescribeGetOne {
+
+    @Nested
+    @DisplayName("member에 null 값이 전달되면")
+    class ContextWithMemberNull {
+
+      @Test
+      @DisplayName("IllegalArgumentException을 반환한다")
+      void ItResponseIllegalArgumentException() {
+        String encodedMemberId = "TESTID";
+        assertThrows(IllegalArgumentException.class, () ->
+            memberService.getOne(null, encodedMemberId));
+      }
+    }
+
+    @Nested
+    @DisplayName("encodedMemberId가 비어있는 인자를 받으면")
+    class ContextWithEncodedMemberIdNullAndEmptySource {
+
+      @ParameterizedTest
+      @NullAndEmptySource
+      @ValueSource(strings = {"\t", "\n"})
+      @DisplayName("IllegalArgumentException을 반환한다")
+      void ItThrowIllegalArgumentException(String encodedMemberId) {
+        //given
+        final Workspace workspace = Workspace.createDefaultWorkspace();
+        ReflectionTestUtils.setField(workspace, "id", 1L);
+        final Member member = Member.builder()
+            .email("test@test.com")
+            .name("test")
+            .displayName("test")
+            .role(Role.ROLE_USER)
+            .build();
+        ReflectionTestUtils.setField(member, "id", 1L);
+        ReflectionTestUtils.setField(member, "workspace", workspace);
+
+        //when, then
+        assertThrows(IllegalArgumentException.class, () ->
+            memberService.getOne(member, encodedMemberId));
+      }
+    }
+
+    @Nested
+    @DisplayName("해당 멤버 id와 워크스페이스 id을 가진 멤버가 존재하지 않은 경우")
+    class ContextWithNotExistedMember {
+
+      @Test
+      @DisplayName("NotFoundException을 반환한다")
+      void ItResponseNotFoundException() {
+        //given
+        final Workspace workspace = Workspace.createDefaultWorkspace();
+        ReflectionTestUtils.setField(workspace, "id", 1L);
+        final Member member = Member.builder()
+            .email("test@test.com")
+            .name("test")
+            .displayName("test")
+            .role(Role.ROLE_USER)
+            .build();
+        ReflectionTestUtils.setField(member, "id", 1L);
+        ReflectionTestUtils.setField(member, "workspace", workspace);
+        final String encodedMemberId = "TESTID";
+        given(idEncoder.decode(anyString())).willReturn(1L);
+        given(repository.findByIdAndWorkspace_id(anyLong(), anyLong())).willReturn(Optional.empty());
+
+        //when, then
+        assertThrows(NotFoundException.class, () ->
+            memberService.getOne(member, encodedMemberId));
+      }
+    }
+
+    @Nested
+    @DisplayName("해당 멤버 id와 워크스페이스 id을 가진 멤버가 존재할 경우")
+    class ContextWithExistedMember {
+
+      @Test
+      @DisplayName("멤버 정보를 담은 memberResponse을 반환한다")
+      void ItResponseMemberResponse() {
+        //given
+        final Workspace workspace = Workspace.createDefaultWorkspace();
+        ReflectionTestUtils.setField(workspace, "id", 1L);
+        final Member member = Member.builder()
+            .email("test@test.com")
+            .name("test")
+            .displayName("test")
+            .role(Role.ROLE_USER)
+            .build();
+        ReflectionTestUtils.setField(member, "id", 1L);
+        ReflectionTestUtils.setField(member, "workspace", workspace);
+        final String encodedMemberId = "TESTID";
+        final MemberResponse memberResponse = MemberResponse.builder()
+            .encodedMemberId("TESTID")
+            .email("test@test.com")
+            .name("test")
+            .displayName("test")
+            .role(Role.ROLE_USER)
+            .build();
+        given(idEncoder.decode(anyString())).willReturn(1L);
+        given(repository.findByIdAndWorkspace_id(anyLong(), anyLong())).willReturn(Optional.of(member));
+
+        //when
+        final MemberResponse foundMemberResponse = memberService.getOne(member, encodedMemberId);
+
+        // then
+        assertThat(foundMemberResponse).usingRecursiveComparison().isEqualTo(memberResponse);
       }
     }
   }

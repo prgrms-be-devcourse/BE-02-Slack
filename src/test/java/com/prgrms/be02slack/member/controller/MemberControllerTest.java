@@ -26,9 +26,13 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.prgrms.be02slack.common.dto.AuthResponse;
+import com.prgrms.be02slack.member.controller.dto.MemberResponse;
 import com.prgrms.be02slack.member.controller.dto.VerificationRequest;
+import com.prgrms.be02slack.member.entity.Member;
+import com.prgrms.be02slack.member.entity.Role;
 import com.prgrms.be02slack.member.service.MemberService;
 import com.prgrms.be02slack.util.ControllerSetUp;
+import com.prgrms.be02slack.util.WithMockCustomLoginMember;
 import com.prgrms.be02slack.util.WithMockCustomLoginUser;
 
 @WebMvcTest(controllers = MemberApiController.class)
@@ -215,6 +219,63 @@ public class MemberControllerTest extends ControllerSetUp {
                         .type(JsonFieldType.STRING)
                         .description("토큰 타입")
                 )));
+      }
+    }
+  }
+
+  @Nested
+  @DisplayName("getOne 메서드는")
+  @WithMockCustomLoginMember
+  class DescribeGetOne {
+
+    private static final String GET_ONE_URI = "/api/v1/members/{encodedMemberId}";
+
+    @Nested
+    @DisplayName("유효한 값이 전달되면")
+    class ContextWithValidData {
+
+      @Test
+      @DisplayName("멤버 정보를 전달한다")
+      void ItResponseMemberInfo() throws Exception {
+        //given
+        final String encodedMemberId = "TESTID";
+        final MemberResponse memberResponse = MemberResponse.builder()
+            .encodedMemberId("TESTID")
+            .email("test@test.com")
+            .name("test")
+            .displayName("test")
+            .role(Role.ROLE_USER)
+            .build();
+        given(memberService.getOne(any(Member.class), anyString())).willReturn(memberResponse);
+
+        //when
+        final MockHttpServletRequestBuilder request =
+            RestDocumentationRequestBuilders.get(GET_ONE_URI, encodedMemberId);
+
+        final ResultActions response = mockMvc.perform(request);
+
+        //then
+        verify(memberService).getOne(any(Member.class), anyString());
+        response.andExpect(status().isOk())
+            .andExpect(jsonPath("encodedMemberId").value(memberResponse.getEncodedMemberId()))
+            .andExpect(jsonPath("email").value(memberResponse.getEmail()))
+            .andExpect(jsonPath("name").value(memberResponse.getName()))
+            .andExpect(jsonPath("displayName").value(memberResponse.getDisplayName()))
+            .andExpect(jsonPath("role").value(memberResponse.getRole().name()))
+            .andDo(document("Get Member Info",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                pathParameters(
+                    parameterWithName("encodedMemberId").description("Encoded Member Id")
+                ),
+                responseFields(
+                    fieldWithPath("encodedMemberId").type(JsonFieldType.STRING).description("인코딩된 멤버 id"),
+                    fieldWithPath("email").type(JsonFieldType.STRING).description("이메일"),
+                    fieldWithPath("name").type(JsonFieldType.STRING).description("이름"),
+                    fieldWithPath("displayName").type(JsonFieldType.STRING).description("보여지는 이름"),
+                    fieldWithPath("role").type(JsonFieldType.STRING).description("워크스페이스 내 역할")
+                )
+            ));
       }
     }
   }

@@ -59,6 +59,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .authorizeRequests()
           .antMatchers(HttpMethod.POST, "/api/v1/workspaces/{encodedWorkspaceId}/token")
             .hasAnyRole(GUEST)
+        .antMatchers(HttpMethod.GET, "/api/v1/members/{encodedMemberId}")
+          .hasAnyRole(USER, OWNER)
           .anyRequest().permitAll()
           .and()
         .addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
