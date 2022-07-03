@@ -8,4 +8,8 @@ public interface SubscribeInfoService {
   void subscribe(Channel channel, Member member);
 
   void unsubscribe(Channel channel, Member member);
+
+  boolean isExistsByChannelAndMemberEmail(Channel channel, String email);
+
+  boolean isExistsByChannelAndMemberName(Channel channel, String name);
 }

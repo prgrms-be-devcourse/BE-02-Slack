@@ -1,5 +1,6 @@
 package com.prgrms.be02slack.subscribeInfo.service;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
@@ -11,6 +12,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -260,6 +264,271 @@ class DefaultSubscribeInfoServiceTest {
         //when, then
         assertThrows(NotFoundException.class,
             () -> subscribeInfoService.unsubscribe(channel, member));
+      }
+    }
+  }
+
+  @Nested
+  @DisplayName("isExistsByChannelAndMemberEmail 메서드는")
+  class DescribeIsExistsByChannelAndMemberEmail {
+
+    @Nested
+    @DisplayName("channel 값이 null 이면")
+    class ContextWithChannelNull {
+
+      @Test
+      @DisplayName("IllegalArgumentException 에러를 발생시킨다")
+      void ItThrowsIllegalArgumentException() {
+        //given
+        String email = "test@gmail.com";
+
+        //when, then
+        assertThrows(IllegalArgumentException.class,
+            () -> subscribeInfoService.isExistsByChannelAndMemberEmail(null, email));
+      }
+    }
+
+    @Nested
+    @DisplayName("email 값이 null 이거나 공백 또는 빈 값이라면")
+    class ContextWithEmailBlank {
+
+      @ParameterizedTest
+      @NullAndEmptySource
+      @ValueSource(strings = {" "})
+      @DisplayName("IllegalArgumentException 에러를 발생시킨다")
+      void ItThrowsIllegalArgumentException(String email) {
+        //given
+        Workspace workspace = Workspace.createDefaultWorkspace();
+        Member owner = Member.builder()
+            .email("test@naver.com")
+            .name("test")
+            .displayName("test")
+            .role(Role.ROLE_OWNER)
+            .workspace(workspace)
+            .build();
+
+        Channel channel = Channel.builder()
+            .workspace(workspace)
+            .description("test")
+            .name("test")
+            .isPrivate(true)
+            .owner(owner)
+            .build();
+
+        //when, then
+        assertThrows(IllegalArgumentException.class,
+            () -> subscribeInfoService.isExistsByChannelAndMemberEmail(channel, email));
+      }
+    }
+
+    @Nested
+    @DisplayName("채널과 멤버의 이메일에 해당하는 구독 정보가 존재한다면")
+    class ContextWithExistentSubscribeInfo {
+
+      @Test
+      @DisplayName("true 를 반환한다")
+      void ItReturnsTrue() {
+        //given
+        String email = "test@gmail.com";
+        Workspace workspace = Workspace.createDefaultWorkspace();
+        Member owner = Member.builder()
+            .email("test@naver.com")
+            .name("test")
+            .displayName("test")
+            .role(Role.ROLE_OWNER)
+            .workspace(workspace)
+            .build();
+
+        Channel channel = Channel.builder()
+            .workspace(workspace)
+            .description("test")
+            .name("test")
+            .isPrivate(true)
+            .owner(owner)
+            .build();
+
+        given(
+            subscribeInfoRepository.existsByChannelAndMemberEmail(any(Channel.class), anyString()))
+            .willReturn(Optional.of(mock(SubscribeInfo.class)));
+
+        //when
+        boolean isExists = subscribeInfoService.isExistsByChannelAndMemberEmail(
+            channel, email);
+
+        //then
+        verify(subscribeInfoRepository).existsByChannelAndMemberEmail(any(Channel.class),
+            anyString());
+        assertThat(isExists).isTrue();
+      }
+    }
+
+    @Nested
+    @DisplayName("채널과 멤버의 이메일에 해당하는 구독 정보가 존재하지 않는다면")
+    class ContextWithNonexistentSubscribeInfo {
+      @Test
+      @DisplayName("false 를 반환한다")
+      void ItReturnsFalse() {
+        //given
+        String email = "test@gmail.com";
+        Workspace workspace = Workspace.createDefaultWorkspace();
+        Member owner = Member.builder()
+            .email("test@naver.com")
+            .name("test")
+            .displayName("test")
+            .role(Role.ROLE_OWNER)
+            .workspace(workspace)
+            .build();
+
+        Channel channel = Channel.builder()
+            .workspace(workspace)
+            .description("test")
+            .name("test")
+            .isPrivate(true)
+            .owner(owner)
+            .build();
+
+        given(
+            subscribeInfoRepository.existsByChannelAndMemberEmail(any(Channel.class), anyString()))
+            .willReturn(Optional.empty());
+
+        //when
+        boolean isExists = subscribeInfoService.isExistsByChannelAndMemberEmail(
+            channel, email);
+
+        //then
+        assertThat(isExists).isFalse();
+      }
+    }
+  }
+
+  @Nested
+  @DisplayName("isExistsByChannelAndMemberName 메서드는")
+  class DescribeIsExistsByChannelAndMemberName {
+
+    @Nested
+    @DisplayName("channel 값이 null 이면")
+    class ContextWithChannelNull {
+
+      @Test
+      @DisplayName("IllegalArgumentException 에러를 발생시킨다")
+      void ItThrowsIllegalArgumentException() {
+        //given
+        String name = "testName";
+
+        //when, then
+        assertThrows(IllegalArgumentException.class,
+            () -> subscribeInfoService.isExistsByChannelAndMemberName(null, name));
+      }
+    }
+
+    @Nested
+    @DisplayName("name 값이 null 이거나 공백 또는 빈 값이라면")
+    class ContextWithNameBlank {
+
+      @ParameterizedTest
+      @NullAndEmptySource
+      @ValueSource(strings = {" "})
+      @DisplayName("IllegalArgumentException 에러를 발생시킨다")
+      void ItThrowsIllegalArgumentException(String name) {
+        //given
+        Workspace workspace = Workspace.createDefaultWorkspace();
+        Member owner = Member.builder()
+            .email("test@naver.com")
+            .name("test")
+            .displayName("test")
+            .role(Role.ROLE_OWNER)
+            .workspace(workspace)
+            .build();
+
+        Channel channel = Channel.builder()
+            .workspace(workspace)
+            .description("test")
+            .name("test")
+            .isPrivate(true)
+            .owner(owner)
+            .build();
+
+        //when, then
+        assertThrows(IllegalArgumentException.class,
+            () -> subscribeInfoService.isExistsByChannelAndMemberName(channel, name));
+      }
+    }
+
+    @Nested
+    @DisplayName("채널과 멤버의 이름에 해당하는 구독 정보가 존재한다면")
+    class ContextWithExistentSubscribeInfo {
+
+      @Test
+      @DisplayName("true 를 반환한다")
+      void ItReturnsTrue() {
+        //given
+        String name = "testName";
+        Workspace workspace = Workspace.createDefaultWorkspace();
+        Member owner = Member.builder()
+            .email("test@naver.com")
+            .name("test")
+            .displayName("test")
+            .role(Role.ROLE_OWNER)
+            .workspace(workspace)
+            .build();
+
+        Channel channel = Channel.builder()
+            .workspace(workspace)
+            .description("test")
+            .name("test")
+            .isPrivate(true)
+            .owner(owner)
+            .build();
+
+        given(subscribeInfoRepository.existsByChannelAndMemberName(any(Channel.class), anyString()))
+            .willReturn(Optional.of(mock(SubscribeInfo.class)));
+
+        //when
+        boolean isExists = subscribeInfoService.isExistsByChannelAndMemberName(
+            channel, name);
+
+        //then
+        verify(subscribeInfoRepository).existsByChannelAndMemberName(any(Channel.class),
+            anyString());
+        assertThat(isExists).isTrue();
+      }
+    }
+
+    @Nested
+    @DisplayName("채널과 멤버의 이름에 해당하는 구독 정보가 존재하지 않는다면")
+    class ContextWithNonExistentSubscribeInfo {
+
+      @Test
+      @DisplayName("false 를 반환한다")
+      void ItReturnsFalse() {
+        //given
+        String name = "testName";
+        Workspace workspace = Workspace.createDefaultWorkspace();
+        Member owner = Member.builder()
+            .email("test@naver.com")
+            .name("test")
+            .displayName("test")
+            .role(Role.ROLE_OWNER)
+            .workspace(workspace)
+            .build();
+
+        Channel channel = Channel.builder()
+            .workspace(workspace)
+            .description("test")
+            .name("test")
+            .isPrivate(true)
+            .owner(owner)
+            .build();
+
+        given(subscribeInfoRepository.existsByChannelAndMemberName(any(Channel.class), anyString()))
+            .willReturn(Optional.empty());
+
+        //when
+        boolean isExists = subscribeInfoService.isExistsByChannelAndMemberName(
+            channel, name);
+
+        //then
+        assertThat(isExists).isFalse();
       }
     }
   }

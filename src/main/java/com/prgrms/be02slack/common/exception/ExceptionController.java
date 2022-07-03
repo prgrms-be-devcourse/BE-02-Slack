@@ -45,7 +45,8 @@ public class ExceptionController {
   @Order(4)
   @ExceptionHandler(value = {
       ConstraintViolationException.class,
-      MissingPathVariableException.class})
+      MissingPathVariableException.class,
+      IllegalArgumentException.class})
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public void handleConstraintViolationException(Exception e) {
     logger.warn("PathVariable is blank : ", e);

@@ -7,6 +7,8 @@ import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.DisplayName;
@@ -35,9 +37,11 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.prgrms.be02slack.channel.controller.dto.ChannelSaveRequest;
+import com.prgrms.be02slack.channel.controller.dto.InviteRequest;
 import com.prgrms.be02slack.channel.exception.NameDuplicateException;
 import com.prgrms.be02slack.channel.service.ChannelService;
 import com.prgrms.be02slack.common.configuration.security.SecurityConfig;
+import com.prgrms.be02slack.common.dto.AuthResponse;
 
 @WebMvcTest(
     controllers = ChannelApiController.class,
@@ -61,7 +65,7 @@ class ChannelApiControllerTest {
   @MockBean
   private ChannelService channelService;
 
-  static class WorkspaceIdSourceBlank implements ArgumentsProvider {
+  static class PathVariableSourceBlank implements ArgumentsProvider {
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
       return Stream.of(
@@ -81,6 +85,28 @@ class ChannelApiControllerTest {
           Arguments.of("\t"),
           Arguments.of("\n"),
           Arguments.of("a".repeat(81))
+      );
+    }
+  }
+
+  static class InviteeInfosSourceNullOrEmpty implements ArgumentsProvider {
+    @Override
+    public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
+      return Stream.of(
+          Arguments.of((Object)null),
+          Arguments.of(new HashSet<>())
+      );
+    }
+  }
+
+  static class TokenSourceBlank implements ArgumentsProvider {
+    @Override
+    public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
+      return Stream.of(
+          Arguments.of((Object)null),
+          Arguments.of(""),
+          Arguments.of("\t"),
+          Arguments.of("\n")
       );
     }
   }
@@ -141,7 +167,7 @@ class ChannelApiControllerTest {
     class ContextWithWorkspaceIdBlank {
 
       @ParameterizedTest
-      @ArgumentsSource(WorkspaceIdSourceBlank.class)
+      @ArgumentsSource(PathVariableSourceBlank.class)
       @DisplayName("BadRequest 를 응답한다")
       void ItResponseBadRequest(String workspaceId) throws Exception {
         //given
@@ -222,6 +248,344 @@ class ChannelApiControllerTest {
 
         //then
         response.andExpect(status().isConflict());
+      }
+    }
+  }
+
+  @Nested
+  @DisplayName("invite 메서드는")
+  class DescribeInvite {
+
+    @Nested
+    @DisplayName("유효한 값이 전달되면")
+    class ContextWithValidData {
+      @Test
+      @DisplayName("Ok 를 응답한다")
+      void ItResponseOk() throws Exception {
+        //given
+        HashMap<String, Object> requestMap = new HashMap<>();
+        requestMap.put("sender", "testSenderName");
+        requestMap.put("inviteeInfos", Set.of("name1", "test@gmail.com"));
+
+        String requestBody = objectMapper.writeValueAsString(requestMap);
+
+        //when
+        MockHttpServletRequestBuilder request = RestDocumentationRequestBuilders.post(
+                API_URL + "/workspaces/{workspaceId}/channels/{channelId}/invite",
+                "workspaceId", "channelId"
+            )
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestBody);
+
+        ResultActions response = mockMvc.perform(request);
+
+        //then
+        verify(channelService).invite(anyString(), anyString(), any(InviteRequest.class));
+        response.andExpect(status().isOk())
+            .andDo(document("Invite to channel",
+                pathParameters(
+                    parameterWithName("workspaceId").description("workspace id"),
+                    parameterWithName("channelId").description("channel id")
+                ),
+                requestFields(
+                    fieldWithPath("sender")
+                        .type(JsonFieldType.STRING)
+                        .description("invitation sender name"),
+                    fieldWithPath("inviteeInfos")
+                        .type(JsonFieldType.ARRAY)
+                        .description("list of invitees")
+                )
+            ));
+      }
+    }
+
+    @Nested
+    @DisplayName("workspaceId 가 빈 값 이거나 공백이라면")
+    class ContextWithWorkspaceIdBlank {
+
+      @ParameterizedTest
+      @ArgumentsSource(PathVariableSourceBlank.class)
+      @DisplayName("BadRequest 를 응답한다")
+      void ItResponseBadRequest(String workspaceId) throws Exception {
+        //given
+        HashMap<String, Object> requestMap = new HashMap<>();
+        requestMap.put("sender", "testSenderName");
+        requestMap.put("inviteeInfos", Set.of("name1", "test@gmail.com"));
+
+        String requestBody = objectMapper.writeValueAsString(requestMap);
+
+        //when
+        MockHttpServletRequestBuilder request = RestDocumentationRequestBuilders.post(
+                API_URL + "/workspaces/{workspaceId}/channels/{channelId}/invite",
+                workspaceId, "channelId"
+            )
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestBody);
+
+        ResultActions response = mockMvc.perform(request);
+
+        //then
+        response.andExpect(status().isBadRequest());
+      }
+    }
+
+    @Nested
+    @DisplayName("channelId 가 빈 값 이거나 공백이라면")
+    class ContextWithChannelIdBlank {
+
+      @ParameterizedTest
+      @ArgumentsSource(PathVariableSourceBlank.class)
+      @DisplayName("BadRequest 를 응답한다")
+      void ItResponseBadRequest(String channelId) throws Exception {
+        //given
+        HashMap<String, Object> requestMap = new HashMap<>();
+        requestMap.put("sender", "testSenderName");
+        requestMap.put("inviteeInfos", Set.of("name1", "test@gmail.com"));
+
+        String requestBody = objectMapper.writeValueAsString(requestMap);
+
+        //when
+        MockHttpServletRequestBuilder request = RestDocumentationRequestBuilders.post(
+                API_URL + "/workspaces/{workspaceId}/channels/{channelId}/invite",
+                "workspaceId", channelId
+            )
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestBody);
+
+        ResultActions response = mockMvc.perform(request);
+
+        //then
+        response.andExpect(status().isBadRequest());
+      }
+    }
+
+    @Nested
+    @DisplayName("sender 의 길이가 범위를 벗어나면")
+    class ContextWithSenderOutOfRange {
+
+      @ParameterizedTest
+      @ArgumentsSource(NameSourceOutOfRange.class)
+      @DisplayName("BadRequest 를 응답한다")
+      void ItResponseBadRequest(String sender) throws Exception {
+        //given
+        HashMap<String, Object> requestMap = new HashMap<>();
+        requestMap.put("sender", sender);
+        requestMap.put("inviteeInfos", Set.of("name1", "test@gmail.com"));
+
+        String requestBody = objectMapper.writeValueAsString(requestMap);
+
+        //when
+        MockHttpServletRequestBuilder request = RestDocumentationRequestBuilders.post(
+                API_URL + "/workspaces/{workspaceId}/channels/{channelId}/invite",
+                "workspaceId", "channelId"
+            )
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestBody);
+
+        ResultActions response = mockMvc.perform(request);
+
+        //then
+        response.andExpect(status().isBadRequest());
+      }
+    }
+
+    @Nested
+    @DisplayName("inviteeInfos 가 null 이거나 빈 리스트라면")
+    class ContextWithInviteeInfosNullOrEmpty {
+
+      @ParameterizedTest
+      @ArgumentsSource(InviteeInfosSourceNullOrEmpty.class)
+      @DisplayName("BadRequest 를 응답한다")
+      void ItResponseBadRequest(Set<Object> inviteeInfos) throws Exception {
+        //given
+        HashMap<String, Object> requestMap = new HashMap<>();
+        requestMap.put("sender", "sender");
+        requestMap.put("inviteeInfos", inviteeInfos);
+
+        String requestBody = objectMapper.writeValueAsString(requestMap);
+
+        //when
+        MockHttpServletRequestBuilder request = RestDocumentationRequestBuilders.post(
+                API_URL + "/workspaces/{workspaceId}/channels/{channelId}/invite",
+                "workspaceId", "channelId"
+            )
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestBody);
+
+        ResultActions response = mockMvc.perform(request);
+
+        //then
+        response.andExpect(status().isBadRequest());
+      }
+    }
+
+    @Nested
+    @DisplayName("초대를 보낼 수 없는 사람이 한명이라도 있다면")
+    class ContextWithCantSendInvitation {
+
+      @Test
+      @DisplayName("BadRequest 를 응답한다")
+      void ItResponseBadRequest() throws Exception {
+        //given
+        doThrow(IllegalArgumentException.class)
+            .when(channelService).invite(anyString(), anyString(), any(InviteRequest.class));
+
+        HashMap<String, Object> requestMap = new HashMap<>();
+        requestMap.put("sender", "sender");
+        requestMap.put("inviteeInfos", Set.of("name1", "test@gmail.com"));
+
+        String requestBody = objectMapper.writeValueAsString(requestMap);
+
+        //when
+        MockHttpServletRequestBuilder request = RestDocumentationRequestBuilders.post(
+                API_URL + "/workspaces/{workspaceId}/channels/{channelId}/invite",
+                "workspaceId", "channelId"
+            )
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestBody);
+
+        ResultActions response = mockMvc.perform(request);
+
+        //then
+        response.andExpect(status().isBadRequest());
+      }
+    }
+  }
+
+  @Nested
+  @DisplayName("participate 메서드는")
+  class DescribeParticipate {
+
+    @Nested
+    @DisplayName("유효한 값이 전달되면")
+    class ContextWithValidData {
+      @Test
+      @DisplayName("AuthResponse 를 응답한다")
+      void ItResponseAuthResponse() throws Exception {
+        //given
+        given(channelService.participate(anyString(), anyString(), anyString()))
+            .willReturn(new AuthResponse("token"));
+
+        HashMap<String, Object> requestMap = new HashMap<>();
+        requestMap.put("token", "token");
+
+        String requestBody = objectMapper.writeValueAsString(requestMap);
+
+        //when
+        MockHttpServletRequestBuilder request = RestDocumentationRequestBuilders.post(
+                API_URL + "/workspaces/{workspaceId}/channels/{channelId}/participate?token={token}",
+                "workspaceId", "channelId", "token"
+            )
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestBody);
+
+        ResultActions response = mockMvc.perform(request);
+
+        //then
+        verify(channelService).participate(anyString(), anyString(), anyString());
+        response.andExpect(status().isOk())
+            .andDo(document("Participate to channel",
+                pathParameters(
+                    parameterWithName("workspaceId").description("workspace id"),
+                    parameterWithName("channelId").description("channel id")
+                ),
+                requestFields(
+                    fieldWithPath("token")
+                        .type(JsonFieldType.STRING)
+                        .description("login token")
+                ),
+                responseFields(
+                    fieldWithPath("token").type(JsonFieldType.STRING).description("token"),
+                    fieldWithPath("tokenType").type(JsonFieldType.STRING)
+                        .description("token type")
+                )));
+      }
+    }
+
+    @Nested
+    @DisplayName("workspaceId 가 빈 값 이거나 공백이라면")
+    class ContextWithWorkspaceIdBlank {
+
+      @ParameterizedTest
+      @ArgumentsSource(PathVariableSourceBlank.class)
+      @DisplayName("BadRequest 를 응답한다")
+      void ItResponseBadRequest(String workspaceId) throws Exception {
+        //given
+        HashMap<String, Object> requestMap = new HashMap<>();
+        requestMap.put("token", "token");
+
+        String requestBody = objectMapper.writeValueAsString(requestMap);
+
+        //when
+        MockHttpServletRequestBuilder request = RestDocumentationRequestBuilders.post(
+                API_URL + "/workspaces/{workspaceId}/channels/{channelId}/participate?token={token}",
+                workspaceId, "channelId", "token"
+            )
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestBody);
+
+        ResultActions response = mockMvc.perform(request);
+
+        //then
+        response.andExpect(status().isBadRequest());
+      }
+    }
+
+    @Nested
+    @DisplayName("channelId 가 빈 값 이거나 공백이라면")
+    class ContextWithChannelIdBlank {
+
+      @ParameterizedTest
+      @ArgumentsSource(PathVariableSourceBlank.class)
+      @DisplayName("BadRequest 를 응답한다")
+      void ItResponseBadRequest(String channelId) throws Exception {
+        //given
+        HashMap<String, Object> requestMap = new HashMap<>();
+        requestMap.put("token", "token");
+
+        String requestBody = objectMapper.writeValueAsString(requestMap);
+
+        //when
+        MockHttpServletRequestBuilder request = RestDocumentationRequestBuilders.post(
+                API_URL + "/workspaces/{workspaceId}/channels/{channelId}/participate?token={token}",
+                "workspaceId", channelId, "token"
+            )
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestBody);
+
+        ResultActions response = mockMvc.perform(request);
+
+        //then
+        response.andExpect(status().isBadRequest());
+      }
+    }
+
+    @Nested
+    @DisplayName("token 이 null 이거나 빈 값 또는 공백이라면")
+    class ContextWithTokenBlank {
+
+      @ParameterizedTest
+      @ArgumentsSource(TokenSourceBlank.class)
+      @DisplayName("BadRequest 를 응답한다")
+      void ItResponseBadRequest(String token) throws Exception {
+        //given
+        HashMap<String, Object> requestMap = new HashMap<>();
+        requestMap.put("token", token);
+
+        String requestBody = objectMapper.writeValueAsString(requestMap);
+
+        //when
+        MockHttpServletRequestBuilder request = RestDocumentationRequestBuilders.post(
+                API_URL + "/workspaces/{workspaceId}/channels/{channelId}/invite",
+                "workspaceId", "channelId"
+            )
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestBody);
+
+        ResultActions response = mockMvc.perform(request);
+
+        //then
+        response.andExpect(status().isBadRequest());
       }
     }
   }
