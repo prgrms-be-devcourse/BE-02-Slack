@@ -1,5 +1,6 @@
 package com.prgrms.be02slack.member.service;
 
+import com.prgrms.be02slack.member.controller.dto.MemberResponse;
 import com.prgrms.be02slack.member.entity.Member;
 
 import com.prgrms.be02slack.member.controller.dto.VerificationRequest;
@@ -22,4 +23,6 @@ public interface MemberService {
   boolean isExistsByNameAndWorkspaceKey(String name, String key);
 
   Member save(String name, String email, Role role, String workspaceKey, String displayName);
+
+  MemberResponse getOne(Member member, String encodedMemberId);
 }

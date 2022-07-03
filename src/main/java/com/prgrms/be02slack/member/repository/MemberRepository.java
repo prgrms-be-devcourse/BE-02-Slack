@@ -18,4 +18,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
   boolean existsByEmailAndWorkspace_Id(String email, Long workspaceId);
 
   Optional<Member> findByEmail(String email);
+
+  Optional<Member> findByIdAndWorkspace_id(Long id, Long workspaceId);
 }

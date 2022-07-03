@@ -9,6 +9,7 @@ import org.springframework.util.Assert;
 import com.prgrms.be02slack.common.exception.NotFoundException;
 import com.prgrms.be02slack.common.util.IdEncoder;
 import com.prgrms.be02slack.email.service.EmailService;
+import com.prgrms.be02slack.member.controller.dto.MemberResponse;
 import com.prgrms.be02slack.member.controller.dto.VerificationRequest;
 import com.prgrms.be02slack.common.dto.AuthResponse;
 import com.prgrms.be02slack.member.entity.Member;
@@ -30,8 +31,10 @@ public class DefaultMemberService implements MemberService {
 
   public DefaultMemberService(
       MemberRepository memberRepository,
-      WorkspaceService workspaceService, EmailService emailService,
-      TokenProvider tokenProvider, IdEncoder idEncoder) {
+      WorkspaceService workspaceService,
+      EmailService emailService,
+      TokenProvider tokenProvider,
+      IdEncoder idEncoder) {
     this.memberRepository = memberRepository;
     this.workspaceService = workspaceService;
     this.emailService = emailService;
@@ -125,6 +128,19 @@ public class DefaultMemberService implements MemberService {
         .build();
 
     return memberRepository.save(member);
+  }
+
+  @Override
+  public MemberResponse getOne(Member member, String encodedMemberId) {
+    Assert.notNull(member, "Member must be provided");
+    Assert.isTrue(isNotBlank(encodedMemberId), "EncodedMemberId must be provided");
+
+    final long memberId = idEncoder.decode(encodedMemberId);
+    final Member foundMember = memberRepository
+        .findByIdAndWorkspace_id(memberId, member.getWorkspace().getId())
+        .orElseThrow(() -> new NotFoundException("Member not found"));
+
+    return MemberResponse.from(foundMember, encodedMemberId);
   }
 
   private Member createMember(String email) {
