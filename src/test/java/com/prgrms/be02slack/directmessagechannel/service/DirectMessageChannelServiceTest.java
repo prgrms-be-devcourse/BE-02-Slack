@@ -14,9 +14,6 @@ import org.mockito.Mock;
 import org.mockito.MockedConstruction;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import com.prgrms.be02slack.common.exception.NotFoundException;
@@ -24,8 +21,8 @@ import com.prgrms.be02slack.common.util.IdEncoder;
 import com.prgrms.be02slack.directmessagechannel.entity.DirectMessageChannel;
 import com.prgrms.be02slack.directmessagechannel.repository.DirectMessageChannelRepository;
 import com.prgrms.be02slack.member.entity.Member;
+import com.prgrms.be02slack.member.entity.Role;
 import com.prgrms.be02slack.member.service.MemberService;
-import com.prgrms.be02slack.security.MemberDetails;
 import com.prgrms.be02slack.util.WithMockCustomLoginUser;
 import com.prgrms.be02slack.workspace.entity.Workspace;
 import com.prgrms.be02slack.workspace.service.WorkspaceService;
@@ -49,15 +46,6 @@ public class DirectMessageChannelServiceTest {
 
   @Mock
   private IdEncoder idEncoder;
-
-  @Mock
-  private SecurityContext securityContextMocked;
-
-  @Mock
-  private Authentication authenticationMocked;
-
-  @Mock
-  private MemberDetails memberDetails;
 
   @InjectMocks
   DefaultDirectMessageChannelService directMessageChannelService;
@@ -83,10 +71,20 @@ public class DirectMessageChannelServiceTest {
       void itThrowIllegalArgumentException(String workspaceId) {
         //given
         final String validReceiverEmail = "test@test.com";
+        final Workspace workspace = Workspace.createDefaultWorkspace();
+        ReflectionTestUtils.setField(workspace, "id", 1L);
+        final Member member = Member.builder()
+            .email("test@test.com")
+            .name("test")
+            .displayName("test")
+            .role(Role.ROLE_USER)
+            .build();
+        ReflectionTestUtils.setField(member, "id", 1L);
+        ReflectionTestUtils.setField(member, "workspace", workspace);
 
         //then
         Assertions.assertThatThrownBy(
-                () -> directMessageChannelService.create(workspaceId, validReceiverEmail))
+                () -> directMessageChannelService.create(workspaceId, validReceiverEmail, member))
             .isInstanceOf(IllegalArgumentException.class);
       }
     }
@@ -102,10 +100,20 @@ public class DirectMessageChannelServiceTest {
       void itThrowIllegalArgumentException(String receiverEmail) {
         //given
         final String validWorkspaceId = "testId";
+        final Workspace workspace = Workspace.createDefaultWorkspace();
+        ReflectionTestUtils.setField(workspace, "id", 1L);
+        final Member member = Member.builder()
+            .email("test@test.com")
+            .name("test")
+            .displayName("test")
+            .role(Role.ROLE_USER)
+            .build();
+        ReflectionTestUtils.setField(member, "id", 1L);
+        ReflectionTestUtils.setField(member, "workspace", workspace);
 
         //then
         Assertions.assertThatThrownBy(
-                () -> directMessageChannelService.create(validWorkspaceId, receiverEmail))
+                () -> directMessageChannelService.create(validWorkspaceId, receiverEmail, member))
             .isInstanceOf(IllegalArgumentException.class);
       }
     }
@@ -120,11 +128,24 @@ public class DirectMessageChannelServiceTest {
         //given
         final String validWorkspaceId = "testId";
         final String validReceiverEmail = "test@test.test";
+        final Workspace workspace = Workspace.createDefaultWorkspace();
+        ReflectionTestUtils.setField(workspace, "id", 1L);
+        final Member member = Member.builder()
+            .email("test@test.com")
+            .name("test")
+            .displayName("test")
+            .role(Role.ROLE_USER)
+            .build();
+        ReflectionTestUtils.setField(member, "id", 1L);
+        ReflectionTestUtils.setField(member, "workspace", workspace);
         when(workspaceService.findByKey(anyString())).thenThrow(NotFoundException.class);
 
         //then
         Assertions.assertThatThrownBy(
-                () -> directMessageChannelService.create(validWorkspaceId, validReceiverEmail))
+                () -> directMessageChannelService.create(
+                    validWorkspaceId,
+                    validReceiverEmail,
+                    member))
             .isInstanceOf(NotFoundException.class);
       }
     }
@@ -148,17 +169,14 @@ public class DirectMessageChannelServiceTest {
 
         when(workspaceService.findByKey(any())).thenReturn(workspace);
 
-        when(authenticationMocked.getPrincipal()).thenReturn(memberDetails);
-        when(securityContextMocked.getAuthentication()).thenReturn(authenticationMocked);
-        when(memberDetails.getMember()).thenReturn(member);
-        SecurityContextHolder.setContext(securityContextMocked);
-
         when(memberService.findByEmailAndWorkspaceKey(any(), any()))
             .thenThrow(NotFoundException.class);
 
         //then
         Assertions.assertThatThrownBy(
-                () -> directMessageChannelService.create(validWorkspaceId, notExistReceiverEmail))
+                () -> directMessageChannelService.create(validWorkspaceId,
+                    notExistReceiverEmail,
+                    member))
             .isInstanceOf(NotFoundException.class);
       }
     }
@@ -195,11 +213,6 @@ public class DirectMessageChannelServiceTest {
 
         ReflectionTestUtils.setField(testDirectMessageChannel, "id", 1L);
 
-        when(authenticationMocked.getPrincipal()).thenReturn(memberDetails);
-        when(securityContextMocked.getAuthentication()).thenReturn(authenticationMocked);
-        when(memberDetails.getMember()).thenReturn(member);
-        SecurityContextHolder.setContext(securityContextMocked);
-
         when(memberService.findByEmailAndWorkspaceKey(any(), any()))
             .thenReturn(testMember);
 
@@ -211,7 +224,7 @@ public class DirectMessageChannelServiceTest {
 
         //when
         final String actualId =
-            directMessageChannelService.create(validWorkspaceId, validReceiverEmail);
+            directMessageChannelService.create(validWorkspaceId, validReceiverEmail, member);
 
         final String expectedId = "testtest";
 
@@ -251,12 +264,6 @@ public class DirectMessageChannelServiceTest {
 
         when(workspaceService.findByKey(any())).thenReturn(workspace);
 
-        when(authenticationMocked.getPrincipal()).thenReturn(memberDetails);
-        when(securityContextMocked.getAuthentication()).thenReturn(authenticationMocked);
-        when(memberDetails.getMember()).thenReturn(member);
-        SecurityContextHolder.setContext(securityContextMocked);
-
-
         when(memberService.findByEmailAndWorkspaceKey(any(), any()))
             .thenReturn(testMember);
 
@@ -272,7 +279,7 @@ public class DirectMessageChannelServiceTest {
 
         //when
         final String actualId =
-            directMessageChannelService.create(validWorkspaceId, validReceiverEmail);
+            directMessageChannelService.create(validWorkspaceId, validReceiverEmail, member);
 
         final String expectedId = "testtest";
 
