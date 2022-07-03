@@ -6,8 +6,6 @@ import static org.mockito.BDDMockito.*;
 
 import java.util.Optional;
 
-import javax.validation.constraints.Null;
-
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -23,6 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import com.prgrms.be02slack.common.exception.NotFoundException;
+import com.prgrms.be02slack.common.util.IdEncoder;
 import com.prgrms.be02slack.email.service.EmailService;
 import com.prgrms.be02slack.member.controller.dto.VerificationRequest;
 import com.prgrms.be02slack.common.dto.AuthResponse;
@@ -47,6 +46,9 @@ class DefaultMemberServiceTest {
 
   @Mock
   TokenProvider tokenProvider;
+
+  @Mock
+  IdEncoder idEncoder;
 
   @Spy
   @InjectMocks
@@ -376,6 +378,265 @@ class DefaultMemberServiceTest {
         //then
         verify(tokenProvider).createMemberToken(anyString(), anyString());
         assertThat(response).usingRecursiveComparison().isEqualTo(verificationResponse);
+      }
+    }
+  }
+
+  @Nested
+  @DisplayName("FindByNameAndWorkspace 메서드는")
+  class DescribeFindByNameAndWorkspace {
+
+    @Nested
+    @DisplayName("존재하지 않는 멤버 name 값을 인자로 받으면")
+    class ContextWithNotExistName {
+
+      @Test
+      @DisplayName("Throw NotfoundException")
+      void ItThrowNotFoundException() {
+
+        final String name = "testName";
+        final String key = "ABC123ABC";
+        final Long decodedId = 123L;
+
+        when(idEncoder.decode(anyString())).thenReturn(decodedId);
+        when(repository.findByNameAndWorkspace_Id(name, decodedId)).thenReturn(Optional.empty());
+
+        Assertions.assertThatThrownBy(() -> memberService.findByNameAndWorkspaceKey(name, key))
+            .isInstanceOf(NotFoundException.class);
+      }
+    }
+
+    @Nested
+    @DisplayName("key가 비어있는 인자를 받으면")
+    class ContextWithKeyNullAndEmptySource {
+
+      @ParameterizedTest
+      @NullAndEmptySource
+      @ValueSource(strings = {"\t", "\n"})
+      @DisplayName("IllegalArgumentException 을 반환한다.")
+      void ItThrowIllegalArgumentException(String key) {
+        final String name = "testName";
+        Assertions.assertThatThrownBy(() -> memberService.findByNameAndWorkspaceKey(name, key))
+            .isInstanceOf(IllegalArgumentException.class);
+      }
+    }
+
+    @Nested
+    @DisplayName("name이 비어있는 인자를 받으면")
+    class ContextWithNameNullAndEmptySource {
+
+      @ParameterizedTest
+      @NullAndEmptySource
+      @ValueSource(strings = {"\t", "\n"})
+      @DisplayName("IllegalArgumentException 을 반환한다.")
+      void ItThrowIllegalArgumentException(String name) {
+        final String key = "AAAADB24";
+        Assertions.assertThatThrownBy(() -> memberService.findByNameAndWorkspaceKey(name, key))
+            .isInstanceOf(IllegalArgumentException.class);
+      }
+    }
+
+    @Nested
+    @DisplayName("존재하는 멤버 name 값을 인자로 받으면")
+    class ContextWithExistentName {
+
+      @Test
+      @DisplayName("해당 멤버를 반환한다")
+      void ItReturnsMember() {
+        //given
+        final var decodedId = 123L;
+        final var savedName = "testName";
+
+        final var findWorkspace = new Workspace("test", "test");
+        final var savedMember = Member.builder().name(savedName)
+            .workspace(findWorkspace)
+            .email("test@gmail.com")
+            .displayName("test")
+            .role(Role.ROLE_USER)
+            .build();
+
+        given(idEncoder.decode(anyString())).willReturn(decodedId);
+        given(repository.findByNameAndWorkspace_Id(anyString(), anyLong()))
+            .willReturn(Optional.of(savedMember));
+
+        //when
+        final var foundMember = memberService.findByNameAndWorkspaceKey(savedName, "test");
+
+        //then
+        final var foundMemberEmail = ReflectionTestUtils.getField(foundMember, "name");
+        assertEquals(savedName, foundMemberEmail);
+      }
+    }
+  }
+
+  @Nested
+  @DisplayName("IsExistsByNameAndWorkspaceKey 메서드는")
+  class DescribeIsExistsByNameAndWorkspaceKey {
+    @Nested
+    @DisplayName("key 가 비어있는 인자를 받으면")
+    class ContextWithKeyNullAndEmptySource {
+
+      @ParameterizedTest
+      @NullAndEmptySource
+      @ValueSource(strings = {"\t", "\n"})
+      @DisplayName("IllegalArgumentException 을 반환한다.")
+      void ItThrowIllegalArgumentException(String key) {
+        String name = "testName";
+        Assertions.assertThatThrownBy(() -> memberService.isExistsByNameAndWorkspaceKey(name, key))
+            .isInstanceOf(IllegalArgumentException.class);
+      }
+    }
+
+    @Nested
+    @DisplayName("name 이 비어있는 인자를 받으면")
+    class ContextWithNameNullAndEmptySource {
+
+      @ParameterizedTest
+      @NullAndEmptySource
+      @ValueSource(strings = {"\t", "\n"})
+      @DisplayName("IllegalArgumentException 을 반환한다.")
+      void ItThrowIllegalArgumentException(String name) {
+        String key = "AAAADB24";
+        Assertions.assertThatThrownBy(() -> memberService.isExistsByNameAndWorkspaceKey(name, key))
+            .isInstanceOf(IllegalArgumentException.class);
+      }
+    }
+
+    @Nested
+    @DisplayName("워크스페이스에 해당 이름을 가진 멤버가 존재한다면")
+    class ContextWithExistMember {
+
+      @Test
+      @DisplayName("true 를 반환한다")
+      void ItReturnTrue() {
+        //given
+        String name = "testName";
+        String key = "AAAADB24";
+        Long decodedWorkspaceId = 123L;
+
+        given(idEncoder.decode(anyString()))
+            .willReturn(decodedWorkspaceId);
+        given(repository.existsByNameAndWorkspace_Id(anyString(), anyLong()))
+            .willReturn(true);
+
+        //when
+        boolean isExists = memberService.isExistsByNameAndWorkspaceKey(name, key);
+
+        //then
+        verify(repository).existsByNameAndWorkspace_Id(anyString(), anyLong());
+        assertThat(isExists).isTrue();
+      }
+    }
+
+    @Nested
+    @DisplayName("워크스페이스에 해당 이름을 가진 멤버가 존재하지 않는다면")
+    class ContextWithNonexistentMember {
+
+      @Test
+      @DisplayName("false 를 반환한다")
+      void ItReturnFalse() {
+        //given
+        String name = "testName";
+        String key = "AAAADB24";
+        Long decodedWorkspaceId = 123L;
+
+        given(idEncoder.decode(anyString()))
+            .willReturn(decodedWorkspaceId);
+        given(repository.existsByNameAndWorkspace_Id(anyString(), anyLong()))
+            .willReturn(false);
+
+        //when
+        boolean isExists = memberService.isExistsByNameAndWorkspaceKey(name, key);
+
+        //then
+        assertThat(isExists).isFalse();
+      }
+    }
+  }
+
+  @Nested
+  @DisplayName("IsExistsByEmailAndWorkspaceKey 메서드는")
+  class DescribeIsExistsByEmailAndWorkspaceKey {
+    @Nested
+    @DisplayName("key 가 비어있는 인자를 받으면")
+    class ContextWithKeyNullAndEmptySource {
+
+      @ParameterizedTest
+      @NullAndEmptySource
+      @ValueSource(strings = {"\t", "\n"})
+      @DisplayName("IllegalArgumentException 을 반환한다.")
+      void ItThrowIllegalArgumentException(String key) {
+        String email = "test@gmail.com";
+        Assertions.assertThatThrownBy(
+                () -> memberService.isExistsByEmailAndWorkspaceKey(email, key))
+            .isInstanceOf(IllegalArgumentException.class);
+      }
+    }
+
+    @Nested
+    @DisplayName("email 이 비어있는 인자를 받으면")
+    class ContextWithEmailNullAndEmptySource {
+
+      @ParameterizedTest
+      @NullAndEmptySource
+      @ValueSource(strings = {"\t", "\n"})
+      @DisplayName("IllegalArgumentException 을 반환한다.")
+      void ItThrowIllegalArgumentException(String email) {
+        String key = "AAAADB24";
+        Assertions.assertThatThrownBy(
+                () -> memberService.isExistsByEmailAndWorkspaceKey(email, key))
+            .isInstanceOf(IllegalArgumentException.class);
+      }
+    }
+
+    @Nested
+    @DisplayName("워크스페이스에 해당 이메일을 가진 멤버가 존재한다면")
+    class ContextWithExistentMember {
+
+      @Test
+      @DisplayName("true 를 반환한다")
+      void ItReturnTrue() {
+        //given
+        String email = "test@gmail.com";
+        String key = "AAAADB24";
+        Long decodedWorkspaceId = 123L;
+
+        given(idEncoder.decode(anyString()))
+            .willReturn(decodedWorkspaceId);
+        given(repository.existsByEmailAndWorkspace_Id(anyString(), anyLong()))
+            .willReturn(true);
+
+        //when
+        boolean isExists = memberService.isExistsByEmailAndWorkspaceKey(email, key);
+
+        //then
+        verify(repository).existsByEmailAndWorkspace_Id(anyString(), anyLong());
+        assertThat(isExists).isTrue();
+      }
+    }
+
+    @Nested
+    @DisplayName("워크스페이스에 해당 메일을 가진 멤버가 존재하지 않는다면")
+    class ContextWithNonexistentMember {
+
+      @Test
+      @DisplayName("false 를 반환한다")
+      void ItReturnFalse() {
+        //given
+        String email = "test@gmail.com";
+        String key = "AAAADB24";
+        Long decodedWorkspaceId = 123L;
+
+        given(idEncoder.decode(anyString()))
+            .willReturn(decodedWorkspaceId);
+        given(repository.existsByEmailAndWorkspace_Id(anyString(), anyLong()))
+            .willReturn(false);
+
+        //when
+        boolean isExists = memberService.isExistsByEmailAndWorkspaceKey(email, key);
+
+        //then
+        assertThat(isExists).isFalse();
       }
     }
   }

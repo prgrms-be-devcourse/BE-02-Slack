@@ -26,6 +26,6 @@ public class EmailController {
   @PostMapping
   @ResponseStatus(HttpStatus.OK)
   public void send(@Valid @RequestBody EmailRequest request) throws MessagingException {
-    emailService.sendMail(request);
+    emailService.sendLoginMail(request);
   }
 }
