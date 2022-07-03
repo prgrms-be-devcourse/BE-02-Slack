@@ -25,6 +25,7 @@ import com.prgrms.be02slack.directmessagechannel.entity.DirectMessageChannel;
 import com.prgrms.be02slack.directmessagechannel.repository.DirectMessageChannelRepository;
 import com.prgrms.be02slack.member.entity.Member;
 import com.prgrms.be02slack.member.service.MemberService;
+import com.prgrms.be02slack.security.MemberDetails;
 import com.prgrms.be02slack.util.WithMockCustomLoginUser;
 import com.prgrms.be02slack.workspace.entity.Workspace;
 import com.prgrms.be02slack.workspace.service.WorkspaceService;
@@ -54,6 +55,9 @@ public class DirectMessageChannelServiceTest {
 
   @Mock
   private Authentication authenticationMocked;
+
+  @Mock
+  private MemberDetails memberDetails;
 
   @InjectMocks
   DefaultDirectMessageChannelService directMessageChannelService;
@@ -136,11 +140,17 @@ public class DirectMessageChannelServiceTest {
         final String validWorkspaceId = "testId";
         final String notExistReceiverEmail = "test@test.test";
         final Workspace workspace = new Workspace("test", "test");
+        final Member member =
+            Member.builder()
+                .name("test")
+                .email("hey")
+                .build();
 
         when(workspaceService.findByKey(any())).thenReturn(workspace);
 
-        when(authenticationMocked.getName()).thenReturn("test");
+        when(authenticationMocked.getPrincipal()).thenReturn(memberDetails);
         when(securityContextMocked.getAuthentication()).thenReturn(authenticationMocked);
+        when(memberDetails.getMember()).thenReturn(member);
         SecurityContextHolder.setContext(securityContextMocked);
 
         when(memberService.findByEmailAndWorkspaceKey(any(), any()))
@@ -175,20 +185,26 @@ public class DirectMessageChannelServiceTest {
                 testMember,
                 workspace
             );
-
-        ReflectionTestUtils.setField(testDirectMessageChannel, "id", 1L);
+        final Member member =
+            Member.builder()
+                .name("test")
+                .email("hey")
+                .build();
 
         when(workspaceService.findByKey(any())).thenReturn(workspace);
 
-        when(authenticationMocked.getName()).thenReturn("test");
+        ReflectionTestUtils.setField(testDirectMessageChannel, "id", 1L);
+
+        when(authenticationMocked.getPrincipal()).thenReturn(memberDetails);
         when(securityContextMocked.getAuthentication()).thenReturn(authenticationMocked);
+        when(memberDetails.getMember()).thenReturn(member);
         SecurityContextHolder.setContext(securityContextMocked);
 
         when(memberService.findByEmailAndWorkspaceKey(any(), any()))
             .thenReturn(testMember);
 
         when(directMessageChannelRepository
-            .findByFirstMemberAndSecondMember(testMember, testMember))
+            .findByFirstMemberAndSecondMember(any(), any()))
             .thenReturn(Optional.of(testDirectMessageChannel));
 
         when(idEncoder.encode(testDirectMessageChannel.getId())).thenReturn("testtest");
@@ -203,7 +219,7 @@ public class DirectMessageChannelServiceTest {
         Assertions.assertThat(expectedId).isEqualTo(actualId);
 
         verify(workspaceService).findByKey(any());
-        verify(memberService, times(2))
+        verify(memberService, times(1))
             .findByEmailAndWorkspaceKey(any(), any());
         verify(directMessageChannelRepository, times(1))
             .findByFirstMemberAndSecondMember(any(), any());
@@ -227,18 +243,25 @@ public class DirectMessageChannelServiceTest {
                 "test",
                 "test"
             );
+        final Member member =
+            Member.builder()
+                  .name("test")
+                  .email("hey")
+                  .build();
 
         when(workspaceService.findByKey(any())).thenReturn(workspace);
 
-        when(authenticationMocked.getName()).thenReturn("test");
+        when(authenticationMocked.getPrincipal()).thenReturn(memberDetails);
         when(securityContextMocked.getAuthentication()).thenReturn(authenticationMocked);
+        when(memberDetails.getMember()).thenReturn(member);
         SecurityContextHolder.setContext(securityContextMocked);
+
 
         when(memberService.findByEmailAndWorkspaceKey(any(), any()))
             .thenReturn(testMember);
 
         when(directMessageChannelRepository
-            .findByFirstMemberAndSecondMember(testMember, testMember))
+            .findByFirstMemberAndSecondMember(any(), any()))
             .thenReturn(Optional.empty());
 
         MockedConstruction<DirectMessageChannel> mockedConstruction2 =
@@ -257,9 +280,9 @@ public class DirectMessageChannelServiceTest {
         Assertions.assertThat(expectedId).isEqualTo(actualId);
 
         verify(workspaceService).findByKey(any());
-        verify(memberService, times(2))
+        verify(memberService, times(1))
             .findByEmailAndWorkspaceKey(any(), any());
-        verify(directMessageChannelRepository, times(2))
+        verify(directMessageChannelRepository, times(1))
             .findByFirstMemberAndSecondMember(any(), any());
         verify(idEncoder).encode(anyLong());
       }
