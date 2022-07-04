@@ -18,13 +18,18 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.MockBeans;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.prgrms.be02slack.directmessagechannel.service.DirectMessageChannelService;
+import com.prgrms.be02slack.member.entity.Member;
+import com.prgrms.be02slack.member.entity.Role;
 import com.prgrms.be02slack.util.ControllerSetUp;
+import com.prgrms.be02slack.util.WithMockCustomLoginMember;
+import com.prgrms.be02slack.workspace.entity.Workspace;
 
 @WebMvcTest(controllers = DirectMessageChannelApiController.class)
 @MockBeans({@MockBean(JpaMetamodelMappingContext.class)})
@@ -53,13 +58,24 @@ public class DirectMessageChannelApiControllerTest extends ControllerSetUp {
 
       @Test
       @DisplayName("다이렉트 메세지 채널 ID를 반환한다.")
+      @WithMockCustomLoginMember
       void itReturnDirectMessageChannelId() throws Exception {
 
         //given
         final String validReceiverEmail = "test@test.test";
         final String url = DM_CHANNEL_URL + "?receiverEmail=" + validReceiverEmail;
+        final Workspace workspace = Workspace.createDefaultWorkspace();
+        ReflectionTestUtils.setField(workspace, "id", 1L);
+        final Member member = Member.builder()
+            .email("test@test.com")
+            .name("test")
+            .displayName("test")
+            .role(Role.ROLE_USER)
+            .build();
+        ReflectionTestUtils.setField(member, "id", 1L);
+        ReflectionTestUtils.setField(member, "workspace", workspace);
 
-        given(directMessageChannelService.create("test", "test"))
+        given(directMessageChannelService.create("test", "test", member))
             .willReturn("testId");
 
         //when
@@ -68,7 +84,7 @@ public class DirectMessageChannelApiControllerTest extends ControllerSetUp {
 
         final ResultActions response = mockMvc.perform(request);
         //then
-        verify(directMessageChannelService).create(anyString(), anyString());
+        verify(directMessageChannelService).create(anyString(), anyString(), any());
         response.andExpect(status().isOk())
             .andDo(document("Create DirectMessageChannel",
                 requestParameters(
@@ -133,6 +149,7 @@ public class DirectMessageChannelApiControllerTest extends ControllerSetUp {
       @ParameterizedTest
       @ValueSource(strings = {"hello", "@hello", "hello.test"})
       @DisplayName("BadRequest를 반환한다.")
+
       void itReturnBadRequest(String receiverEmail) throws Exception {
         //given
         final String workspaceId = "testId";
