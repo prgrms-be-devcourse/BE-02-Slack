@@ -3,6 +3,7 @@ package com.prgrms.be02slack.workspace.controller;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Email;
 
 import org.springframework.http.HttpStatus;
@@ -33,7 +34,7 @@ public class WorkspaceApiController {
 
   @PutMapping("{key}")
   @ResponseStatus(HttpStatus.OK)
-  public void update(@PathVariable String key, @RequestBody WorkspaceUpdateRequest request) {
+  public void update(@PathVariable String key, @Valid @RequestBody WorkspaceUpdateRequest request) {
     final var workspace = WorkspaceUpdateRequest.toEntity(request);
     workspaceService.update(key, workspace);
   }
