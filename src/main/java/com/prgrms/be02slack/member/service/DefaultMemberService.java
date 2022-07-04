@@ -2,6 +2,8 @@ package com.prgrms.be02slack.member.service;
 
 import static org.apache.logging.log4j.util.Strings.*;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -141,6 +143,11 @@ public class DefaultMemberService implements MemberService {
         .orElseThrow(() -> new NotFoundException("Member not found"));
 
     return MemberResponse.from(foundMember, encodedMemberId);
+  }
+
+  @Override
+  public List<MemberResponse> getAllFromChannel(Member member, String encodedChannelId) {
+    return null;
   }
 
   private Member createMember(String email) {

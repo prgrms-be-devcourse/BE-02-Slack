@@ -1,5 +1,7 @@
 package com.prgrms.be02slack.member.service;
 
+import java.util.List;
+
 import com.prgrms.be02slack.member.controller.dto.MemberResponse;
 import com.prgrms.be02slack.member.entity.Member;
 
@@ -25,4 +27,6 @@ public interface MemberService {
   Member save(String name, String email, Role role, String workspaceKey, String displayName);
 
   MemberResponse getOne(Member member, String encodedMemberId);
+
+  List<MemberResponse> getAllFromChannel(Member member, String encodedChannelId);
 }
