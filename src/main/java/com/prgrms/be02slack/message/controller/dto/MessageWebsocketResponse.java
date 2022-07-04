@@ -7,7 +7,7 @@ public class MessageWebsocketResponse {
   private Author author;
   private String content;
 
-  public MessageWebsocketResponse() {/*no-op*/}
+  protected MessageWebsocketResponse() {/*no-op*/}
 
   public MessageWebsocketResponse(Author author, String content) {
     this.author = author;

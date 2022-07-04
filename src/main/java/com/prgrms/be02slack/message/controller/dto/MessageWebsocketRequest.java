@@ -10,7 +10,7 @@ public class MessageWebsocketRequest {
   @NotBlank
   private String content;
 
-  public MessageWebsocketRequest() {/*no-op*/}
+  protected MessageWebsocketRequest() {/*no-op*/}
 
   public MessageWebsocketRequest(String content) {
     this.content = content;
