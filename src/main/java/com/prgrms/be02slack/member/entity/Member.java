@@ -142,4 +142,8 @@ public class Member extends BaseTime {
   public int hashCode() {
     return Objects.hash(id);
   }
+
+  public Workspace getWorkspace() {
+    return workspace;
+  }
 }
