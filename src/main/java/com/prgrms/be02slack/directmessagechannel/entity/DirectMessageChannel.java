@@ -24,11 +24,11 @@ public class DirectMessageChannel extends BaseTime {
   private Long id;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "member_id")
+  @JoinColumn(name = "member_id1")
   private Member firstMember;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "member_id")
+  @JoinColumn(name = "member_id2")
   private Member secondMember;
 
   @ManyToOne(fetch = FetchType.LAZY)

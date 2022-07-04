@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.prgrms.be02slack.directmessagechannel.service.DirectMessageChannelService;
+import com.prgrms.be02slack.member.entity.Member;
+import com.prgrms.be02slack.security.CurrentMember;
 
 @RestController
 @Validated
@@ -26,9 +28,10 @@ public class DirectMessageChannelApiController {
 
   @PostMapping
   public String create(
+      @CurrentMember Member member,
       @PathVariable @NotBlank String workspaceId,
       @RequestParam @NotBlank @Email String receiverEmail
   ) {
-    return directMessageChannelService.create(workspaceId, receiverEmail);
+    return directMessageChannelService.create(workspaceId, receiverEmail, member);
   }
 }
