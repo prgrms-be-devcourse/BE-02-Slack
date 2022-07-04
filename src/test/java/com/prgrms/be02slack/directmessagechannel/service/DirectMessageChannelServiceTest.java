@@ -78,9 +78,9 @@ public class DirectMessageChannelServiceTest {
             .name("test")
             .displayName("test")
             .role(Role.ROLE_USER)
+            .workspace(workspace)
             .build();
         ReflectionTestUtils.setField(member, "id", 1L);
-        ReflectionTestUtils.setField(member, "workspace", workspace);
 
         //then
         Assertions.assertThatThrownBy(
@@ -107,9 +107,9 @@ public class DirectMessageChannelServiceTest {
             .name("test")
             .displayName("test")
             .role(Role.ROLE_USER)
+            .workspace(workspace)
             .build();
         ReflectionTestUtils.setField(member, "id", 1L);
-        ReflectionTestUtils.setField(member, "workspace", workspace);
 
         //then
         Assertions.assertThatThrownBy(
@@ -135,9 +135,9 @@ public class DirectMessageChannelServiceTest {
             .name("test")
             .displayName("test")
             .role(Role.ROLE_USER)
+            .workspace(workspace)
             .build();
         ReflectionTestUtils.setField(member, "id", 1L);
-        ReflectionTestUtils.setField(member, "workspace", workspace);
         when(workspaceService.findByKey(anyString())).thenThrow(NotFoundException.class);
 
         //then

@@ -38,6 +38,7 @@ public class DefaultDirectMessageChannelService implements DirectMessageChannelS
 
   @Override
   public String create(String encodedWorkspaceId, String receiverEmail, Member sender) {
+    Assert.notNull(sender, "sender must be provided");
     Assert.isTrue(isNotBlank(encodedWorkspaceId), "EncodedWorkspaceId must be provided");
     Assert.isTrue(isNotBlank(receiverEmail), "EncodedReceiverId must be provided");
 
