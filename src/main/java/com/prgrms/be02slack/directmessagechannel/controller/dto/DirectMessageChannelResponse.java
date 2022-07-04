@@ -9,4 +9,12 @@ public class DirectMessageChannelResponse {
     this.memberName = memberName;
     this.encodedDirectMessageChannelId = encodedDirectMessageChannelId;
   }
+
+  public String getMemberName() {
+    return memberName;
+  }
+
+  public String getEncodedDirectMessageChannelId() {
+    return encodedDirectMessageChannelId;
+  }
 }
