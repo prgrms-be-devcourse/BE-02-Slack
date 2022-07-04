@@ -1,11 +1,14 @@
 package com.prgrms.be02slack.channel.controller;
 
+import java.util.List;
+
 import javax.mail.MessagingException;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,10 +17,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.prgrms.be02slack.channel.controller.dto.ChannelResponse;
 import com.prgrms.be02slack.channel.controller.dto.ChannelSaveRequest;
 import com.prgrms.be02slack.channel.controller.dto.InviteRequest;
 import com.prgrms.be02slack.channel.service.ChannelService;
 import com.prgrms.be02slack.common.dto.AuthResponse;
+import com.prgrms.be02slack.member.entity.Member;
+import com.prgrms.be02slack.security.CurrentMember;
 
 @Validated
 @RestController
@@ -52,5 +58,11 @@ public class ChannelApiController {
       @PathVariable @NotBlank String channelId,
       @RequestParam @NotBlank String token) {
     return channelService.participate(workspaceId, channelId, token);
+  }
+
+  @GetMapping
+  public List<ChannelResponse> findAllByMember(
+      @CurrentMember Member member) {
+    return channelService.findAllByMember(member);
   }
 }
