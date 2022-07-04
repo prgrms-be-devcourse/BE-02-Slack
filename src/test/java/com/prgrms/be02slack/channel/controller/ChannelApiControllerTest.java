@@ -21,7 +21,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.MockBeans;
@@ -29,7 +28,6 @@ import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
@@ -48,16 +46,12 @@ import com.prgrms.be02slack.util.WithMockCustomLoginMember;
     controllers = ChannelApiController.class
 )
 @MockBeans({@MockBean(JpaMetamodelMappingContext.class)})
-@AutoConfigureRestDocs
 class ChannelApiControllerTest extends ControllerSetUp {
   private static final String API_URL = "/api/v1/";
   private static final String CREATE_CHANNEL_URL = API_URL + "workspaces/testWorkspaceId/channels";
 
   @Autowired
   private ObjectMapper objectMapper;
-
-  @Autowired
-  private MockMvc mockMvc;
 
   @MockBean
   private ChannelService channelService;
