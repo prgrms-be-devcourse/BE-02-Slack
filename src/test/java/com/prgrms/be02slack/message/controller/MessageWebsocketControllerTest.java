@@ -158,7 +158,7 @@ class MessageWebsocketControllerTest {
 
         //then
         final var resultResponse = (MessageWebsocketResponse)blockingQueue.poll(1, SECONDS);
-        assertNotEquals(null, resultResponse);
+        assertNotNull(resultResponse);
       }
     }
   }
