@@ -18,6 +18,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import com.prgrms.be02slack.common.exception.NotFoundException;
 import com.prgrms.be02slack.common.util.IdEncoder;
+import com.prgrms.be02slack.directmessagechannel.controller.dto.DirectMessageChannelResponse;
 import com.prgrms.be02slack.directmessagechannel.entity.DirectMessageChannel;
 import com.prgrms.be02slack.directmessagechannel.repository.DirectMessageChannelRepository;
 import com.prgrms.be02slack.member.entity.Member;
@@ -30,6 +31,7 @@ import com.prgrms.be02slack.workspace.service.WorkspaceService;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
@@ -258,9 +260,9 @@ public class DirectMessageChannelServiceTest {
             );
         final Member member =
             Member.builder()
-                  .name("test")
-                  .email("hey")
-                  .build();
+                .name("test")
+                .email("hey")
+                .build();
 
         when(workspaceService.findByKey(any())).thenReturn(workspace);
 
@@ -292,6 +294,108 @@ public class DirectMessageChannelServiceTest {
         verify(directMessageChannelRepository, times(1))
             .findByFirstMemberAndSecondMember(any(), any());
         verify(idEncoder).encode(anyLong());
+      }
+    }
+  }
+
+  @Nested
+  @DisplayName("getChannel 메서드는")
+  @WithMockCustomLoginUser
+  class DescribeGetChannel {
+
+    @Nested
+    @DisplayName("Null인 Member를 인자로 받으면")
+    class ContextNullMember {
+
+      @Test
+      @DisplayName("IllegalArgumentException을 반환한다.")
+      void itThrowIllegalArgumentException() {
+
+        //given
+        final Member member = null;
+
+        //then
+        Assertions.assertThatThrownBy(
+                () -> directMessageChannelService.getChannels(member))
+            .isInstanceOf(IllegalArgumentException.class);
+      }
+    }
+
+    @Nested
+    @DisplayName("Member의 생성된 DM채널이 존재하지 않는 다면")
+    class ContextNotExistWorkspaceId {
+
+      @Test
+      @DisplayName("빈 리스트를 반환한다.")
+      void itThrowNotFoundException() {
+
+        //given
+        final Workspace workspace = Workspace.createDefaultWorkspace();
+        ReflectionTestUtils.setField(workspace, "id", 1L);
+        final Member member = Member.builder()
+            .email("test@test.com")
+            .name("test")
+            .displayName("test")
+            .role(Role.ROLE_USER)
+            .workspace(workspace)
+            .build();
+        ReflectionTestUtils.setField(member, "id", 1L);
+
+        final List<DirectMessageChannel> emptyList = List.of();
+        when(directMessageChannelRepository.findAllByMember(any())).thenReturn(emptyList);
+
+        final List<DirectMessageChannelResponse> expect = List.of();
+
+        //when
+        final List<DirectMessageChannelResponse> actual =
+            directMessageChannelService.getChannels(member);
+
+        //then
+        Assertions.assertThat(actual).isEqualTo(expect);
+        verify(directMessageChannelRepository).findAllByMember(any());
+      }
+    }
+
+    @Nested
+    @DisplayName("해당 멤버의 Dm채들이 존재한다면")
+    class ContextExistDirectMessageChannel {
+
+      @Test
+      @DisplayName("해당 채널들의 ResponseDto List를 반환한다.")
+      void itReturnResponseDtoList() {
+
+        //given
+        final Workspace workspace = new Workspace("test", "test");
+        final Member member =
+            Member.builder()
+                .name("test")
+                .email("hey")
+                .workspace(workspace)
+                .role(Role.ROLE_OWNER)
+                .build();
+        final DirectMessageChannel firstChannel =
+            new DirectMessageChannel(member, member, workspace);
+        final DirectMessageChannel secondChannel =
+            new DirectMessageChannel(member, member, workspace);
+        ReflectionTestUtils.setField(firstChannel, "id", 1L);
+        ReflectionTestUtils.setField(secondChannel, "id", 2L);
+        final List<DirectMessageChannel> channels = List.of(firstChannel, secondChannel);
+
+        when(directMessageChannelRepository.findAllByMember(any())).thenReturn(channels);
+
+        final String firstExpectedId = idEncoder.encode(1);
+        final String secondExpectedId = idEncoder.encode(2);
+
+        //when
+        final List<DirectMessageChannelResponse> actual =
+            directMessageChannelService.getChannels(member);
+
+        //then
+        Assertions.assertThat(actual.size()).isEqualTo(2);
+        Assertions.assertThat(actual.get(0).getEncodedDirectMessageChannelId())
+            .isEqualTo(firstExpectedId);
+        Assertions.assertThat(actual.get(1).getEncodedDirectMessageChannelId())
+            .isEqualTo(secondExpectedId);
       }
     }
   }
