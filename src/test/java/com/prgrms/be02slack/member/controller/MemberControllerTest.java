@@ -7,6 +7,8 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.util.List;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -274,6 +276,59 @@ public class MemberControllerTest extends ControllerSetUp {
                     fieldWithPath("name").type(JsonFieldType.STRING).description("이름"),
                     fieldWithPath("displayName").type(JsonFieldType.STRING).description("보여지는 이름"),
                     fieldWithPath("role").type(JsonFieldType.STRING).description("워크스페이스 내 역할")
+                )
+            ));
+      }
+    }
+  }
+
+  @Nested
+  @DisplayName("getAllFromChannel 메서드는")
+  @WithMockCustomLoginMember
+  class DescribeGetAllFromChannel {
+
+    private static final String GET_ALL_URI = "/api/v1/channels/{encodedChannelId}/members";
+
+    @Nested
+    @DisplayName("유효한 값이 전달되면")
+    class ContextWithValidData {
+
+      @Test
+      @DisplayName("채널 내 모든 멤버 정보들을 전달한다")
+      void ItResponseMembersInfo() throws Exception {
+        //given
+        final String encodedChannelId = "TESTID";
+        final MemberResponse memberResponse = MemberResponse.builder()
+            .encodedMemberId("TESTID")
+            .email("test@test.com")
+            .name("test")
+            .displayName("test")
+            .role(Role.ROLE_USER)
+            .build();
+        final List<MemberResponse> memberResponseList = List.of(memberResponse);
+        given(memberService.getAllFromChannel(any(Member.class), anyString())).willReturn(memberResponseList);
+
+        //when
+        final MockHttpServletRequestBuilder request =
+            RestDocumentationRequestBuilders.get(GET_ALL_URI, encodedChannelId);
+
+        final ResultActions response = mockMvc.perform(request);
+
+        //then
+        verify(memberService).getAllFromChannel(any(Member.class), anyString());
+        response.andExpect(status().isOk())
+            .andDo(document("Get Member Infos From Channel",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                pathParameters(
+                    parameterWithName("encodedChannelId").description("Encoded Channel Id")
+                ),
+                responseFields(
+                    fieldWithPath("[].encodedMemberId").type(JsonFieldType.STRING).description("인코딩된 멤버 id"),
+                    fieldWithPath("[].email").type(JsonFieldType.STRING).description("이메일"),
+                    fieldWithPath("[].name").type(JsonFieldType.STRING).description("이름"),
+                    fieldWithPath("[].displayName").type(JsonFieldType.STRING).description("보여지는 이름"),
+                    fieldWithPath("[].role").type(JsonFieldType.STRING).description("워크스페이스 내 역할")
                 )
             ));
       }

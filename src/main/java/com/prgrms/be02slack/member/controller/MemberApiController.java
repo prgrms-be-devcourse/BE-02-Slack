@@ -1,5 +1,7 @@
 package com.prgrms.be02slack.member.controller;
 
+import java.util.List;
+
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 
@@ -48,5 +50,13 @@ public class MemberApiController {
       @CurrentMember Member member,
       @PathVariable @NotBlank String encodedMemberId) {
     return memberService.getOne(member, encodedMemberId);
+  }
+
+  @GetMapping("api/v1/channels/{encodedChannelId}/members")
+  @ResponseStatus(HttpStatus.OK)
+  public List<MemberResponse> getAllFromChannel(
+      @CurrentMember Member member,
+      @PathVariable @NotBlank String encodedChannelId) {
+    return memberService.getAllFromChannel(member, encodedChannelId);
   }
 }
