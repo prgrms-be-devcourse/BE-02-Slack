@@ -676,9 +676,9 @@ class DefaultMemberServiceTest {
             .name("test")
             .displayName("test")
             .role(Role.ROLE_USER)
+            .workspace(workspace)
             .build();
         ReflectionTestUtils.setField(member, "id", 1L);
-        ReflectionTestUtils.setField(member, "workspace", workspace);
 
         //when, then
         assertThrows(IllegalArgumentException.class, () ->
@@ -701,9 +701,9 @@ class DefaultMemberServiceTest {
             .name("test")
             .displayName("test")
             .role(Role.ROLE_USER)
+            .workspace(workspace)
             .build();
         ReflectionTestUtils.setField(member, "id", 1L);
-        ReflectionTestUtils.setField(member, "workspace", workspace);
         final String encodedMemberId = "TESTID";
         given(idEncoder.decode(anyString())).willReturn(1L);
         given(repository.findByIdAndWorkspace_id(anyLong(), anyLong())).willReturn(Optional.empty());
@@ -729,9 +729,9 @@ class DefaultMemberServiceTest {
             .name("test")
             .displayName("test")
             .role(Role.ROLE_USER)
+            .workspace(workspace)
             .build();
         ReflectionTestUtils.setField(member, "id", 1L);
-        ReflectionTestUtils.setField(member, "workspace", workspace);
         final String encodedMemberId = "TESTID";
         final MemberResponse memberResponse = MemberResponse.builder()
             .encodedMemberId("TESTID")
