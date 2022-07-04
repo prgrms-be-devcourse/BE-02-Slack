@@ -62,17 +62,6 @@ class ChannelApiControllerTest extends ControllerSetUp {
   @MockBean
   private ChannelService channelService;
 
-  static class PathVariableSourceBlank implements ArgumentsProvider {
-    @Override
-    public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
-      return Stream.of(
-          Arguments.of(" "),
-          Arguments.of("\t"),
-          Arguments.of("\n")
-      );
-    }
-  }
-
   static class NameSourceOutOfRange implements ArgumentsProvider {
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
@@ -156,35 +145,6 @@ class ChannelApiControllerTest extends ControllerSetUp {
                         .description("whether the channel is open to the public")
                 )
             ));
-      }
-    }
-
-    @Nested
-    @DisplayName("workspaceId 가 빈 값 이거나 공백이라면")
-    class ContextWithWorkspaceIdBlank {
-
-      @ParameterizedTest
-      @ArgumentsSource(PathVariableSourceBlank.class)
-      @DisplayName("BadRequest 를 응답한다")
-      void ItResponseBadRequest(String workspaceId) throws Exception {
-        //given
-        HashMap<Object, Object> requestMap = new HashMap<>();
-        requestMap.put("name", "testName");
-        requestMap.put("description", "testDescription");
-        requestMap.put("isPrivate", false);
-
-        String requestBody = objectMapper.writeValueAsString(requestMap);
-
-        //when
-        MockHttpServletRequestBuilder request = RestDocumentationRequestBuilders.post(
-                API_URL + "workspaces/" + workspaceId + "/channels")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(requestBody);
-
-        ResultActions response = mockMvc.perform(request);
-
-        //then
-        response.andExpect(status().isBadRequest());
       }
     }
 
@@ -293,66 +253,6 @@ class ChannelApiControllerTest extends ControllerSetUp {
                         .description("list of invitees")
                 )
             ));
-      }
-    }
-
-    @Nested
-    @DisplayName("workspaceId 가 빈 값 이거나 공백이라면")
-    class ContextWithWorkspaceIdBlank {
-
-      @ParameterizedTest
-      @ArgumentsSource(PathVariableSourceBlank.class)
-      @DisplayName("BadRequest 를 응답한다")
-      void ItResponseBadRequest(String workspaceId) throws Exception {
-        //given
-        HashMap<String, Object> requestMap = new HashMap<>();
-        requestMap.put("sender", "testSenderName");
-        requestMap.put("inviteeInfos", Set.of("name1", "test@gmail.com"));
-
-        String requestBody = objectMapper.writeValueAsString(requestMap);
-
-        //when
-        MockHttpServletRequestBuilder request = RestDocumentationRequestBuilders.post(
-                API_URL + "/workspaces/{workspaceId}/channels/{channelId}/invite",
-                workspaceId, "channelId"
-            )
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(requestBody);
-
-        ResultActions response = mockMvc.perform(request);
-
-        //then
-        response.andExpect(status().isBadRequest());
-      }
-    }
-
-    @Nested
-    @DisplayName("channelId 가 빈 값 이거나 공백이라면")
-    class ContextWithChannelIdBlank {
-
-      @ParameterizedTest
-      @ArgumentsSource(PathVariableSourceBlank.class)
-      @DisplayName("BadRequest 를 응답한다")
-      void ItResponseBadRequest(String channelId) throws Exception {
-        //given
-        HashMap<String, Object> requestMap = new HashMap<>();
-        requestMap.put("sender", "testSenderName");
-        requestMap.put("inviteeInfos", Set.of("name1", "test@gmail.com"));
-
-        String requestBody = objectMapper.writeValueAsString(requestMap);
-
-        //when
-        MockHttpServletRequestBuilder request = RestDocumentationRequestBuilders.post(
-                API_URL + "/workspaces/{workspaceId}/channels/{channelId}/invite",
-                "workspaceId", channelId
-            )
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(requestBody);
-
-        ResultActions response = mockMvc.perform(request);
-
-        //then
-        response.andExpect(status().isBadRequest());
       }
     }
 
@@ -496,64 +396,6 @@ class ChannelApiControllerTest extends ControllerSetUp {
                     fieldWithPath("tokenType").type(JsonFieldType.STRING)
                         .description("token type")
                 )));
-      }
-    }
-
-    @Nested
-    @DisplayName("workspaceId 가 빈 값 이거나 공백이라면")
-    class ContextWithWorkspaceIdBlank {
-
-      @ParameterizedTest
-      @ArgumentsSource(PathVariableSourceBlank.class)
-      @DisplayName("BadRequest 를 응답한다")
-      void ItResponseBadRequest(String workspaceId) throws Exception {
-        //given
-        HashMap<String, Object> requestMap = new HashMap<>();
-        requestMap.put("token", "token");
-
-        String requestBody = objectMapper.writeValueAsString(requestMap);
-
-        //when
-        MockHttpServletRequestBuilder request = RestDocumentationRequestBuilders.post(
-                API_URL + "/workspaces/{workspaceId}/channels/{channelId}/participate?token={token}",
-                workspaceId, "channelId", "token"
-            )
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(requestBody);
-
-        ResultActions response = mockMvc.perform(request);
-
-        //then
-        response.andExpect(status().isBadRequest());
-      }
-    }
-
-    @Nested
-    @DisplayName("channelId 가 빈 값 이거나 공백이라면")
-    class ContextWithChannelIdBlank {
-
-      @ParameterizedTest
-      @ArgumentsSource(PathVariableSourceBlank.class)
-      @DisplayName("BadRequest 를 응답한다")
-      void ItResponseBadRequest(String channelId) throws Exception {
-        //given
-        HashMap<String, Object> requestMap = new HashMap<>();
-        requestMap.put("token", "token");
-
-        String requestBody = objectMapper.writeValueAsString(requestMap);
-
-        //when
-        MockHttpServletRequestBuilder request = RestDocumentationRequestBuilders.post(
-                API_URL + "/workspaces/{workspaceId}/channels/{channelId}/participate?token={token}",
-                "workspaceId", channelId, "token"
-            )
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(requestBody);
-
-        ResultActions response = mockMvc.perform(request);
-
-        //then
-        response.andExpect(status().isBadRequest());
       }
     }
 
