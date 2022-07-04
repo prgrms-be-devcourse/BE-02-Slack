@@ -3,8 +3,13 @@ package com.prgrms.be02slack.directmessagechannel.controller;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+
+import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -18,12 +23,15 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.MockBeans;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
+import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.prgrms.be02slack.directmessagechannel.controller.dto.DirectMessageChannelResponse;
+import com.prgrms.be02slack.directmessagechannel.entity.DirectMessageChannel;
 import com.prgrms.be02slack.directmessagechannel.service.DirectMessageChannelService;
 import com.prgrms.be02slack.member.entity.Member;
 import com.prgrms.be02slack.member.entity.Role;
@@ -41,10 +49,6 @@ public class DirectMessageChannelApiControllerTest extends ControllerSetUp {
 
   @Autowired
   private MockMvc mockMvc;
-
-  @Autowired
-  private ObjectMapper objectMapper;
-
   @MockBean
   private DirectMessageChannelService directMessageChannelService;
 
@@ -164,6 +168,53 @@ public class DirectMessageChannelApiControllerTest extends ControllerSetUp {
 
         //then
         response.andExpect(status().isBadRequest());
+      }
+    }
+  }
+
+  @Nested
+  @DisplayName("getChannels 메서드는 테스트 할 때")
+  class DescribeGetChannels {
+
+    @Nested
+    @DisplayName("유효한 workspaceId와 Member객체를 인자로 받으면")
+    @WithMockCustomLoginMember
+    class ContextValidRequest {
+
+      @Test
+      @DisplayName("200ok와 DM채널 리스트를 반환한다.")
+      void itReturnOkAndDMChannelList() throws Exception {
+
+        //given
+        final DirectMessageChannelResponse firstResponse =
+            new DirectMessageChannelResponse("testName","testId");
+        final DirectMessageChannelResponse secondResponse =
+            new DirectMessageChannelResponse("testName","testId");
+
+        final List<DirectMessageChannelResponse> responseDto = List.of(firstResponse, secondResponse);
+
+
+        given(directMessageChannelService.getChannels(any())).willReturn(responseDto);
+
+        //when
+        final MockHttpServletRequestBuilder request =
+            RestDocumentationRequestBuilders.get(DM_CHANNEL_URL);
+
+        final ResultActions response = mockMvc.perform(request);
+
+        //then
+        verify(directMessageChannelService).getChannels(any());
+        response.andExpect(status().isOk())
+            .andDo(document("Get DirectMessageChannels",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                responseFields(
+                    fieldWithPath("[].memberName")
+                        .type(JsonFieldType.STRING).description("상대 이름"),
+                    fieldWithPath("[].encodedDirectMessageChannelId")
+                        .type(JsonFieldType.STRING).description("채널 ID")
+                )
+            ));
       }
     }
   }
