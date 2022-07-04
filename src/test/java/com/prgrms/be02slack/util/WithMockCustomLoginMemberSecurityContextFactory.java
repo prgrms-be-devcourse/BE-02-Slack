@@ -27,9 +27,9 @@ public class WithMockCustomLoginMemberSecurityContextFactory implements
         .name(annotation.name())
         .displayName(annotation.displayName())
         .role(annotation.role())
+        .workspace(workspace)
         .build();
     ReflectionTestUtils.setField(member, "id", annotation.id());
-    ReflectionTestUtils.setField(member, "workspace", workspace);
 
     final MemberDetails memberDetails = MemberDetails.create(member);
 
