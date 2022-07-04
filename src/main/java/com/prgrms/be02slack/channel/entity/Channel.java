@@ -63,6 +63,14 @@ public class Channel extends BaseTime {
     return id;
   }
 
+  public String getName() {
+    return name;
+  }
+
+  public boolean isPrivate() {
+    return isPrivate;
+  }
+
   public void addSubscribeInfo(SubscribeInfo subscribeInfo) {
     subscribeInfos.add(subscribeInfo);
   }

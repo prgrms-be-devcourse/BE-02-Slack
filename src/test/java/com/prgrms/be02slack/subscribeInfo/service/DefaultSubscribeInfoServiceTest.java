@@ -532,4 +532,53 @@ class DefaultSubscribeInfoServiceTest {
       }
     }
   }
+
+  @Nested
+  @DisplayName("findAllByMember 메서드는")
+  class DescribeFindAllByMember {
+
+    @Test
+    @DisplayName("멤버의 구독 정보들을 반환한다")
+    void ItReturnsSubscribeInfos() {
+      //given
+      Workspace workspace = Workspace.createDefaultWorkspace();
+      Member member = Member.builder()
+          .email("test@naver.com")
+          .name("test")
+          .displayName("test")
+          .role(Role.ROLE_OWNER)
+          .workspace(workspace)
+          .build();
+      Channel channel = Channel.builder()
+          .workspace(workspace)
+          .description("test")
+          .name("test")
+          .isPrivate(true)
+          .owner(member)
+          .build();
+      List<SubscribeInfo> createdSubscribeInfos = List.of(SubscribeInfo.subscribe(channel, member));
+      given(subscribeInfoRepository.findAllByMember(any(Member.class)))
+          .willReturn(createdSubscribeInfos);
+
+      //when
+      List<SubscribeInfo> subscribeInfos = subscribeInfoService.findAllByMember(member);
+
+      //then
+      verify(subscribeInfoRepository).findAllByMember(any(Member.class));
+      assertThat(subscribeInfos).isEqualTo(createdSubscribeInfos);
+    }
+
+    @Nested
+    @DisplayName("member 값이 null 이라면")
+    class ContextWithMemberNull {
+      @Test
+      @DisplayName("IllegalArgumentException 에러를 발생시킨다")
+      void ItThrowsIllegalArgumentException() {
+        //given
+        //when, then
+        assertThrows(IllegalArgumentException.class,
+            () -> subscribeInfoService.findAllByMember(null));
+      }
+    }
+  }
 }
