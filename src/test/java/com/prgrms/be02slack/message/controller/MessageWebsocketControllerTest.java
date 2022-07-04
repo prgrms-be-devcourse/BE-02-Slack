@@ -104,18 +104,17 @@ class MessageWebsocketControllerTest {
         StompSession session = stompClient.connect(WS_URI, getStompSessionHandlerAdapter())
             .get(1, SECONDS);
 
-        String subUrl = MessageFormat.format("/topic/workspace/{0}/channel/{1}", "TEST", "TEST");
+        String subUrl = MessageFormat.format("/topic/channel.{0}", "TEST");
         session.subscribe(subUrl, getStompFrameHandler(MessageWebsocketResponse.class));
 
         final var message = Message.builder()
             .encodedChannelId("TEST123")
             .member(testMember)
             .content("test").build();
-        given(messageService.sendMessage(anyString(), anyString(), anyString())).willReturn(
-            message);
+        given(messageService.sendMessage(anyString(), anyString())).willReturn(message);
 
         //when
-        String pubUrl = MessageFormat.format("/app/workspace/{0}/channel/{1}", "TEST", "TEST");
+        String pubUrl = MessageFormat.format("/app/channel.{0}", "TEST");
         session.send(pubUrl, new MessageWebsocketRequest("TEST"));
 
         //then
@@ -144,18 +143,17 @@ class MessageWebsocketControllerTest {
         StompSession session = stompClient.connect(WS_URI, getStompSessionHandlerAdapter())
             .get(1, SECONDS);
 
-        String subUrl = "/user/queue/error";
+        String subUrl = "/user/queue.error";
         session.subscribe(subUrl, getStompFrameHandler(MessageWebsocketResponse.class));
 
         final var message = Message.builder()
             .encodedChannelId("TEST123")
             .member(testMember)
             .content("test").build();
-        given(messageService.sendMessage(anyString(), anyString(), anyString())).willReturn(
-            message);
+        given(messageService.sendMessage(anyString(), anyString())).willReturn(message);
 
         //when
-        String pubUrl = MessageFormat.format("/app/workspace/{0}/channel/{1}", "TEST", "TEST");
+        String pubUrl = MessageFormat.format("/app/channel.{0}", "TEST");
         session.send(pubUrl, new MessageWebsocketRequest(src));
 
         //then
