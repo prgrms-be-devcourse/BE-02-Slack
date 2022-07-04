@@ -2,6 +2,8 @@ package com.prgrms.be02slack.subscribeInfo.service;
 
 import static org.apache.logging.log4j.util.Strings.*;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -56,5 +58,12 @@ public class DefaultSubscribeInfoService implements SubscribeInfoService {
     Assert.isTrue(isNotBlank(name), "Name must be provided");
 
     return subscribeInfoRepository.existsByChannelAndMemberName(channel, name).isPresent();
+  }
+
+  @Override
+  public List<SubscribeInfo> findAllByMember(Member member) {
+    Assert.notNull(member, "Member must be provided");
+
+    return subscribeInfoRepository.findAllByMember(member);
   }
 }

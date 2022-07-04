@@ -4,15 +4,19 @@ import static com.prgrms.be02slack.channel.exception.ErrorMessage.*;
 import static com.prgrms.be02slack.common.exception.ErrorMessage.*;
 import static org.apache.logging.log4j.util.Strings.*;
 
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.mail.MessagingException;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import com.prgrms.be02slack.channel.controller.dto.ChannelResponse;
 import com.prgrms.be02slack.channel.controller.dto.ChannelSaveRequest;
 import com.prgrms.be02slack.channel.controller.dto.InviteRequest;
 import com.prgrms.be02slack.channel.entity.Channel;
@@ -32,6 +36,7 @@ import com.prgrms.be02slack.workspace.entity.Workspace;
 import com.prgrms.be02slack.workspace.service.WorkspaceService;
 
 @Service
+@Transactional
 public class DefaultChannelService implements ChannelService {
   private final ChannelRepository channelRepository;
   private final WorkspaceService workspaceService;
@@ -162,6 +167,17 @@ public class DefaultChannelService implements ChannelService {
     Long decodedChannelId = idEncoder.decode(key);
     return channelRepository.findById(decodedChannelId)
         .orElseThrow(() -> new NotFoundException("channel notfound"));
+  }
+
+  @Override
+  public List<ChannelResponse> findAllByMember(Member member) {
+    Assert.notNull(member, "Member must be provided");
+
+    return subscribeInfoService.findAllByMember(member)
+        .stream()
+        .map((subscribeInfo -> subscribeInfo.getChannel()))
+        .map((c) -> new ChannelResponse(idEncoder.encode(c.getId()), c.getName(), c.isPrivate()))
+        .collect(Collectors.toList());
   }
 
   private boolean isValidEmail(String email) {
