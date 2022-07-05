@@ -49,6 +49,8 @@ public class Member extends BaseTime {
   @JoinColumn(name = "workspace_id")
   private Workspace workspace;
 
+  private String type = "member";
+
   @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   private List<SubscribeInfo> subscribeInfos = new ArrayList<>();
 
@@ -149,5 +151,9 @@ public class Member extends BaseTime {
 
   public Workspace getWorkspace() {
     return workspace;
+  }
+
+  public String getType() {
+    return type;
   }
 }
