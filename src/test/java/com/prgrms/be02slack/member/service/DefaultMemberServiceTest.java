@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
@@ -748,6 +750,85 @@ class DefaultMemberServiceTest {
 
         // then
         assertThat(foundMemberResponse).usingRecursiveComparison().isEqualTo(memberResponse);
+      }
+    }
+  }
+  @Nested
+  @DisplayName("FindAllByWorkspaceId 메서드는")
+  class DescribeFindAllByWorkspaceId {
+
+    @Nested
+    @DisplayName("존재하지 않는 워크스페이스 아이디 값을 인자로 받으면")
+    class ContextWithNotExistWorkspaceId {
+
+      @Test
+      @DisplayName("IllegalArgumentException 예외를 발생시킨다.")
+      void ItThrowIllegalArgumentException() {
+        // given
+        final var workspaceId = 1L;
+        final var encodedWorkspaceId = "existEncodedWorkspaceId";
+
+        given(idEncoder.decode(anyString())).willReturn(workspaceId);
+        given(repository.findAllByWorkspace_id(anyLong())).willReturn(List.of());
+
+        //when, then
+        Assertions
+            .assertThatThrownBy(() -> memberService.findAllByWorkspaceId(encodedWorkspaceId))
+            .isInstanceOf(IllegalArgumentException.class);
+      }
+    }
+
+    @Nested
+    @DisplayName("워크스페이스 아이디 값을 비어있는 인자로 받으면")
+    class ContextWithKeyNullAndEmptySource {
+
+      @ParameterizedTest
+      @NullAndEmptySource
+      @ValueSource(strings = {"\t", "\n"})
+      @DisplayName("IllegalArgumentException 을 반환한다.")
+      void ItThrowIllegalArgumentException(String emptyWorkspaceId) {
+        Assertions.assertThatThrownBy(() -> memberService.findAllByWorkspaceId(emptyWorkspaceId))
+                  .isInstanceOf(IllegalArgumentException.class);
+      }
+    }
+
+    @Nested
+    @DisplayName("존재하는 워크스페이스 아이디값을 인자로 받으면")
+    class ContextWithExistWorkspaceId {
+
+      @Test
+      @DisplayName("해당 멤버 리스트를 반환한다")
+      void ItReturnMemberList() {
+        //given
+        final var workspaceId = 1L;
+        final var validEncodedWorkspaceId = "validEncoderWorkspaceId";
+
+        final var findWorkspace = new Workspace("test", "test");
+
+        final var membersList = new ArrayList<Member>();
+        final var numOfMembers = 5;
+        for (long i = 0; i < numOfMembers; i++) {
+          final var newMember = Member.builder()
+                                      .name("test"+i)
+                                      .workspace(findWorkspace)
+                                      .email("email"+i+"@test.com")
+                                      .displayName("test"+i)
+                                      .role(Role.ROLE_USER)
+                                      .build();
+          ReflectionTestUtils.setField(newMember,"id", i);
+          membersList.add(newMember);
+          given(idEncoder.encode(i)).willReturn("test"+i);
+        }
+
+
+        given(idEncoder.decode(anyString())).willReturn(workspaceId);
+        given(repository.findAllByWorkspace_id(anyLong())).willReturn(membersList);
+
+        //when
+        final var foundMemberList = memberService.findAllByWorkspaceId(validEncodedWorkspaceId);
+
+        //then
+        assertEquals(foundMemberList.size(), 5);
       }
     }
   }

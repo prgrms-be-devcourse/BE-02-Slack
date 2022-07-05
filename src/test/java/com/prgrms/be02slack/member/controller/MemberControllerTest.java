@@ -334,4 +334,81 @@ public class MemberControllerTest extends ControllerSetUp {
       }
     }
   }
+
+  @Nested
+  @DisplayName("findAllByWorkspaceId 메서드는")
+  @WithMockCustomLoginMember
+  class DescribeFindAllByWorkspaceId {
+
+    private static final String API_URL = "/api/v1/workspaces/{encodedWorkspaceId}/members";
+
+    @Nested
+    @DisplayName("존재하는 워크스페이스 아이디 값이 전달되면")
+    class ContextWithExistEncodedWorkspaceId {
+
+      @Test
+      @DisplayName("워크스페이스에 포함된 모든 멤버들을 반환한다")
+      void ItResponseAllMembersInWorkspace() throws Exception {
+        //given
+        final String encodedWorkspaceId = "TESTID";
+        final MemberResponse memberResponse = MemberResponse.builder()
+                                                            .encodedMemberId("TESTID")
+                                                            .email("test@test.com")
+                                                            .name("test")
+                                                            .displayName("test")
+                                                            .role(Role.ROLE_USER)
+                                                            .build();
+        final List<MemberResponse> memberResponseList = List.of(memberResponse);
+        given(memberService.findAllByWorkspaceId(anyString())).willReturn(memberResponseList);
+
+        //when
+        final MockHttpServletRequestBuilder request =
+            RestDocumentationRequestBuilders.get(API_URL, encodedWorkspaceId);
+
+        final ResultActions response = mockMvc.perform(request);
+
+        //then
+        verify(memberService).findAllByWorkspaceId(anyString());
+        response.andExpect(status().isOk())
+                .andDo(document("Get Members in Workspace",
+                                preprocessRequest(prettyPrint()),
+                                preprocessResponse(prettyPrint()),
+                                pathParameters(
+                                    parameterWithName("encodedWorkspaceId").description("Encoded Workspace Id")
+                                ),
+                                responseFields(
+                                    fieldWithPath("[].encodedMemberId").type(JsonFieldType.STRING).description("인코딩된 멤버 id"),
+                                    fieldWithPath("[].email").type(JsonFieldType.STRING).description("이메일"),
+                                    fieldWithPath("[].name").type(JsonFieldType.STRING).description("이름"),
+                                    fieldWithPath("[].displayName").type(JsonFieldType.STRING).description("보여지는 이름"),
+                                    fieldWithPath("[].role").type(JsonFieldType.STRING).description("워크스페이스 내 역할")
+                                )
+                ));
+      }
+    }
+    @Nested
+    @DisplayName("존재하지 않는 워크스페이스 아이디 값이 전달되면")
+    class ContextWithNotExistEncodedWorkspaceId {
+
+      @Test
+      @DisplayName("BadRequest로 응답한다.")
+      void ItResponseBadRequest() throws Exception {
+        //given
+        final String encodedWorkspaceId = "TESTID";
+
+        given(memberService.findAllByWorkspaceId(anyString()))
+            .willThrow(IllegalArgumentException.class);
+
+        //when
+        final MockHttpServletRequestBuilder request =
+            RestDocumentationRequestBuilders.get(API_URL, encodedWorkspaceId);
+
+        final ResultActions response = mockMvc.perform(request);
+
+        //then
+        verify(memberService).findAllByWorkspaceId(anyString());
+        response.andExpect(status().isBadRequest());
+      }
+    }
+  }
 }
