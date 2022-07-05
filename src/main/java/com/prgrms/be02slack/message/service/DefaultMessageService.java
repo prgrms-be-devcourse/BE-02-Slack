@@ -8,7 +8,7 @@ import com.prgrms.be02slack.message.entity.Message;
 public class DefaultMessageService implements MessageService {
 
   @Override
-  public Message sendMessage(String encodedChannelId, String content) {
+  public Message sendMessage(String senderEmail, String encodedChannelId, String content) {
     return null;
   }
 }

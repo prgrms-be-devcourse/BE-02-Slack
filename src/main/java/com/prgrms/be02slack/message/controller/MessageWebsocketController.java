@@ -1,5 +1,7 @@
 package com.prgrms.be02slack.message.controller;
 
+import java.security.Principal;
+
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
@@ -31,11 +33,14 @@ public class MessageWebsocketController {
   @SendTo("/topic/channel.{encodedChannelId}")
   public MessageWebsocketResponse sendMessage(
       @DestinationVariable String encodedChannelId,
-      @Valid MessageWebsocketRequest channelMessageRequest
+      @Valid MessageWebsocketRequest channelMessageRequest,
+      Principal principal
   ) {
-    log.info("channel id : {}, content : {}", encodedChannelId, channelMessageRequest.getContent());
+    final var senderEmail = principal.getName();
+    log.info("sender email : {}, channel id : {}, content : {}", senderEmail, encodedChannelId,
+        channelMessageRequest.getContent());
 
-    final var sendMessage = messageService.sendMessage(encodedChannelId,
+    final var sendMessage = messageService.sendMessage(senderEmail, encodedChannelId,
         channelMessageRequest.getContent());
 
     return MessageWebsocketResponse.from(sendMessage);
