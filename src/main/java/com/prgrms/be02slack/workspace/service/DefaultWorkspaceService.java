@@ -62,6 +62,8 @@ public class DefaultWorkspaceService implements WorkspaceService {
 
   @Override
   public List<Workspace> findAllByMemberEmail(String memberEmail) {
+    Assert.isTrue(isNotBlank(memberEmail), "Member Email must be provided");
+
     final var foundWorkspaces = this.workspaceRepository.findAllByMemberEmail(memberEmail);
 
     Assert.notEmpty(foundWorkspaces, "email with no matching member");
