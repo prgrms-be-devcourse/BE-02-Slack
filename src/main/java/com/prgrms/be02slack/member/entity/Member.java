@@ -89,6 +89,10 @@ public class Member extends BaseTime {
     subscribeInfos.add(subscribeInfo);
   }
 
+  public long getId() {
+    return this.id;
+  }
+
   public static class Builder {
 
     private String email;

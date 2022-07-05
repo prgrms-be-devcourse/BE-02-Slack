@@ -3,6 +3,7 @@ package com.prgrms.be02slack.member.service;
 import static org.apache.logging.log4j.util.Strings.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -148,6 +149,22 @@ public class DefaultMemberService implements MemberService {
   @Override
   public List<MemberResponse> getAllFromChannel(Member member, String encodedChannelId) {
     return null;
+  }
+
+  @Override
+  public List<MemberResponse> findAllByWorkspaceId(String encodedWorkspaceId) {
+    Assert.isTrue(isNotBlank(encodedWorkspaceId), "EncodedWorkspaceId must be provided");
+
+    final var workspaceId = idEncoder.decode(encodedWorkspaceId);
+
+    final var foundMembers = this.memberRepository.findAllByWorkspace_id(workspaceId);
+
+    Assert.notEmpty(foundMembers, "Workspace Id is not Valid");
+
+    return foundMembers.stream()
+                       .map(member -> MemberResponse.from(member,
+                                                          idEncoder.encode(member.getId())))
+                       .collect(Collectors.toList());
   }
 
   private Member createMember(String email) {

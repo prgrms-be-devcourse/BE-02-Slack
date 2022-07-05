@@ -59,4 +59,11 @@ public class MemberApiController {
       @PathVariable @NotBlank String encodedChannelId) {
     return memberService.getAllFromChannel(member, encodedChannelId);
   }
+
+
+  @GetMapping("api/v1/workspaces/{encodedWorkspaceId}/members")
+  @ResponseStatus(HttpStatus.OK)
+  public List<MemberResponse> findAllByWorkspaceId(@PathVariable() String encodedWorkspaceId) {
+    return this.memberService.findAllByWorkspaceId(encodedWorkspaceId);
+  }
 }
