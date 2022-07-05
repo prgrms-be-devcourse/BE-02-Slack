@@ -1,7 +1,5 @@
 package com.prgrms.be02slack.directmessagechannel.entity;
 
-import static org.apache.logging.log4j.util.Strings.*;
-
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -49,5 +47,13 @@ public class DirectMessageChannel extends BaseTime {
 
   public Long getId() {
     return id;
+  }
+
+  public Member getFirstMember() {
+    return firstMember;
+  }
+
+  public Member getSecondMember() {
+    return secondMember;
   }
 }

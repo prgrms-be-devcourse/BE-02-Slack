@@ -2,6 +2,7 @@ package com.prgrms.be02slack.member.entity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -81,10 +82,6 @@ public class Member extends BaseTime {
     return role.name();
   }
 
-  public Workspace getWorkspace() {
-    return workspace;
-  }
-
   public void addSubscribeInfo(SubscribeInfo subscribeInfo) {
     subscribeInfos.add(subscribeInfo);
   }
@@ -129,5 +126,24 @@ public class Member extends BaseTime {
 
   public static Builder builder() {
     return new Builder();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
+    Member member = (Member)o;
+    return id.equals(member.id);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id);
+  }
+
+  public Workspace getWorkspace() {
+    return workspace;
   }
 }
