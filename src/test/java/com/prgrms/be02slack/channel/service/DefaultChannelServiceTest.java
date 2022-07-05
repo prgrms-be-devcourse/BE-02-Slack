@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -23,6 +24,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import com.prgrms.be02slack.channel.controller.dto.ChannelResponse;
 import com.prgrms.be02slack.channel.controller.dto.ChannelSaveRequest;
 import com.prgrms.be02slack.channel.controller.dto.InviteRequest;
 import com.prgrms.be02slack.channel.entity.Channel;
@@ -37,6 +39,7 @@ import com.prgrms.be02slack.member.entity.Member;
 import com.prgrms.be02slack.member.entity.Role;
 import com.prgrms.be02slack.member.service.DefaultMemberService;
 import com.prgrms.be02slack.security.TokenProvider;
+import com.prgrms.be02slack.subscribeInfo.entity.SubscribeInfo;
 import com.prgrms.be02slack.subscribeInfo.service.SubscribeInfoService;
 import com.prgrms.be02slack.workspace.entity.Workspace;
 import com.prgrms.be02slack.workspace.service.DefaultWorkspaceService;
@@ -818,6 +821,64 @@ class DefaultChannelServiceTest {
         //when, then
         assertThrows(NotFoundException.class,
             () -> defaultChannelService.findByKey(encodedId));
+      }
+    }
+  }
+
+  @Nested
+  @DisplayName("findAllByMember 메서드는")
+  class DescribeFindAllByMember {
+
+    @Test
+    @DisplayName("멤버가 구독한 채널 목록을 반환한다")
+    void ItReturnsSubscribedChannelList() {
+      //given
+      Workspace workspace = Workspace.createDefaultWorkspace();
+      Member member = Member.builder()
+          .name("testName")
+          .role(Role.ROLE_USER)
+          .displayName("testDisplayName")
+          .workspace(workspace)
+          .build();
+      Channel channel = Channel.builder()
+          .name("testChannel1")
+          .description("channel")
+          .isPrivate(false)
+          .workspace(workspace)
+          .owner(member)
+          .build();
+      ReflectionTestUtils.setField(channel, "id", 1L);
+      List<SubscribeInfo> subscribeInfos = List.of(SubscribeInfo.subscribe(channel, member));
+      List<Channel> subscribedChannels = List.of(channel);
+
+      given(idEncoder.encode(anyLong()))
+          .willReturn("encodedChannelId");
+      given(subscribeInfoService.findAllByMember(any(Member.class)))
+          .willReturn(subscribeInfos);
+
+      //when
+      List<ChannelResponse> channelResponses = defaultChannelService.findAllByMember(member);
+
+      //then
+      verify(idEncoder).encode(anyLong());
+      verify(subscribeInfoService).findAllByMember(any(Member.class));
+      assertThat(channelResponses.size()).isEqualTo(subscribedChannels.size());
+      assertThat(channelResponses.get(0).getName()).isEqualTo(subscribedChannels.get(0).getName());
+      assertThat(channelResponses.get(0).isPrivate()).isEqualTo(
+          subscribedChannels.get(0).isPrivate());
+    }
+
+    @Nested
+    @DisplayName("member 파라미터가 null 이라면")
+    class ContextWithMemberNull {
+
+      @Test
+      @DisplayName("IllegalArgumentException 에러를 발생시킨다")
+      void ItThrowsIllegalArgumentException() {
+        //given
+        //when,then
+        assertThrows(IllegalArgumentException.class,
+            () -> defaultChannelService.findAllByMember(null));
       }
     }
   }

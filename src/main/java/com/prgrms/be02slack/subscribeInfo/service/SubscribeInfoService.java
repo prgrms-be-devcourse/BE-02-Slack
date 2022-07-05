@@ -1,7 +1,10 @@
 package com.prgrms.be02slack.subscribeInfo.service;
 
+import java.util.List;
+
 import com.prgrms.be02slack.channel.entity.Channel;
 import com.prgrms.be02slack.member.entity.Member;
+import com.prgrms.be02slack.subscribeInfo.entity.SubscribeInfo;
 
 public interface SubscribeInfoService {
 
@@ -12,4 +15,6 @@ public interface SubscribeInfoService {
   boolean isExistsByChannelAndMemberEmail(Channel channel, String email);
 
   boolean isExistsByChannelAndMemberName(Channel channel, String name);
+
+  List<SubscribeInfo> findAllByMember(Member member);
 }
