@@ -4,8 +4,11 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
+import org.hibernate.jdbc.Work;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -193,6 +196,51 @@ class DefaultWorkspaceServiceTest {
         //then
         assertEquals(workspace.getName(), "Slack");
         assertEquals(workspace.getUrl(), workspace.getName() + workspace.getId());
+      }
+    }
+  }
+  @Nested
+  @DisplayName("findAllByMemberEmail 메서드는")
+  class DescribefindAllByMemberEmail {
+
+    @Nested
+    @DisplayName("존재하지 않는 MemberEmail이라면")
+    class ContextNotExistMemberEmail {
+
+      @Test
+      @DisplayName("IllegalArgumentException 에러를 던진다")
+      void ItThrowsIllegalArgumentException() {
+        //given
+        final var inputMemberEmail = "notExistEmail";
+        final var emptyList = new ArrayList<Workspace>();
+        given(workspaceRepository.findAllByMemberEmail(inputMemberEmail)).willReturn(emptyList);
+
+        //when, then
+        assertThrows(IllegalArgumentException.class,
+                     () -> defaultWorkspaceService.findAllByMemberEmail(inputMemberEmail));
+      }
+    }
+
+    @Nested
+    @DisplayName("존재하는 MemberEmail이라면")
+    class ContextExistMemberEmail {
+
+      @Test
+      @DisplayName("email이 속한 workspace 리스트를 반환한다.")
+      void ItReturnListOfWorkspace() {
+        //given
+        final var inputMemberEmail = "notExistEmail";
+        final var workspace1 = new Workspace("testWorkspace1");
+        final var workspace2 = new Workspace("testWorkspace2");
+        given(workspaceRepository.findAllByMemberEmail(inputMemberEmail))
+            .willReturn(List.of(workspace1,workspace2));
+
+        //when
+        final var foundWorkspaceList =
+            defaultWorkspaceService.findAllByMemberEmail(inputMemberEmail);
+
+        // then
+        assertTrue(foundWorkspaceList.size() > 0);
       }
     }
   }
