@@ -16,6 +16,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import com.prgrms.be02slack.common.enums.EntityIdType;
 import com.prgrms.be02slack.common.exception.NotFoundException;
 import com.prgrms.be02slack.common.util.IdEncoder;
 import com.prgrms.be02slack.directmessagechannel.controller.dto.DirectMessageChannelResponse;
@@ -239,7 +240,7 @@ public class DirectMessageChannelServiceTest {
             .findByEmailAndWorkspaceKey(any(), any());
         verify(directMessageChannelRepository, times(1))
             .findByFirstMemberAndSecondMember(any(), any());
-        verify(idEncoder).encode(anyLong(), anyString());
+        verify(idEncoder).encode(anyLong(), any());
       }
     }
 
@@ -278,10 +279,10 @@ public class DirectMessageChannelServiceTest {
             Mockito.mockConstruction(DirectMessageChannel.class,
                 (mock, context) -> {
               when(mock.getId()).thenReturn(1L);
-              when(mock.getType()).thenReturn("DMChannel");
+              when(mock.getType()).thenReturn(EntityIdType.DMCHANNEL);
                 });
 
-        when(idEncoder.encode(1L, "DMChannel")).thenReturn("testtest");
+        when(idEncoder.encode(1L, EntityIdType.DMCHANNEL)).thenReturn("testtest");
 
         //when
         final String actualId =
@@ -297,7 +298,7 @@ public class DirectMessageChannelServiceTest {
             .findByEmailAndWorkspaceKey(any(), any());
         verify(directMessageChannelRepository, times(1))
             .findByFirstMemberAndSecondMember(any(), any());
-        verify(idEncoder).encode(anyLong(), anyString());
+        verify(idEncoder).encode(anyLong(), any());
       }
     }
   }
@@ -386,8 +387,8 @@ public class DirectMessageChannelServiceTest {
 
         when(directMessageChannelRepository.findAllByMember(any())).thenReturn(channels);
 
-        final String firstExpectedId = idEncoder.encode(1, "DMChannel");
-        final String secondExpectedId = idEncoder.encode(2, "DMChannel");
+        final String firstExpectedId = idEncoder.encode(1, EntityIdType.DMCHANNEL);
+        final String secondExpectedId = idEncoder.encode(2, EntityIdType.DMCHANNEL);
 
         //when
         final List<DirectMessageChannelResponse> actual =

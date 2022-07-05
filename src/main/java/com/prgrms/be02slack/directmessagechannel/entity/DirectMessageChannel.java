@@ -7,10 +7,12 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Transient;
 
 import org.springframework.util.Assert;
 
 import com.prgrms.be02slack.common.entity.BaseTime;
+import com.prgrms.be02slack.common.enums.EntityIdType;
 import com.prgrms.be02slack.member.entity.Member;
 import com.prgrms.be02slack.workspace.entity.Workspace;
 
@@ -33,7 +35,8 @@ public class DirectMessageChannel extends BaseTime {
   @JoinColumn(name = "workspace_id")
   private Workspace workspace;
 
-  private String type = "DMChannel";
+  @Transient
+  private EntityIdType type = EntityIdType.DMCHANNEL;
 
   protected DirectMessageChannel() {/*no-op*/}
 
@@ -59,7 +62,7 @@ public class DirectMessageChannel extends BaseTime {
     return secondMember;
   }
 
-  public String getType() {
+  public EntityIdType getType() {
     return type;
   }
 }

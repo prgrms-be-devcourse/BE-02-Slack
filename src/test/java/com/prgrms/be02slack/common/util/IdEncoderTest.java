@@ -15,6 +15,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.prgrms.be02slack.common.enums.EntityIdType;
+
 @TestClassOrder(ClassOrderer.OrderAnnotation.class)
 class IdEncoderTest {
 
@@ -42,10 +44,10 @@ class IdEncoderTest {
         final var directMessageType = "DMChannel";
 
         //when
-        final var encodedChannel = idEncoder.encode(src, channelType);
-        final var encodedWorkspace = idEncoder.encode(src, workspaceType);
-        final var encodedMember = idEncoder.encode(src, memberType);
-        final var encodedDirectMessage = idEncoder.encode(src, directMessageType);
+        final var encodedChannel = idEncoder.encode(src, EntityIdType.CHANNEL);
+        final var encodedWorkspace = idEncoder.encode(src, EntityIdType.TEAM);
+        final var encodedMember = idEncoder.encode(src, EntityIdType.MEMBER);
+        final var encodedDirectMessage = idEncoder.encode(src, EntityIdType.DMCHANNEL);
         log.info(encodedChannel);
 
         //then
@@ -64,7 +66,8 @@ class IdEncoderTest {
       @ValueSource(longs = {0, -1, Long.MIN_VALUE})
       @DisplayName("IllegalArgumentException 에러를 반환한다")
       void ItThrowsIllegalArgumentException(long src) {
-        assertThrows(IllegalArgumentException.class, () -> idEncoder.encode(src, "channel"));
+        assertThrows(IllegalArgumentException.class,
+            () -> idEncoder.encode(src, EntityIdType.CHANNEL));
       }
     }
   }
@@ -82,7 +85,7 @@ class IdEncoderTest {
       @DisplayName("디코딩된 값을 반환한다")
       void ItReturnsDecodedValue() {
         final var testId = 12L;
-        final var encoded = idEncoder.encode(testId, "channel");
+        final var encoded = idEncoder.encode(testId, EntityIdType.CHANNEL);
 
         final var decoded = idEncoder.decode(encoded);
         assertEquals(testId, decoded);

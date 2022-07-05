@@ -7,13 +7,15 @@ import java.util.regex.Pattern;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
+import com.prgrms.be02slack.common.enums.EntityIdType;
+
 @Component
 public class IdEncoder {
   private static final String CODEC = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   private static final String CODEC_PATTERN = "^[ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789]*$";
   private final int RADIX = 36;
 
-  public String encode(long id, String type) {
+  public String encode(long id, EntityIdType type) {
     Assert.isTrue(id > 0, "Id must be positive");
 
     long param = id == Long.MAX_VALUE ? id : Long.MAX_VALUE - id;
@@ -22,15 +24,8 @@ public class IdEncoder {
       sb.append(CODEC.charAt((int)(param % RADIX)));
       param /= RADIX;
     }
-    switch (type) {
-      case "channel" : sb.insert(0, "C");
-            break;
-      case "DMChannel" : sb.insert(0, "D");
-            break;
-      case "member" : sb.insert(0, "M");
-            break;
-      case "workspace" : sb.insert(0, "T");
-    }
+
+    sb.insert(0, EntityIdType.filter(type));
     return sb.toString();
   }
 

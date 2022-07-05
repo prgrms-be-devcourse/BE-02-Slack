@@ -97,7 +97,7 @@ class DefaultChannelServiceTest {
           .willReturn(false);
       given(channelRepository.save(any(Channel.class)))
           .willReturn(channel);
-      given(idEncoder.encode(anyLong(), anyString()))
+      given(idEncoder.encode(anyLong(), any()))
           .willReturn("encodedTestId");
 
       //when
@@ -107,7 +107,7 @@ class DefaultChannelServiceTest {
       verify(idEncoder).decode(anyString());
       verify(defaultWorkspaceService).findByKey(anyString());
       verify(channelRepository).save(any(Channel.class));
-      verify(idEncoder).encode(anyLong(), anyString());
+      verify(idEncoder).encode(anyLong(), any());
       assertThat(encodedChannelId).isNotBlank();
     }
 
@@ -851,7 +851,7 @@ class DefaultChannelServiceTest {
       List<SubscribeInfo> subscribeInfos = List.of(SubscribeInfo.subscribe(channel, member));
       List<Channel> subscribedChannels = List.of(channel);
 
-      given(idEncoder.encode(anyLong(), anyString()))
+      given(idEncoder.encode(anyLong(), any()))
           .willReturn("encodedChannelId");
       given(subscribeInfoService.findAllByMember(any(Member.class)))
           .willReturn(subscribeInfos);
@@ -860,7 +860,7 @@ class DefaultChannelServiceTest {
       List<ChannelResponse> channelResponses = defaultChannelService.findAllByMember(member);
 
       //then
-      verify(idEncoder).encode(anyLong(), anyString());
+      verify(idEncoder).encode(anyLong(), any());
       verify(subscribeInfoService).findAllByMember(any(Member.class));
       assertThat(channelResponses.size()).isEqualTo(subscribedChannels.size());
       assertThat(channelResponses.get(0).getName()).isEqualTo(subscribedChannels.get(0).getName());
