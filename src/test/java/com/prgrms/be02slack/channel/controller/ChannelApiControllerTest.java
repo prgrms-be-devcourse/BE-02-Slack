@@ -42,6 +42,7 @@ import com.prgrms.be02slack.member.entity.Member;
 import com.prgrms.be02slack.util.ControllerSetUp;
 import com.prgrms.be02slack.util.WithMockCustomLoginMember;
 
+@WithMockCustomLoginMember
 @WebMvcTest(
     controllers = ChannelApiController.class
 )
@@ -424,7 +425,6 @@ class ChannelApiControllerTest extends ControllerSetUp {
   }
 
   @Nested
-  @WithMockCustomLoginMember
   @DisplayName("findAllByMember 메서드는")
   class DescribeFindAllByMember {
 
@@ -461,7 +461,6 @@ class ChannelApiControllerTest extends ControllerSetUp {
   }
 
   @Nested
-  @WithMockCustomLoginMember
   @DisplayName("leave 메서드는")
   class DescribeLeave {
 
