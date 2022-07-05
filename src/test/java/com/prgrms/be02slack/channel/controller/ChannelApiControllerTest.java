@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -20,61 +21,40 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.MockBeans;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.prgrms.be02slack.channel.controller.dto.ChannelResponse;
 import com.prgrms.be02slack.channel.controller.dto.ChannelSaveRequest;
 import com.prgrms.be02slack.channel.controller.dto.InviteRequest;
 import com.prgrms.be02slack.channel.exception.NameDuplicateException;
 import com.prgrms.be02slack.channel.service.ChannelService;
-import com.prgrms.be02slack.common.configuration.security.SecurityConfig;
 import com.prgrms.be02slack.common.dto.AuthResponse;
+import com.prgrms.be02slack.member.entity.Member;
+import com.prgrms.be02slack.util.ControllerSetUp;
+import com.prgrms.be02slack.util.WithMockCustomLoginMember;
 
 @WebMvcTest(
-    controllers = ChannelApiController.class,
-    excludeAutoConfiguration = SecurityAutoConfiguration.class,
-    excludeFilters = {
-        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SecurityConfig.class)
-    }
+    controllers = ChannelApiController.class
 )
 @MockBeans({@MockBean(JpaMetamodelMappingContext.class)})
-@AutoConfigureRestDocs
-class ChannelApiControllerTest {
+class ChannelApiControllerTest extends ControllerSetUp {
   private static final String API_URL = "/api/v1/";
   private static final String CREATE_CHANNEL_URL = API_URL + "workspaces/testWorkspaceId/channels";
 
   @Autowired
   private ObjectMapper objectMapper;
 
-  @Autowired
-  private MockMvc mockMvc;
-
   @MockBean
   private ChannelService channelService;
-
-  static class PathVariableSourceBlank implements ArgumentsProvider {
-    @Override
-    public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
-      return Stream.of(
-          Arguments.of(" "),
-          Arguments.of("\t"),
-          Arguments.of("\n")
-      );
-    }
-  }
 
   static class NameSourceOutOfRange implements ArgumentsProvider {
     @Override
@@ -159,35 +139,6 @@ class ChannelApiControllerTest {
                         .description("whether the channel is open to the public")
                 )
             ));
-      }
-    }
-
-    @Nested
-    @DisplayName("workspaceId 가 빈 값 이거나 공백이라면")
-    class ContextWithWorkspaceIdBlank {
-
-      @ParameterizedTest
-      @ArgumentsSource(PathVariableSourceBlank.class)
-      @DisplayName("BadRequest 를 응답한다")
-      void ItResponseBadRequest(String workspaceId) throws Exception {
-        //given
-        HashMap<Object, Object> requestMap = new HashMap<>();
-        requestMap.put("name", "testName");
-        requestMap.put("description", "testDescription");
-        requestMap.put("isPrivate", false);
-
-        String requestBody = objectMapper.writeValueAsString(requestMap);
-
-        //when
-        MockHttpServletRequestBuilder request = RestDocumentationRequestBuilders.post(
-                API_URL + "workspaces/" + workspaceId + "/channels")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(requestBody);
-
-        ResultActions response = mockMvc.perform(request);
-
-        //then
-        response.andExpect(status().isBadRequest());
       }
     }
 
@@ -296,66 +247,6 @@ class ChannelApiControllerTest {
                         .description("list of invitees")
                 )
             ));
-      }
-    }
-
-    @Nested
-    @DisplayName("workspaceId 가 빈 값 이거나 공백이라면")
-    class ContextWithWorkspaceIdBlank {
-
-      @ParameterizedTest
-      @ArgumentsSource(PathVariableSourceBlank.class)
-      @DisplayName("BadRequest 를 응답한다")
-      void ItResponseBadRequest(String workspaceId) throws Exception {
-        //given
-        HashMap<String, Object> requestMap = new HashMap<>();
-        requestMap.put("sender", "testSenderName");
-        requestMap.put("inviteeInfos", Set.of("name1", "test@gmail.com"));
-
-        String requestBody = objectMapper.writeValueAsString(requestMap);
-
-        //when
-        MockHttpServletRequestBuilder request = RestDocumentationRequestBuilders.post(
-                API_URL + "/workspaces/{workspaceId}/channels/{channelId}/invite",
-                workspaceId, "channelId"
-            )
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(requestBody);
-
-        ResultActions response = mockMvc.perform(request);
-
-        //then
-        response.andExpect(status().isBadRequest());
-      }
-    }
-
-    @Nested
-    @DisplayName("channelId 가 빈 값 이거나 공백이라면")
-    class ContextWithChannelIdBlank {
-
-      @ParameterizedTest
-      @ArgumentsSource(PathVariableSourceBlank.class)
-      @DisplayName("BadRequest 를 응답한다")
-      void ItResponseBadRequest(String channelId) throws Exception {
-        //given
-        HashMap<String, Object> requestMap = new HashMap<>();
-        requestMap.put("sender", "testSenderName");
-        requestMap.put("inviteeInfos", Set.of("name1", "test@gmail.com"));
-
-        String requestBody = objectMapper.writeValueAsString(requestMap);
-
-        //when
-        MockHttpServletRequestBuilder request = RestDocumentationRequestBuilders.post(
-                API_URL + "/workspaces/{workspaceId}/channels/{channelId}/invite",
-                "workspaceId", channelId
-            )
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(requestBody);
-
-        ResultActions response = mockMvc.perform(request);
-
-        //then
-        response.andExpect(status().isBadRequest());
       }
     }
 
@@ -503,64 +394,6 @@ class ChannelApiControllerTest {
     }
 
     @Nested
-    @DisplayName("workspaceId 가 빈 값 이거나 공백이라면")
-    class ContextWithWorkspaceIdBlank {
-
-      @ParameterizedTest
-      @ArgumentsSource(PathVariableSourceBlank.class)
-      @DisplayName("BadRequest 를 응답한다")
-      void ItResponseBadRequest(String workspaceId) throws Exception {
-        //given
-        HashMap<String, Object> requestMap = new HashMap<>();
-        requestMap.put("token", "token");
-
-        String requestBody = objectMapper.writeValueAsString(requestMap);
-
-        //when
-        MockHttpServletRequestBuilder request = RestDocumentationRequestBuilders.post(
-                API_URL + "/workspaces/{workspaceId}/channels/{channelId}/participate?token={token}",
-                workspaceId, "channelId", "token"
-            )
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(requestBody);
-
-        ResultActions response = mockMvc.perform(request);
-
-        //then
-        response.andExpect(status().isBadRequest());
-      }
-    }
-
-    @Nested
-    @DisplayName("channelId 가 빈 값 이거나 공백이라면")
-    class ContextWithChannelIdBlank {
-
-      @ParameterizedTest
-      @ArgumentsSource(PathVariableSourceBlank.class)
-      @DisplayName("BadRequest 를 응답한다")
-      void ItResponseBadRequest(String channelId) throws Exception {
-        //given
-        HashMap<String, Object> requestMap = new HashMap<>();
-        requestMap.put("token", "token");
-
-        String requestBody = objectMapper.writeValueAsString(requestMap);
-
-        //when
-        MockHttpServletRequestBuilder request = RestDocumentationRequestBuilders.post(
-                API_URL + "/workspaces/{workspaceId}/channels/{channelId}/participate?token={token}",
-                "workspaceId", channelId, "token"
-            )
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(requestBody);
-
-        ResultActions response = mockMvc.perform(request);
-
-        //then
-        response.andExpect(status().isBadRequest());
-      }
-    }
-
-    @Nested
     @DisplayName("token 이 null 이거나 빈 값 또는 공백이라면")
     class ContextWithTokenBlank {
 
@@ -587,6 +420,43 @@ class ChannelApiControllerTest {
         //then
         response.andExpect(status().isBadRequest());
       }
+    }
+  }
+
+  @Nested
+  @WithMockCustomLoginMember
+  @DisplayName("findAllByMember 메서드는")
+  class DescribeFindAllByMember {
+
+    @Test
+    @DisplayName("멤버가 구독한 채널들을 응답한다")
+    void ItResponseSubscribedChannels() throws Exception {
+      //given
+      given(channelService.findAllByMember(any(Member.class)))
+          .willReturn(List.of(new ChannelResponse("SDFASD", "testName", false)));
+
+      //when
+      MockHttpServletRequestBuilder request = RestDocumentationRequestBuilders.get(
+          API_URL + "/workspaces/{workspaceId}/channels",
+          "workspaceId"
+      );
+
+      ResultActions response = mockMvc.perform(request);
+
+      //then
+      verify(channelService).findAllByMember(any(Member.class));
+      response.andExpect(status().isOk())
+          .andDo(document("Look up channel",
+              pathParameters(
+                  parameterWithName("workspaceId").description("workspace id")
+              ),
+              responseFields(
+                  fieldWithPath("[].id").type(JsonFieldType.STRING).description("channel id"),
+                  fieldWithPath("[].name").type(JsonFieldType.STRING)
+                      .description("channel name"),
+                  fieldWithPath("[].isPrivate").type(JsonFieldType.BOOLEAN)
+                      .description("whether the channel is open or not")
+              )));
     }
   }
 }

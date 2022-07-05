@@ -1,5 +1,6 @@
 package com.prgrms.be02slack.subscribeInfo.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -20,4 +21,7 @@ public interface SubscribeInfoRepository extends JpaRepository<SubscribeInfo, Lo
   @Query("select s from SubscribeInfo s where s.channel =:channel and s.member.name = :name")
   Optional<SubscribeInfo> existsByChannelAndMemberName(@Param("channel") Channel channel,
       @Param("name") String name);
+
+  @Query("select s from SubscribeInfo s join fetch s.channel join fetch s.member where s.member =:member")
+  List<SubscribeInfo> findAllByMember(@Param("member") Member member);
 }
