@@ -33,6 +33,8 @@ public class DirectMessageChannel extends BaseTime {
   @JoinColumn(name = "workspace_id")
   private Workspace workspace;
 
+  private String type = "DMChannel";
+
   protected DirectMessageChannel() {/*no-op*/}
 
   public DirectMessageChannel(Member firstMember, Member secondMember, Workspace workspace) {
@@ -55,5 +57,9 @@ public class DirectMessageChannel extends BaseTime {
 
   public Member getSecondMember() {
     return secondMember;
+  }
+
+  public String getType() {
+    return type;
   }
 }
