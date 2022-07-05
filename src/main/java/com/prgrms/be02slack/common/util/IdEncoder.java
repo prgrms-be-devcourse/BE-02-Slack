@@ -30,7 +30,7 @@ public class IdEncoder {
   }
 
   public long decode(String encodedId) {
-    Assert.isTrue(isNotBlank(encodedId), "Invalid hash value");
+    Assert.isTrue(isNotBlank(encodedId), "EncodedId must be provided");
     Assert.isTrue(isValidHashVal(encodedId), "Invalid hash value");
 
     final String param = encodedId.substring(1);
