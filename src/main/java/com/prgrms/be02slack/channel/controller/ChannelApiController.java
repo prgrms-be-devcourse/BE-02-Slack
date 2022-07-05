@@ -65,4 +65,10 @@ public class ChannelApiController {
       @CurrentMember Member member) {
     return channelService.findAllByMember(member);
   }
+
+  @PostMapping("{channelId}/leave")
+  @ResponseStatus(HttpStatus.OK)
+  public void leave(@PathVariable String channelId, @CurrentMember Member member) {
+    channelService.leave(channelId, member);
+  }
 }
