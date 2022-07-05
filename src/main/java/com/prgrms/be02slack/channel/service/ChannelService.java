@@ -27,5 +27,7 @@ public interface ChannelService {
   Channel findByKey(String key);
 
   List<ChannelResponse> findAllByMember(Member member);
+
+  void leave(String channelId, Member member);
 }
 

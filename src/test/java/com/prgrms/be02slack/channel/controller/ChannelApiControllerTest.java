@@ -459,4 +459,36 @@ class ChannelApiControllerTest extends ControllerSetUp {
               )));
     }
   }
+
+  @Nested
+  @WithMockCustomLoginMember
+  @DisplayName("leave 메서드는")
+  class DescribeLeave {
+
+    @Nested
+    @DisplayName("유효한 값이 전달되면")
+    class ContextWithValidData {
+      @Test
+      @DisplayName("Ok 를 응답한다")
+      void ItResponseOK() throws Exception {
+        //given
+        //when
+        MockHttpServletRequestBuilder request = RestDocumentationRequestBuilders.post(
+            API_URL + "/workspaces/{workspaceId}/channels/{channelId}/leave",
+            "workspaceId", "channelId"
+        );
+
+        ResultActions response = mockMvc.perform(request);
+
+        //then
+        verify(channelService).leave(anyString(), any(Member.class));
+        response.andExpect(status().isOk())
+            .andDo(document("Leave channel",
+                pathParameters(
+                    parameterWithName("workspaceId").description("workspace id"),
+                    parameterWithName("channelId").description("channel id")
+                )));
+      }
+    }
+  }
 }
