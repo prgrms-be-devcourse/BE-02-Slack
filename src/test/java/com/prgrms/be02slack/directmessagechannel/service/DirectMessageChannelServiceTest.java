@@ -339,7 +339,6 @@ public class DirectMessageChannelServiceTest {
             .role(Role.ROLE_USER)
             .workspace(workspace)
             .build();
-        ReflectionTestUtils.setField(member, "id", 1L);
 
         final List<DirectMessageChannel> emptyList = List.of();
         when(directMessageChannelRepository.findAllByMember(any())).thenReturn(emptyList);
