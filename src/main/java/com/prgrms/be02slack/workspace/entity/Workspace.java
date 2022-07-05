@@ -31,6 +31,8 @@ public class Workspace extends BaseTime {
   @Column(unique = true)
   private String url;
 
+  private String type = "workspace";
+
   protected Workspace() {/*no-op*/}
 
   public Workspace(String name) {
@@ -71,5 +73,9 @@ public class Workspace extends BaseTime {
 
   public String getUrl() {
     return url;
+  }
+
+  public String getType() {
+    return type;
   }
 }
