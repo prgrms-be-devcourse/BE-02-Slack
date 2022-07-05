@@ -1,5 +1,6 @@
 package com.prgrms.be02slack.directmessagechannel.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,4 +19,8 @@ public interface DirectMessageChannelRepository extends JpaRepository<DirectMess
   Optional<DirectMessageChannel> findByFirstMemberAndSecondMember(
       @Param("firstMember") Member firstMember,
       @Param("secondMember") Member secondMember);
+
+  @Query("select d from DirectMessageChannel d where (d.firstMember = :member)"
+      + "or (d.secondMember = :member)")
+  List<DirectMessageChannel> findAllByMember(@Param("member") Member member);
 }

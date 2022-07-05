@@ -180,6 +180,15 @@ public class DefaultChannelService implements ChannelService {
         .collect(Collectors.toList());
   }
 
+  @Override
+  public void leave(String encodedChannelId, Member member) {
+    Assert.isTrue(isNotBlank(encodedChannelId), "EncodedChannelId must be provided");
+    Assert.notNull(member, "Member must be provided");
+
+    Channel channel = findByKey(encodedChannelId);
+    subscribeInfoService.unsubscribe(channel, member);
+  }
+
   private boolean isValidEmail(String email) {
     boolean err = false;
     String emailRegex = "^[_a-z0-9-]+(.[_a-z0-9-]+)*@(?:\\w+\\.)+\\w+$";

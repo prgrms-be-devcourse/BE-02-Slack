@@ -882,4 +882,141 @@ class DefaultChannelServiceTest {
       }
     }
   }
+
+  @Nested
+  @DisplayName("leave 메서드는")
+  class DescribeLeave {
+    @Test
+    @DisplayName("멤버의 채널 구독을 취소시킨다")
+    void ItMakeMemberUnsubscribe() {
+      //given
+      String encodedChannelId = "encodedId";
+      Long decodedChannelId = 123L;
+
+      Member member = Member.builder()
+          .name("testName")
+          .displayName("testName")
+          .email("test@gmail.com")
+          .role(Role.ROLE_USER)
+          .build();
+      Channel channel = Channel.builder()
+          .name("testName")
+          .description("testDescription")
+          .isPrivate(false)
+          .build();
+
+      given(idEncoder.decode(anyString()))
+          .willReturn(decodedChannelId);
+      given(channelRepository.findById(anyLong()))
+          .willReturn(Optional.of(channel));
+
+      //when
+      defaultChannelService.leave(encodedChannelId, member);
+
+      //then
+      verify(idEncoder).decode(anyString());
+      verify(channelRepository).findById(anyLong());
+      verify(subscribeInfoService).unsubscribe(any(Channel.class), any(Member.class));
+    }
+
+    @Nested
+    @DisplayName("encodedChannelId가 null 이거나 공백 또는 빈 값 이라면")
+    class ContextWithEncodedChannelIdBlank {
+      @ParameterizedTest
+      @NullAndEmptySource
+      @ValueSource(strings = {" "})
+      @DisplayName("IllegalArgumentException 예외를 발생시킨다")
+      void ItThrowsIllegalArgumentException(String encodedChannelId) {
+        //given
+        Member member = Member.builder()
+            .name("testName")
+            .displayName("testName")
+            .email("test@gmail.com")
+            .role(Role.ROLE_USER)
+            .build();
+
+        //when, then
+        assertThrows(IllegalArgumentException.class,
+            () -> defaultChannelService.leave(encodedChannelId, member));
+      }
+    }
+
+    @Nested
+    @DisplayName("member 가 null 이라면")
+    class ContextWithMemberNull {
+      @Test
+      @DisplayName("IllegalArgumentException 예외를 발생시킨다")
+      void ItThrowsIllegalArgumentException() {
+        //given
+        String encodedChannelId = "encodedId";
+
+        //when, then
+        assertThrows(IllegalArgumentException.class,
+            () -> defaultChannelService.leave(encodedChannelId, null));
+      }
+    }
+
+    @Nested
+    @DisplayName("channelId에 해당하는 channel 이 존재하지 않는다면")
+    class ContextWithNonexistentChannel {
+      @Test
+      @DisplayName("NotFoundException 예외를 발생시킨다")
+      void ItThrowsNotFoundException() {
+        //given
+        String encodedChannelId = "encodedId";
+        Long decodedChannelId = 123L;
+        Member member = Member.builder()
+            .name("testName")
+            .displayName("testName")
+            .email("test@gmail.com")
+            .role(Role.ROLE_USER)
+            .build();
+
+        given(idEncoder.decode(anyString()))
+            .willReturn(decodedChannelId);
+        given(channelRepository.findById(anyLong()))
+            .willReturn(Optional.empty());
+
+        //when, then
+        assertThrows(NotFoundException.class,
+            () -> defaultChannelService.leave(encodedChannelId, member));
+      }
+    }
+
+    @Nested
+    @DisplayName("멤버가 구독한 채널이 아니라면")
+    class ContextWithUnsubscribedChannel {
+      @Test
+      @DisplayName("NotFoundException 예외를 발생시킨다")
+      void ItThrowsNotFoundException() {
+        //given
+        String encodedChannelId = "encodedId";
+        Long decodedChannelId = 123L;
+
+        Member member = Member.builder()
+            .name("testName")
+            .displayName("testName")
+            .email("test@gmail.com")
+            .role(Role.ROLE_USER)
+            .build();
+        Channel channel = Channel.builder()
+            .name("testName")
+            .description("testDescription")
+            .isPrivate(false)
+            .build();
+
+        given(idEncoder.decode(anyString()))
+            .willReturn(decodedChannelId);
+        given(channelRepository.findById(anyLong()))
+            .willReturn(Optional.of(channel));
+
+        doThrow(new NotFoundException())
+            .when(subscribeInfoService).unsubscribe(any(Channel.class), any(Member.class));
+
+        //when, then
+        assertThrows(NotFoundException.class,
+            () -> defaultChannelService.leave(encodedChannelId, member));
+      }
+    }
+  }
 }
