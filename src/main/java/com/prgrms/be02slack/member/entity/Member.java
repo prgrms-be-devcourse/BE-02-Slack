@@ -62,6 +62,10 @@ public class Member extends BaseTime {
     this.workspace = builder.workspace;
   }
 
+  public Long getId() {
+    return id;
+  }
+
   public String getEmail() {
     return email;
   }
@@ -84,10 +88,6 @@ public class Member extends BaseTime {
 
   public void addSubscribeInfo(SubscribeInfo subscribeInfo) {
     subscribeInfos.add(subscribeInfo);
-  }
-
-  public long getId() {
-    return this.id;
   }
 
   public static class Builder {
