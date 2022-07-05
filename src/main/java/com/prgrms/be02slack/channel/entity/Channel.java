@@ -38,6 +38,8 @@ public class Channel extends BaseTime {
   @NotNull
   private boolean isPrivate;
 
+  private String type = "channel";
+
   protected Channel() {/*no-op*/}
 
   private Channel(Builder builder) {
@@ -114,5 +116,9 @@ public class Channel extends BaseTime {
     public Channel build() {
       return new Channel(this);
     }
+  }
+
+  public String getType() {
+    return type;
   }
 }
