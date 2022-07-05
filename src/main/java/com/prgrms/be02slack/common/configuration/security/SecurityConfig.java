@@ -61,6 +61,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .hasAnyRole(GUEST)
         .antMatchers(HttpMethod.GET, "/api/v1/members/{encodedMemberId}")
           .hasAnyRole(USER, OWNER)
+        .antMatchers(HttpMethod.GET, "/api/v1/channels/{encodedChannelId}/members")
+          .hasAnyRole(USER, OWNER)
           .anyRequest().permitAll()
           .and()
         .addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
