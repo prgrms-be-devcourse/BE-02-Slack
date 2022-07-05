@@ -914,11 +914,11 @@ class DefaultMemberServiceTest {
     }
 
     @Nested
-    @DisplayName("로그인한 멤버가 해당 채널을 구독했다면")
+    @DisplayName("로그인한 멤버가 해당 채널을 구독했다면 채널 내 멤버들을 조회하고")
     class ContextWithSubscribeChannel  {
 
       @Test
-      @DisplayName("채널 내 멤버들을 조회하고 멤버 정보들을 반환한다.")
+      @DisplayName("멤버 정보들을 반환한다.")
       void ItThrowMemberResponses() {
         final Workspace workspace = Workspace.createDefaultWorkspace();
         //given
@@ -952,7 +952,7 @@ class DefaultMemberServiceTest {
         final List<MemberResponse> memberResponseList = List.of(memberResponse);
 
         given(idEncoder.decode(anyString())).willReturn(1L);
-        given(idEncoder.encode(anyLong())).willReturn(encodedMemberId);
+        given(idEncoder.encode(anyLong(), any())).willReturn(encodedMemberId);
         given(subscribeInfoService.isExistsByMemberAndChannelId(any(Member.class), anyLong()))
             .willReturn(true);
         given(subscribeInfoService.findAllByChannelId(anyLong())).willReturn(subscribeInfos);
@@ -965,7 +965,7 @@ class DefaultMemberServiceTest {
         verify(idEncoder).decode(anyString());
         verify(subscribeInfoService).isExistsByMemberAndChannelId(any(Member.class), anyLong());
         verify(subscribeInfoService).findAllByChannelId(anyLong());
-        verify(idEncoder).encode(anyLong());
+        verify(idEncoder).encode(anyLong(), any());
         assertThat(foundMemberResponseList).usingRecursiveComparison().isEqualTo(memberResponseList);
       }
     }
