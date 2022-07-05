@@ -817,7 +817,7 @@ class DefaultMemberServiceTest {
                                       .build();
           ReflectionTestUtils.setField(newMember,"id", i);
           membersList.add(newMember);
-          given(idEncoder.encode(i)).willReturn("test"+i);
+          given(idEncoder.encode(i, "member")).willReturn("test"+i);
         }
 
 

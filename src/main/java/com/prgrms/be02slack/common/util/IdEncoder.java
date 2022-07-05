@@ -13,7 +13,7 @@ public class IdEncoder {
   private static final String CODEC_PATTERN = "^[ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789]*$";
   private final int RADIX = 36;
 
-  public String encode(long id) {
+  public String encode(long id, String type) {
     Assert.isTrue(id > 0, "Id must be positive");
 
     long param = id == Long.MAX_VALUE ? id : Long.MAX_VALUE - id;
@@ -22,13 +22,23 @@ public class IdEncoder {
       sb.append(CODEC.charAt((int)(param % RADIX)));
       param /= RADIX;
     }
+    switch (type) {
+      case "channel" : sb.insert(0, "C");
+            break;
+      case "DMChannel" : sb.insert(0, "D");
+            break;
+      case "member" : sb.insert(0, "M");
+            break;
+      case "workspace" : sb.insert(0, "T");
+    }
     return sb.toString();
   }
 
-  public long decode(String param) {
-    Assert.isTrue(isNotBlank(param), "Invalid hash value");
-    Assert.isTrue(isValidHashVal(param), "Invalid hash value");
+  public long decode(String encodedId) {
+    Assert.isTrue(isNotBlank(encodedId), "Invalid hash value");
+    Assert.isTrue(isValidHashVal(encodedId), "Invalid hash value");
 
+    final String param = encodedId.substring(1);
     long sum = 0;
     long power = 1;
     for (int i = 0; i < param.length(); i++) {

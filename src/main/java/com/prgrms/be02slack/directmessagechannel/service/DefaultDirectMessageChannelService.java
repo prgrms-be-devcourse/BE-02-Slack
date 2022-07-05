@@ -53,7 +53,7 @@ public class DefaultDirectMessageChannelService implements DirectMessageChannelS
         directMessageChannelRepository.findByFirstMemberAndSecondMember(sender, receiver)
             .orElseGet(() -> new DirectMessageChannel(sender, receiver, workspace));
 
-    return idEncoder.encode(directMessageChannel.getId());
+    return idEncoder.encode(directMessageChannel.getId(), directMessageChannel.getType());
   }
 
   @Override
@@ -62,7 +62,7 @@ public class DefaultDirectMessageChannelService implements DirectMessageChannelS
 
     return directMessageChannelRepository.findAllByMember(member).stream()
         .map(c -> {
-          String encodedDMChannelId = idEncoder.encode(c.getId());
+          String encodedDMChannelId = idEncoder.encode(c.getId(), c.getType());
           return c.getFirstMember().equals(member) ?
               new DirectMessageChannelResponse(c.getSecondMember().getName(),
                   encodedDMChannelId) :

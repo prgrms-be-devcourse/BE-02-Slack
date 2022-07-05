@@ -89,7 +89,7 @@ public class DefaultChannelService implements ChannelService {
         .build();
     Channel savedChannel = channelRepository.save(channel);
 
-    return idEncoder.encode(savedChannel.getId());
+    return idEncoder.encode(savedChannel.getId(), savedChannel.getType());
   }
 
   @Override
@@ -176,7 +176,7 @@ public class DefaultChannelService implements ChannelService {
     return subscribeInfoService.findAllByMember(member)
         .stream()
         .map((subscribeInfo -> subscribeInfo.getChannel()))
-        .map((c) -> new ChannelResponse(idEncoder.encode(c.getId()), c.getName(), c.isPrivate()))
+        .map((c) -> new ChannelResponse(idEncoder.encode(c.getId(), c.getType()), c.getName(), c.isPrivate()))
         .collect(Collectors.toList());
   }
 

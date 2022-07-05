@@ -222,7 +222,8 @@ public class DirectMessageChannelServiceTest {
             .findByFirstMemberAndSecondMember(any(), any()))
             .thenReturn(Optional.of(testDirectMessageChannel));
 
-        when(idEncoder.encode(testDirectMessageChannel.getId())).thenReturn("testtest");
+        when(idEncoder.encode(testDirectMessageChannel.getId(), testDirectMessageChannel.getType()))
+            .thenReturn("testtest");
 
         //when
         final String actualId =
@@ -238,7 +239,7 @@ public class DirectMessageChannelServiceTest {
             .findByEmailAndWorkspaceKey(any(), any());
         verify(directMessageChannelRepository, times(1))
             .findByFirstMemberAndSecondMember(any(), any());
-        verify(idEncoder).encode(anyLong());
+        verify(idEncoder).encode(anyLong(), anyString());
       }
     }
 
@@ -275,9 +276,12 @@ public class DirectMessageChannelServiceTest {
 
         MockedConstruction<DirectMessageChannel> mockedConstruction2 =
             Mockito.mockConstruction(DirectMessageChannel.class,
-                (mock, context) -> when(mock.getId()).thenReturn(1L));
+                (mock, context) -> {
+              when(mock.getId()).thenReturn(1L);
+              when(mock.getType()).thenReturn("DMChannel");
+                });
 
-        when(idEncoder.encode(anyLong())).thenReturn("testtest");
+        when(idEncoder.encode(1L, "DMChannel")).thenReturn("testtest");
 
         //when
         final String actualId =
@@ -293,7 +297,7 @@ public class DirectMessageChannelServiceTest {
             .findByEmailAndWorkspaceKey(any(), any());
         verify(directMessageChannelRepository, times(1))
             .findByFirstMemberAndSecondMember(any(), any());
-        verify(idEncoder).encode(anyLong());
+        verify(idEncoder).encode(anyLong(), anyString());
       }
     }
   }
@@ -382,8 +386,8 @@ public class DirectMessageChannelServiceTest {
 
         when(directMessageChannelRepository.findAllByMember(any())).thenReturn(channels);
 
-        final String firstExpectedId = idEncoder.encode(1);
-        final String secondExpectedId = idEncoder.encode(2);
+        final String firstExpectedId = idEncoder.encode(1, "DMChannel");
+        final String secondExpectedId = idEncoder.encode(2, "DMChannel");
 
         //when
         final List<DirectMessageChannelResponse> actual =

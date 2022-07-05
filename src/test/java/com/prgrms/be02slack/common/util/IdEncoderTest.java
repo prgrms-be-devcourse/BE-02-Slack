@@ -2,6 +2,7 @@ package com.prgrms.be02slack.common.util;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.ClassOrderer;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -26,15 +27,32 @@ class IdEncoderTest {
   class DescribeEncode {
 
     @Nested
-    @DisplayName("양수 값이 전달되면")
+    @DisplayName("양수 값과 객체 타입이 전달되면")
     class ContextWithPositiveValue {
 
       @ParameterizedTest
       @ValueSource(longs = {1, Long.MAX_VALUE})
-      @DisplayName("해시 값을 반환한다")
+      @DisplayName("타입을 명시하고 해시 값을 반환한다")
       void ItReturnHashValue(long src) {
-        final var encoded = idEncoder.encode(src);
-        log.info(encoded);
+
+        //given
+        final var channelType = "channel";
+        final var workspaceType = "workspace";
+        final var memberType = "member";
+        final var directMessageType = "DMChannel";
+
+        //when
+        final var encodedChannel = idEncoder.encode(src, channelType);
+        final var encodedWorkspace = idEncoder.encode(src, workspaceType);
+        final var encodedMember = idEncoder.encode(src, memberType);
+        final var encodedDirectMessage = idEncoder.encode(src, directMessageType);
+        log.info(encodedChannel);
+
+        //then
+        Assertions.assertThat(encodedChannel.substring(0,1)).isEqualTo("C");
+        Assertions.assertThat(encodedWorkspace.substring(0,1)).isEqualTo("T");
+        Assertions.assertThat(encodedMember.substring(0,1)).isEqualTo("M");
+        Assertions.assertThat(encodedDirectMessage.substring(0,1)).isEqualTo("D");
       }
     }
 
@@ -46,7 +64,7 @@ class IdEncoderTest {
       @ValueSource(longs = {0, -1, Long.MIN_VALUE})
       @DisplayName("IllegalArgumentException 에러를 반환한다")
       void ItThrowsIllegalArgumentException(long src) {
-        assertThrows(IllegalArgumentException.class, () -> idEncoder.encode(src));
+        assertThrows(IllegalArgumentException.class, () -> idEncoder.encode(src, "channel"));
       }
     }
   }
@@ -63,8 +81,8 @@ class IdEncoderTest {
       @Test
       @DisplayName("디코딩된 값을 반환한다")
       void ItReturnsDecodedValue() {
-        final var testId = 1000L;
-        final var encoded = idEncoder.encode(testId);
+        final var testId = 12L;
+        final var encoded = idEncoder.encode(testId, "channel");
 
         final var decoded = idEncoder.decode(encoded);
         assertEquals(testId, decoded);
