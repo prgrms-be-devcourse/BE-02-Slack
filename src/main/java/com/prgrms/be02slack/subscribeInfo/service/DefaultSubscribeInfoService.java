@@ -66,4 +66,19 @@ public class DefaultSubscribeInfoService implements SubscribeInfoService {
 
     return subscribeInfoRepository.findAllByMember(member);
   }
+
+  @Override
+  public boolean isExistsByMemberAndChannelId(Member member, Long channelId) {
+    Assert.notNull(member, "Member must be provided");
+    Assert.notNull(channelId, "ChannelId must be provided");
+
+    return subscribeInfoRepository.existsByMemberAndChannelId(member, channelId).isPresent();
+  }
+
+  @Override
+  public List<SubscribeInfo> findAllByChannelId(Long channelId) {
+    Assert.notNull(channelId, "ChannelId must be provided");
+
+    return subscribeInfoRepository.findAllByChannelId(channelId);
+  }
 }

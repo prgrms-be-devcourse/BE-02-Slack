@@ -17,4 +17,8 @@ public interface SubscribeInfoService {
   boolean isExistsByChannelAndMemberName(Channel channel, String name);
 
   List<SubscribeInfo> findAllByMember(Member member);
+
+  boolean isExistsByMemberAndChannelId(Member member, Long channelId);
+
+  List<SubscribeInfo> findAllByChannelId(Long channelId);
 }
