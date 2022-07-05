@@ -3,7 +3,6 @@ package com.prgrms.be02slack.common.configuration.security;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -62,6 +61,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .antMatchers(HttpMethod.GET, "/api/v1/members/{encodedMemberId}")
           .hasAnyRole(USER, OWNER)
         .antMatchers(HttpMethod.GET, "/api/v1/channels/{encodedChannelId}/members")
+          .hasAnyRole(USER, OWNER)
+        .antMatchers("/api/v1/workspaces/{encodedWorkspaceId}/channels/**")
           .hasAnyRole(USER, OWNER)
           .anyRequest().permitAll()
           .and()
