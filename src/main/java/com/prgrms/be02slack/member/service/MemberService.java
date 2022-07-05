@@ -29,4 +29,6 @@ public interface MemberService {
   MemberResponse getOne(Member member, String encodedMemberId);
 
   List<MemberResponse> getAllFromChannel(Member member, String encodedChannelId);
+
+  List<MemberResponse> findAllByWorkspaceId(String encodedWorkspaceId);
 }
