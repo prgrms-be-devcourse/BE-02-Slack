@@ -158,9 +158,7 @@ public class DefaultMemberService implements MemberService {
     Assert.isTrue(isNotBlank(encodedChannelId), "EncodedChannelId must be provided");
 
     final long channelId = idEncoder.decode(encodedChannelId);
-    if(isNotPossibleToAccessChannel(member, channelId)) {
-      throw new IllegalArgumentException(CHANNEL_NOT_ACCESS.getMsg());
-    }
+    Assert.isTrue(!isNotPossibleToAccessChannel(member, channelId), CHANNEL_NOT_ACCESS.getMsg());
 
     return subscribeInfoService.findAllByChannelId(channelId)
         .stream()
