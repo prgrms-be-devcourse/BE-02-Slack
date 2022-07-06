@@ -581,4 +581,61 @@ class DefaultSubscribeInfoServiceTest {
       }
     }
   }
+
+  @Nested
+  @DisplayName("findAllByChannelId 메서드는")
+  class DescribeFindAllByChannelId {
+
+    @Nested
+    @DisplayName("channelId가 null 이면")
+    class ContextWithChannelIdNull {
+
+      @Test
+      @DisplayName("IllegalArgumentException 에러를 발생시킨다")
+      void ItThrowsIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class,
+            () -> subscribeInfoService.findAllByChannelId(null));
+      }
+    }
+
+    @Nested
+    @DisplayName("channelId가 정상적인 값이라면")
+    class ContextWithValidChannelId {
+
+      @Test
+      @DisplayName("채널 아이디별 구독 정보들을 반환한다.")
+      void ItThrowsSubscribeInfosByChannelId() {
+        //given
+        final Long channelId = 1L;
+        final Workspace workspace = Workspace.createDefaultWorkspace();
+        ReflectionTestUtils.setField(workspace, "id", 1L);
+        final Member member = Member.builder()
+            .email("test@test.com")
+            .name("test")
+            .displayName("test")
+            .role(Role.ROLE_USER)
+            .workspace(workspace)
+            .build();
+        ReflectionTestUtils.setField(member, "id", 1L);
+        final Channel channel = Channel.builder()
+            .name("testChannel1")
+            .description("channel")
+            .isPrivate(false)
+            .workspace(workspace)
+            .owner(member)
+            .build();
+        ReflectionTestUtils.setField(channel, "id", 1L);
+        final List<SubscribeInfo> subscribeInfos = List.of(SubscribeInfo.subscribe(channel, member));
+
+        given(subscribeInfoRepository.findAllByChannelId(anyLong())).willReturn(subscribeInfos);
+
+        //when
+        final List<SubscribeInfo> foundSubscribeInfos = subscribeInfoService.findAllByChannelId(channelId);
+
+        //then
+        verify(subscribeInfoRepository).findAllByChannelId(anyLong());
+        assertThat(foundSubscribeInfos).usingRecursiveComparison().isEqualTo(subscribeInfos);
+      }
+    }
+  }
 }
