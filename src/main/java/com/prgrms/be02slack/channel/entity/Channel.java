@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.prgrms.be02slack.common.entity.BaseTime;
+import com.prgrms.be02slack.common.enums.EntityIdType;
 import com.prgrms.be02slack.member.entity.Member;
 import com.prgrms.be02slack.subscribeInfo.entity.SubscribeInfo;
 import com.prgrms.be02slack.workspace.entity.Workspace;
@@ -18,6 +19,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -37,6 +39,9 @@ public class Channel extends BaseTime {
 
   @NotNull
   private boolean isPrivate;
+
+  @Transient
+  private EntityIdType type = EntityIdType.CHANNEL;
 
   protected Channel() {/*no-op*/}
 
@@ -114,5 +119,9 @@ public class Channel extends BaseTime {
     public Channel build() {
       return new Channel(this);
     }
+  }
+
+  public EntityIdType getType() {
+    return type;
   }
 }

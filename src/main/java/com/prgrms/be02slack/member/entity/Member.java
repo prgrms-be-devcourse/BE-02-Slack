@@ -15,10 +15,12 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Transient;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import com.prgrms.be02slack.common.enums.EntityIdType;
 import com.prgrms.be02slack.subscribeInfo.entity.SubscribeInfo;
 import com.prgrms.be02slack.common.entity.BaseTime;
 import com.prgrms.be02slack.workspace.entity.Workspace;
@@ -48,6 +50,9 @@ public class Member extends BaseTime {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "workspace_id")
   private Workspace workspace;
+
+  @Transient
+  private EntityIdType type = EntityIdType.MEMBER;
 
   @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   private List<SubscribeInfo> subscribeInfos = new ArrayList<>();
@@ -149,5 +154,9 @@ public class Member extends BaseTime {
 
   public Workspace getWorkspace() {
     return workspace;
+  }
+
+  public EntityIdType getType() {
+    return type;
   }
 }

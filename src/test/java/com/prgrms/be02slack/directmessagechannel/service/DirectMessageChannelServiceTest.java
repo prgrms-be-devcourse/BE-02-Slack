@@ -16,6 +16,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import com.prgrms.be02slack.common.enums.EntityIdType;
 import com.prgrms.be02slack.common.exception.NotFoundException;
 import com.prgrms.be02slack.common.util.IdEncoder;
 import com.prgrms.be02slack.directmessagechannel.controller.dto.DirectMessageChannelResponse;
@@ -222,7 +223,8 @@ public class DirectMessageChannelServiceTest {
             .findByFirstMemberAndSecondMember(any(), any()))
             .thenReturn(Optional.of(testDirectMessageChannel));
 
-        when(idEncoder.encode(testDirectMessageChannel.getId())).thenReturn("testtest");
+        when(idEncoder.encode(testDirectMessageChannel.getId(), testDirectMessageChannel.getType()))
+            .thenReturn("testtest");
 
         //when
         final String actualId =
@@ -238,7 +240,7 @@ public class DirectMessageChannelServiceTest {
             .findByEmailAndWorkspaceKey(any(), any());
         verify(directMessageChannelRepository, times(1))
             .findByFirstMemberAndSecondMember(any(), any());
-        verify(idEncoder).encode(anyLong());
+        verify(idEncoder).encode(anyLong(), any());
       }
     }
 
@@ -275,9 +277,12 @@ public class DirectMessageChannelServiceTest {
 
         MockedConstruction<DirectMessageChannel> mockedConstruction2 =
             Mockito.mockConstruction(DirectMessageChannel.class,
-                (mock, context) -> when(mock.getId()).thenReturn(1L));
+                (mock, context) -> {
+              when(mock.getId()).thenReturn(1L);
+              when(mock.getType()).thenReturn(EntityIdType.DMCHANNEL);
+                });
 
-        when(idEncoder.encode(anyLong())).thenReturn("testtest");
+        when(idEncoder.encode(1L, EntityIdType.DMCHANNEL)).thenReturn("testtest");
 
         //when
         final String actualId =
@@ -293,7 +298,7 @@ public class DirectMessageChannelServiceTest {
             .findByEmailAndWorkspaceKey(any(), any());
         verify(directMessageChannelRepository, times(1))
             .findByFirstMemberAndSecondMember(any(), any());
-        verify(idEncoder).encode(anyLong());
+        verify(idEncoder).encode(anyLong(), any());
       }
     }
   }
@@ -382,8 +387,8 @@ public class DirectMessageChannelServiceTest {
 
         when(directMessageChannelRepository.findAllByMember(any())).thenReturn(channels);
 
-        final String firstExpectedId = idEncoder.encode(1);
-        final String secondExpectedId = idEncoder.encode(2);
+        final String firstExpectedId = idEncoder.encode(1, EntityIdType.DMCHANNEL);
+        final String secondExpectedId = idEncoder.encode(2, EntityIdType.DMCHANNEL);
 
         //when
         final List<DirectMessageChannelResponse> actual =
