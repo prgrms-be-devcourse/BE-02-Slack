@@ -129,7 +129,7 @@ class MessageWebsocketControllerTest {
             .encodedChannelId("TEST123")
             .member(testMember)
             .content("test").build();
-        given(messageService.sendMessage(anyString(), anyString(), anyString())).willReturn(
+        given(messageService.sendMessage(any(Member.class), anyString(), anyString())).willReturn(
             message);
 
         //when
@@ -176,7 +176,7 @@ class MessageWebsocketControllerTest {
             .encodedChannelId("TEST123")
             .member(testMember)
             .content("test").build();
-        given(messageService.sendMessage(anyString(), anyString(), anyString())).willReturn(
+        given(messageService.sendMessage(any(Member.class), anyString(), anyString())).willReturn(
             message);
 
         //when

@@ -11,12 +11,15 @@ import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.annotation.SendToUser;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 
+import com.prgrms.be02slack.member.entity.Member;
 import com.prgrms.be02slack.message.controller.dto.MessageWebsocketRequest;
 import com.prgrms.be02slack.message.controller.dto.MessageWebsocketResponse;
 import com.prgrms.be02slack.message.service.MessageService;
+import com.prgrms.be02slack.security.MemberDetails;
 
 @Validated
 @Controller
@@ -36,11 +39,9 @@ public class MessageWebsocketController {
       @Valid MessageWebsocketRequest channelMessageRequest,
       Principal principal
   ) {
-    final var senderEmail = principal.getName();
-    log.info("sender email : {}, channel id : {}, content : {}", senderEmail, encodedChannelId,
-        channelMessageRequest.getContent());
+    final var member = getMember(principal);
 
-    final var sendMessage = messageService.sendMessage(senderEmail, encodedChannelId,
+    final var sendMessage = messageService.sendMessage(member, encodedChannelId,
         channelMessageRequest.getContent());
 
     return MessageWebsocketResponse.from(sendMessage);
@@ -52,4 +53,9 @@ public class MessageWebsocketController {
     log.info(e.toString());
     return MessageWebsocketResponse.error(e.getMessage());
   }
+
+  private Member getMember(Principal principal) {
+    return ((MemberDetails)((Authentication)principal).getPrincipal()).getMember();
+  }
+
 }
