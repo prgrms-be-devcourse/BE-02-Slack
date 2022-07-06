@@ -513,7 +513,7 @@ class ChannelApiControllerTest extends ControllerSetUp {
         final var requestBody = objectMapper.writeValueAsString(inviteRequest);
         final MockHttpServletRequestBuilder request =
             RestDocumentationRequestBuilders.post(API_URL +
-                                                      "/workspaces/{encodedWorkspaceId}/channels/invite",
+                                                      "/workspaces/{workspaceId}/channels/invite",
                                                   encodedWorkspaceId)
                                             .contentType(MediaType.APPLICATION_JSON)
                                             .content(requestBody);
@@ -525,7 +525,23 @@ class ChannelApiControllerTest extends ControllerSetUp {
         verify(channelService).inviteMember(any(Member.class),
                                             anyString(),
                                             any(InviteRequest.class));
-        response.andExpect(status().isOk());
+        response.andExpect(status().isOk())
+                .andDo(
+                    document(
+                        "Invite new Member",
+                        pathParameters(
+                            parameterWithName("workspaceId").description("encoded workspace id")
+                        ),
+                        requestFields(
+                            fieldWithPath("sender")
+                                .type(JsonFieldType.STRING)
+                                .description("sender name displayed in the mail"),
+                            fieldWithPath("inviteeInfos")
+                                .type(JsonFieldType.ARRAY)
+                                .description("list of invitees")
+                        )
+                    )
+                );
       }
     }
 
