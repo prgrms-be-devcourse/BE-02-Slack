@@ -913,11 +913,11 @@ class DefaultMemberServiceTest {
     }
 
     @Nested
-    @DisplayName("로그인한 멤버가 해당 채널을 구독했다면 채널 내 멤버들을 조회하고")
+    @DisplayName("로그인한 멤버가 해당 채널을 구독했다면")
     class ContextWithSubscribeChannel  {
 
       @Test
-      @DisplayName("멤버 정보들을 반환한다.")
+      @DisplayName("채널 내 멤버들을 조회하고 멤버 정보들을 반환한다.")
       void ItThrowMemberResponses() {
         final Workspace workspace = Workspace.createDefaultWorkspace();
         //given
