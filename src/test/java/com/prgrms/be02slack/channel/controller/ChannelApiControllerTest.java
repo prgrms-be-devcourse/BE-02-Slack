@@ -490,4 +490,91 @@ class ChannelApiControllerTest extends ControllerSetUp {
       }
     }
   }
+
+
+  @Nested
+  @DisplayName("inviteMember 메서드는")
+  @WithMockCustomLoginMember
+  class DescribeInviteMember {
+
+    @Nested
+    @DisplayName("정상적인 값들이 입력되면")
+    class ContextWithValidInput {
+
+      @Test
+      @DisplayName("memberService의 inviteMember 함수를 호출한다")
+      void ItResponseAllMembersInWorkspace() throws Exception {
+        //given
+        final String encodedWorkspaceId = "TESTID";
+
+        //when
+        final var inviteRequest = new InviteRequest(Set.of("recipentEmail@domain.com"),
+                                                    "SenderId");
+        final var requestBody = objectMapper.writeValueAsString(inviteRequest);
+        final MockHttpServletRequestBuilder request =
+            RestDocumentationRequestBuilders.post(API_URL +
+                                                      "/workspaces/{workspaceId}/channels/invite",
+                                                  encodedWorkspaceId)
+                                            .contentType(MediaType.APPLICATION_JSON)
+                                            .content(requestBody);
+        ;
+
+        final ResultActions response = mockMvc.perform(request);
+
+        //then
+        verify(channelService).inviteMember(any(Member.class),
+                                            anyString(),
+                                            any(InviteRequest.class));
+        response.andExpect(status().isOk())
+                .andDo(
+                    document(
+                        "Invite new Member",
+                        pathParameters(
+                            parameterWithName("workspaceId").description("encoded workspace id")
+                        ),
+                        requestFields(
+                            fieldWithPath("sender")
+                                .type(JsonFieldType.STRING)
+                                .description("sender name displayed in the mail"),
+                            fieldWithPath("inviteeInfos")
+                                .type(JsonFieldType.ARRAY)
+                                .description("list of invitees")
+                        )
+                    )
+                );
+      }
+    }
+
+    @Nested
+    @DisplayName("멤버와 같지 않은 워크스페이스 아이디 값이 전달되면")
+    class ContextWithNotExistOrNotMatchEncodedWorkspaceId {
+
+      @Test
+      @DisplayName("BadRequest로 응답한다.")
+      void ItResponseBadRequest() throws Exception {
+        //given
+        final var encodedWorkspaceId = "TESTID";
+
+        doThrow(IllegalArgumentException.class).when(channelService).inviteMember(any(),
+                                                                                  anyString(),
+                                                                                  any());
+        //when
+        final var inviteRequest = new InviteRequest(Set.of("recipentEmail@domain.com"),
+                                                    "SenderId");
+        final var requestBody = objectMapper.writeValueAsString(inviteRequest);
+        final MockHttpServletRequestBuilder request =
+            RestDocumentationRequestBuilders.post(API_URL +
+                                                      "/workspaces/{encodedWorkspaceId}/channels/invite"
+                                                , encodedWorkspaceId)
+                                            .contentType(MediaType.APPLICATION_JSON)
+                                            .content(requestBody);
+
+        final ResultActions response = mockMvc.perform(request);
+
+        //then
+        verify(channelService).inviteMember(any(Member.class), anyString(), any());
+        response.andExpect(status().isBadRequest());
+      }
+    }
+  }
 }

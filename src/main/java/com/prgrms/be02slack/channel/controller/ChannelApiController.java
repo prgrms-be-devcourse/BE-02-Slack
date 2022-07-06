@@ -5,6 +5,7 @@ import java.util.List;
 import javax.mail.MessagingException;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -49,6 +50,15 @@ public class ChannelApiController {
       @PathVariable @NotBlank String channelId,
       @RequestBody @Valid InviteRequest inviteRequest) throws MessagingException {
     channelService.invite(workspaceId, channelId, inviteRequest);
+  }
+
+  @PostMapping("invite")
+  @ResponseStatus(HttpStatus.OK)
+  public void inviteMember(
+      @CurrentMember Member sender,
+      @PathVariable("workspaceId") @NotBlank String encodedWorkspaceId,
+      @RequestBody @NotNull InviteRequest inviteRequest) throws MessagingException {
+    channelService.inviteMember(sender, encodedWorkspaceId, inviteRequest);
   }
 
   @PostMapping("{channelId}/participate")
