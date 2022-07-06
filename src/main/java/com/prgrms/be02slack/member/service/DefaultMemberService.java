@@ -4,19 +4,26 @@ import static com.prgrms.be02slack.channel.exception.ErrorMessage.*;
 import static com.prgrms.be02slack.member.exception.ErrorMessage.*;
 import static org.apache.logging.log4j.util.Strings.*;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
+
+import javax.mail.MessagingException;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import com.prgrms.be02slack.channel.controller.dto.InviteRequest;
+import com.prgrms.be02slack.channel.service.ChannelService;
+import com.prgrms.be02slack.common.dto.AuthResponse;
 import com.prgrms.be02slack.common.exception.NotFoundException;
 import com.prgrms.be02slack.common.util.IdEncoder;
+import com.prgrms.be02slack.email.controller.dto.EmailRequest;
 import com.prgrms.be02slack.email.service.EmailService;
 import com.prgrms.be02slack.member.controller.dto.MemberResponse;
 import com.prgrms.be02slack.member.controller.dto.VerificationRequest;
-import com.prgrms.be02slack.common.dto.AuthResponse;
 import com.prgrms.be02slack.member.entity.Member;
 import com.prgrms.be02slack.member.entity.Role;
 import com.prgrms.be02slack.member.repository.MemberRepository;
@@ -31,6 +38,7 @@ public class DefaultMemberService implements MemberService {
 
   private final MemberRepository memberRepository;
   private final WorkspaceService workspaceService;
+  private final ChannelService channelService;
   private final EmailService emailService;
   private final TokenProvider tokenProvider;
   private final IdEncoder idEncoder;
@@ -39,12 +47,14 @@ public class DefaultMemberService implements MemberService {
   public DefaultMemberService(
       MemberRepository memberRepository,
       WorkspaceService workspaceService,
+      ChannelService channelService,
       EmailService emailService,
       TokenProvider tokenProvider,
       IdEncoder idEncoder,
       SubscribeInfoService subscribeInfoService) {
     this.memberRepository = memberRepository;
     this.workspaceService = workspaceService;
+    this.channelService = channelService;
     this.emailService = emailService;
     this.tokenProvider = tokenProvider;
     this.idEncoder = idEncoder;
@@ -59,7 +69,7 @@ public class DefaultMemberService implements MemberService {
     final var findWorkspace = workspaceService.findByKey(encodedWorkspaceId);
 
     return memberRepository.findByEmailAndWorkspace(email, findWorkspace)
-        .orElseThrow(() -> new NotFoundException("member notfound"));
+                           .orElseThrow(() -> new NotFoundException("member notfound"));
   }
 
   @Override
@@ -69,7 +79,7 @@ public class DefaultMemberService implements MemberService {
 
     Long decodedWorkspaceId = idEncoder.decode(encodedWorkspaceId);
     return memberRepository.findByNameAndWorkspace_Id(name, decodedWorkspaceId)
-        .orElseThrow(() -> new NotFoundException("member notfound"));
+                           .orElseThrow(() -> new NotFoundException("member notfound"));
   }
 
   @Override
@@ -129,12 +139,12 @@ public class DefaultMemberService implements MemberService {
 
     Workspace workspace = workspaceService.findByKey(workspaceId);
     Member member = Member.builder()
-        .name(name)
-        .email(email)
-        .role(role)
-        .workspace(workspace)
-        .displayName(displayName)
-        .build();
+                          .name(name)
+                          .email(email)
+                          .role(role)
+                          .workspace(workspace)
+                          .displayName(displayName)
+                          .build();
 
     return memberRepository.save(member);
   }
@@ -194,18 +204,35 @@ public class DefaultMemberService implements MemberService {
                        .collect(Collectors.toList());
   }
 
+  @Override
+  public void inviteMember(Member sender, String encodedWorkspaceId, InviteRequest inviteRequest) throws MessagingException {
+    Assert.notNull(sender, "Member must be provided");
+    Assert.isTrue(isNotBlank(encodedWorkspaceId), "encodedWorkspaceId must be provided");
+    Assert.notNull(inviteRequest, "RecipientE  mail must be provided");
+
+    final var workspaceId = idEncoder.decode(encodedWorkspaceId);
+    final var memberWorkspaceId = sender.getWorkspace().getId();
+
+    Assert.isTrue(workspaceId == memberWorkspaceId,
+                  "Only workspace member create workspace invitation");
+
+    final var channelId = channelService.findAllByMember(sender).get(0).getId();
+
+    channelService.invite(encodedWorkspaceId, channelId, inviteRequest);
+  }
+
   private Member createMember(String email) {
     final String[] splitEmail = email.split("@");
     final String defaultName = splitEmail[0];
     final Workspace workspace = workspaceService.create();
 
     final Member member = Member.builder()
-        .email(email)
-        .name(defaultName)
-        .displayName(defaultName)
-        .role(Role.ROLE_OWNER)
-        .workspace(workspace)
-        .build();
+                                .email(email)
+                                .name(defaultName)
+                                .displayName(defaultName)
+                                .role(Role.ROLE_OWNER)
+                                .workspace(workspace)
+                                .build();
 
     return memberRepository.save(member);
   }

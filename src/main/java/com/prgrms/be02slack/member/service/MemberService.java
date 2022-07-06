@@ -2,11 +2,13 @@ package com.prgrms.be02slack.member.service;
 
 import java.util.List;
 
-import com.prgrms.be02slack.member.controller.dto.MemberResponse;
-import com.prgrms.be02slack.member.entity.Member;
+import javax.mail.MessagingException;
 
-import com.prgrms.be02slack.member.controller.dto.VerificationRequest;
+import com.prgrms.be02slack.channel.controller.dto.InviteRequest;
 import com.prgrms.be02slack.common.dto.AuthResponse;
+import com.prgrms.be02slack.member.controller.dto.MemberResponse;
+import com.prgrms.be02slack.member.controller.dto.VerificationRequest;
+import com.prgrms.be02slack.member.entity.Member;
 import com.prgrms.be02slack.member.entity.Role;
 
 public interface MemberService {
@@ -31,4 +33,7 @@ public interface MemberService {
   List<MemberResponse> getAllFromChannel(Member member, String encodedChannelId);
 
   List<MemberResponse> findAllByWorkspaceId(String encodedWorkspaceId);
+
+  void inviteMember(Member sender, String encodedWorkspaceId, InviteRequest inviteRequest) throws
+      MessagingException;
 }

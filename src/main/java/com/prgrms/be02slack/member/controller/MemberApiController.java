@@ -2,8 +2,10 @@ package com.prgrms.be02slack.member.controller;
 
 import java.util.List;
 
+import javax.mail.MessagingException;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -14,12 +16,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.prgrms.be02slack.channel.controller.dto.InviteRequest;
 import com.prgrms.be02slack.member.controller.dto.MemberResponse;
 import com.prgrms.be02slack.member.controller.dto.VerificationRequest;
 import com.prgrms.be02slack.common.dto.AuthResponse;
 import com.prgrms.be02slack.member.entity.Member;
 import com.prgrms.be02slack.member.service.MemberService;
 import com.prgrms.be02slack.security.CurrentMember;
+import com.prgrms.be02slack.workspace.controller.dto.MemberInviteRequest;
 
 @RestController
 public class MemberApiController {
@@ -50,6 +54,15 @@ public class MemberApiController {
       @CurrentMember Member member,
       @PathVariable @NotBlank String encodedMemberId) {
     return memberService.getOne(member, encodedMemberId);
+  }
+
+  @PostMapping("api/v1/workspaces/{encodedWorkspaceId}/members/invite")
+  @ResponseStatus(HttpStatus.OK)
+  public void inviteMember(
+      @CurrentMember Member sender,
+      @PathVariable @NotBlank String encodedWorkspaceId,
+      @RequestBody @NotNull InviteRequest inviteRequest) throws MessagingException {
+    memberService.inviteMember(sender, encodedWorkspaceId, inviteRequest);
   }
 
   @GetMapping("api/v1/channels/{encodedChannelId}/members")
