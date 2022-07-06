@@ -202,9 +202,13 @@ public class DefaultChannelService implements ChannelService {
     Assert.isTrue(workspaceId == memberWorkspaceId,
                   "Only workspace member create workspace invitation");
 
-    final var channelId = findAllByMember(sender).get(0).getId();
+    final var channelId = getDefaultChannelIdByMember(sender);
 
     invite(encodedWorkspaceId, channelId, inviteRequest);
+  }
+
+  private String getDefaultChannelIdByMember(Member sender) {
+    return findAllByMember(sender).get(0).getId();
   }
 
   private boolean isValidEmail(String email) {
