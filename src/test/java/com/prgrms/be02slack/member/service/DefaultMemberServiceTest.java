@@ -24,6 +24,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import com.prgrms.be02slack.channel.entity.Channel;
+import com.prgrms.be02slack.common.enums.EntityIdType;
 import com.prgrms.be02slack.common.exception.NotFoundException;
 import com.prgrms.be02slack.common.util.IdEncoder;
 import com.prgrms.be02slack.email.service.EmailService;
@@ -824,7 +825,7 @@ class DefaultMemberServiceTest {
                                       .build();
           ReflectionTestUtils.setField(newMember,"id", i);
           membersList.add(newMember);
-          given(idEncoder.encode(i)).willReturn("test"+i);
+          given(idEncoder.encode(i, EntityIdType.MEMBER)).willReturn("test"+i);
         }
 
 

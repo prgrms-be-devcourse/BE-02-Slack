@@ -189,7 +189,8 @@ public class DefaultMemberService implements MemberService {
 
     return foundMembers.stream()
                        .map(member -> MemberResponse.from(member,
-                                                          idEncoder.encode(member.getId())))
+                                                          idEncoder.encode(member.getId(),
+                                                              member.getType())))
                        .collect(Collectors.toList());
   }
 

@@ -7,12 +7,14 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.springframework.util.Assert;
 
 import com.prgrms.be02slack.common.entity.BaseTime;
+import com.prgrms.be02slack.common.enums.EntityIdType;
 
 @Entity
 public class Workspace extends BaseTime {
@@ -30,6 +32,9 @@ public class Workspace extends BaseTime {
   @Size(min = 1, max = 21)
   @Column(unique = true)
   private String url;
+
+  @Transient
+  private EntityIdType type = EntityIdType.TEAM;
 
   protected Workspace() {/*no-op*/}
 
@@ -71,5 +76,9 @@ public class Workspace extends BaseTime {
 
   public String getUrl() {
     return url;
+  }
+
+  public EntityIdType getType() {
+    return type;
   }
 }
