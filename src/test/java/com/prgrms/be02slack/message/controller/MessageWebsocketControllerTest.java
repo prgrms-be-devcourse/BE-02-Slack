@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
@@ -24,6 +25,7 @@ import org.springframework.messaging.simp.stomp.StompFrameHandler;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
+import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 import org.springframework.web.socket.sockjs.client.SockJsClient;
@@ -35,6 +37,9 @@ import com.prgrms.be02slack.message.controller.dto.MessageWebsocketRequest;
 import com.prgrms.be02slack.message.controller.dto.MessageWebsocketResponse;
 import com.prgrms.be02slack.message.entity.Message;
 import com.prgrms.be02slack.message.service.MessageService;
+import com.prgrms.be02slack.security.DefaultUserDetailsService;
+import com.prgrms.be02slack.security.MemberDetails;
+import com.prgrms.be02slack.security.TokenProvider;
 import com.prgrms.be02slack.workspace.entity.Workspace;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -42,8 +47,14 @@ class MessageWebsocketControllerTest {
 
   static final String WS_URI = "ws://localhost:8080/ws-stomp";
 
+  @Autowired
+  private TokenProvider tokenProvider;
+
   @MockBean
   private MessageService messageService;
+
+  @MockBean
+  private DefaultUserDetailsService userDetailsService;
 
   private BlockingQueue<Object> blockingQueue;
   private WebSocketStompClient stompClient;
@@ -101,8 +112,15 @@ class MessageWebsocketControllerTest {
       @DisplayName("해당 메시지를 발행한다")
       void ItPublishMessage() throws Exception {
         //given
-        StompSession session = stompClient.connect(WS_URI, getStompSessionHandlerAdapter())
-            .get(1, SECONDS);
+        final var memberDetails = MemberDetails.create(testMember);
+        given(userDetailsService.loadUserByUsername(anyString())).willReturn(memberDetails);
+
+        WebSocketHttpHeaders handshakeHeaders = new WebSocketHttpHeaders();
+        StompHeaders connectHeaders = new StompHeaders();
+        final var token = tokenProvider.createMemberToken("test@test.com", "TEST");
+        connectHeaders.add("Authorization", "Bearer: " + token);
+        StompSession session = stompClient.connect(WS_URI, handshakeHeaders, connectHeaders,
+            getStompSessionHandlerAdapter()).get(1, SECONDS);
 
         String subUrl = MessageFormat.format("/topic/channel.{0}", "TEST");
         session.subscribe(subUrl, getStompFrameHandler(MessageWebsocketResponse.class));
@@ -111,7 +129,8 @@ class MessageWebsocketControllerTest {
             .encodedChannelId("TEST123")
             .member(testMember)
             .content("test").build();
-        given(messageService.sendMessage(anyString(), anyString())).willReturn(message);
+        given(messageService.sendMessage(any(Member.class), anyString(), anyString())).willReturn(
+            message);
 
         //when
         String pubUrl = MessageFormat.format("/app/channel.{0}", "TEST");
@@ -140,8 +159,15 @@ class MessageWebsocketControllerTest {
       @DisplayName("에러메시지를 유저에게 반환한다")
       void ItPublishMessage(String src) throws Exception {
         //given
-        StompSession session = stompClient.connect(WS_URI, getStompSessionHandlerAdapter())
-            .get(1, SECONDS);
+        final var memberDetails = MemberDetails.create(testMember);
+        given(userDetailsService.loadUserByUsername(anyString())).willReturn(memberDetails);
+
+        WebSocketHttpHeaders handshakeHeaders = new WebSocketHttpHeaders();
+        StompHeaders connectHeaders = new StompHeaders();
+        final var token = tokenProvider.createMemberToken("test@test.com", "TEST");
+        connectHeaders.add("Authorization", "Bearer: " + token);
+        StompSession session = stompClient.connect(WS_URI, handshakeHeaders, connectHeaders,
+            getStompSessionHandlerAdapter()).get(1, SECONDS);
 
         String subUrl = "/user/queue.error";
         session.subscribe(subUrl, getStompFrameHandler(MessageWebsocketResponse.class));
@@ -150,7 +176,8 @@ class MessageWebsocketControllerTest {
             .encodedChannelId("TEST123")
             .member(testMember)
             .content("test").build();
-        given(messageService.sendMessage(anyString(), anyString())).willReturn(message);
+        given(messageService.sendMessage(any(Member.class), anyString(), anyString())).willReturn(
+            message);
 
         //when
         String pubUrl = MessageFormat.format("/app/channel.{0}", "TEST");
