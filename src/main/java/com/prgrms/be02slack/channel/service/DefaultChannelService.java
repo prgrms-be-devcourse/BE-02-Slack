@@ -189,6 +189,24 @@ public class DefaultChannelService implements ChannelService {
     subscribeInfoService.unsubscribe(channel, member);
   }
 
+  @Override
+  public void inviteMember(Member sender, String encodedWorkspaceId, InviteRequest inviteRequest)
+      throws MessagingException {
+    Assert.notNull(sender, "Member must be provided");
+    Assert.isTrue(isNotBlank(encodedWorkspaceId), "encodedWorkspaceId must be provided");
+    Assert.notNull(inviteRequest, "RecipientE  mail must be provided");
+
+    final var workspaceId = idEncoder.decode(encodedWorkspaceId);
+    final var memberWorkspaceId = sender.getWorkspace().getId();
+
+    Assert.isTrue(workspaceId == memberWorkspaceId,
+                  "Only workspace member create workspace invitation");
+
+    final var channelId = findAllByMember(sender).get(0).getId();
+
+    invite(encodedWorkspaceId, channelId, inviteRequest);
+  }
+
   private boolean isValidEmail(String email) {
     boolean err = false;
     String emailRegex = "^[_a-z0-9-]+(.[_a-z0-9-]+)*@(?:\\w+\\.)+\\w+$";
