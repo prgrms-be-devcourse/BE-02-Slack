@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.util.ClassUtils;
 
 import com.prgrms.be02slack.channel.entity.Channel;
 import com.prgrms.be02slack.member.entity.Member;
@@ -24,4 +25,11 @@ public interface SubscribeInfoRepository extends JpaRepository<SubscribeInfo, Lo
 
   @Query("select s from SubscribeInfo s join fetch s.channel join fetch s.member where s.member =:member")
   List<SubscribeInfo> findAllByMember(@Param("member") Member member);
+
+  @Query("select s from SubscribeInfo s where s.member =:member and s.channel.id = :channelId")
+  Optional<SubscribeInfo> existsByMemberAndChannelId(@Param("member") Member member,
+      @Param("channelId") Long channelId);
+
+  @Query("select s from SubscribeInfo s join fetch s.channel join fetch s.member where s.channel.id =:channelId")
+  List<SubscribeInfo> findAllByChannelId(@Param("channelId") Long channelId);
 }

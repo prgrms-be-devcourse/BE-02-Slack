@@ -6,6 +6,7 @@ import static org.mockito.BDDMockito.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.List;
 import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
@@ -22,6 +23,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import com.prgrms.be02slack.channel.entity.Channel;
 import com.prgrms.be02slack.common.enums.EntityIdType;
 import com.prgrms.be02slack.common.exception.NotFoundException;
 import com.prgrms.be02slack.common.util.IdEncoder;
@@ -33,6 +35,8 @@ import com.prgrms.be02slack.member.entity.Member;
 import com.prgrms.be02slack.member.entity.Role;
 import com.prgrms.be02slack.member.repository.MemberRepository;
 import com.prgrms.be02slack.security.TokenProvider;
+import com.prgrms.be02slack.subscribeInfo.entity.SubscribeInfo;
+import com.prgrms.be02slack.subscribeInfo.service.SubscribeInfoService;
 import com.prgrms.be02slack.workspace.entity.Workspace;
 import com.prgrms.be02slack.workspace.service.WorkspaceService;
 
@@ -57,6 +61,9 @@ class DefaultMemberServiceTest {
   @Spy
   @InjectMocks
   DefaultMemberService memberService;
+
+  @Mock
+  SubscribeInfoService subscribeInfoService;
 
   @Nested
   @DisplayName("FindByEmailAndWorkspace 메서드는")
@@ -830,6 +837,136 @@ class DefaultMemberServiceTest {
 
         //then
         assertEquals(foundMemberList.size(), 5);
+      }
+    }
+  }
+
+  @Nested
+  @DisplayName("getAllFromChannel 메서드는")
+  class DescribeGetAllFromChannel {
+    @Nested
+    @DisplayName("member가 null 인자면")
+    class ContextWithKeyNullAndEmptySource {
+
+      @Test
+      @DisplayName("IllegalArgumentException 을 반환한다.")
+      void ItThrowIllegalArgumentException() {
+        String encodedChannelId = "TESTID";
+        Assertions.assertThatThrownBy(() -> memberService.getAllFromChannel(null, encodedChannelId))
+            .isInstanceOf(IllegalArgumentException.class);
+      }
+    }
+
+    @Nested
+    @DisplayName("encodedChannelId 이 비어있는 인자를 받으면")
+    class ContextWithNameNullAndEmptySource {
+
+      @ParameterizedTest
+      @NullAndEmptySource
+      @ValueSource(strings = {"\t", "\n"})
+      @DisplayName("IllegalArgumentException 을 반환한다.")
+      void ItThrowIllegalArgumentException(String encodedChannelId) {
+        final Workspace workspace = Workspace.createDefaultWorkspace();
+        ReflectionTestUtils.setField(workspace, "id", 1L);
+        final Member member = Member.builder()
+            .email("test@test.com")
+            .name("test")
+            .displayName("test")
+            .role(Role.ROLE_USER)
+            .workspace(workspace)
+            .build();
+        ReflectionTestUtils.setField(member, "id", 1L);
+
+        Assertions.assertThatThrownBy(
+                () -> memberService.getAllFromChannel(member, encodedChannelId))
+            .isInstanceOf(IllegalArgumentException.class);
+      }
+    }
+
+    @Nested
+    @DisplayName("로그인한 멤버가 해당 채널을 구독하지 않았으면")
+    class ContextWithNotSubscribeChannel  {
+
+      @Test
+      @DisplayName("IllegalArgumentException 을 반환한다.")
+      void ItThrowIllegalArgumentException() {
+        final Workspace workspace = Workspace.createDefaultWorkspace();
+        //given
+        ReflectionTestUtils.setField(workspace, "id", 1L);
+        final Member member = Member.builder()
+            .email("test@test.com")
+            .name("test")
+            .displayName("test")
+            .role(Role.ROLE_USER)
+            .workspace(workspace)
+            .build();
+        ReflectionTestUtils.setField(member, "id", 1L);
+        final String encodedChannelId = "TESTID";
+        given(idEncoder.decode(anyString())).willReturn(1L);
+        given(subscribeInfoService.isExistsByMemberAndChannelId(any(Member.class), anyLong()))
+            .willReturn(false);
+
+        //when, then
+        Assertions.assertThatThrownBy(
+                () -> memberService.getAllFromChannel(member, encodedChannelId))
+            .isInstanceOf(IllegalArgumentException.class);
+      }
+    }
+
+    @Nested
+    @DisplayName("로그인한 멤버가 해당 채널을 구독했다면 채널 내 멤버들을 조회하고")
+    class ContextWithSubscribeChannel  {
+
+      @Test
+      @DisplayName("멤버 정보들을 반환한다.")
+      void ItThrowMemberResponses() {
+        final Workspace workspace = Workspace.createDefaultWorkspace();
+        //given
+        ReflectionTestUtils.setField(workspace, "id", 1L);
+        final Member member = Member.builder()
+            .email("test@test.com")
+            .name("test")
+            .displayName("test")
+            .role(Role.ROLE_USER)
+            .workspace(workspace)
+            .build();
+        ReflectionTestUtils.setField(member, "id", 1L);
+        final Channel channel = Channel.builder()
+            .name("testChannel1")
+            .description("channel")
+            .isPrivate(false)
+            .workspace(workspace)
+            .owner(member)
+            .build();
+        ReflectionTestUtils.setField(channel, "id", 1L);
+        final List<SubscribeInfo> subscribeInfos = List.of(SubscribeInfo.subscribe(channel, member));
+        final String encodedChannelId = "TESTID";
+        final String encodedMemberId = "TESTID2";
+        final MemberResponse memberResponse = MemberResponse.builder()
+                .encodedMemberId(encodedMemberId)
+                .email("test@test.com")
+                .name("test")
+                .displayName("test")
+                .role(Role.ROLE_USER)
+                .build();
+        final List<MemberResponse> memberResponseList = List.of(memberResponse);
+
+        given(idEncoder.decode(anyString())).willReturn(1L);
+        given(idEncoder.encode(anyLong(), any())).willReturn(encodedMemberId);
+        given(subscribeInfoService.isExistsByMemberAndChannelId(any(Member.class), anyLong()))
+            .willReturn(true);
+        given(subscribeInfoService.findAllByChannelId(anyLong())).willReturn(subscribeInfos);
+
+        //when
+        final List<MemberResponse> foundMemberResponseList =
+            memberService.getAllFromChannel(member, encodedChannelId);
+
+        //then
+        verify(idEncoder).decode(anyString());
+        verify(subscribeInfoService).isExistsByMemberAndChannelId(any(Member.class), anyLong());
+        verify(subscribeInfoService).findAllByChannelId(anyLong());
+        verify(idEncoder).encode(anyLong(), any());
+        assertThat(foundMemberResponseList).usingRecursiveComparison().isEqualTo(memberResponseList);
       }
     }
   }

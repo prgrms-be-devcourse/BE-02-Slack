@@ -1,5 +1,7 @@
 package com.prgrms.be02slack.member.service;
 
+import static com.prgrms.be02slack.channel.exception.ErrorMessage.*;
+import static com.prgrms.be02slack.member.exception.ErrorMessage.*;
 import static org.apache.logging.log4j.util.Strings.*;
 
 import java.util.List;
@@ -19,6 +21,7 @@ import com.prgrms.be02slack.member.entity.Member;
 import com.prgrms.be02slack.member.entity.Role;
 import com.prgrms.be02slack.member.repository.MemberRepository;
 import com.prgrms.be02slack.security.TokenProvider;
+import com.prgrms.be02slack.subscribeInfo.service.SubscribeInfoService;
 import com.prgrms.be02slack.workspace.entity.Workspace;
 import com.prgrms.be02slack.workspace.service.WorkspaceService;
 
@@ -31,18 +34,21 @@ public class DefaultMemberService implements MemberService {
   private final EmailService emailService;
   private final TokenProvider tokenProvider;
   private final IdEncoder idEncoder;
+  private final SubscribeInfoService subscribeInfoService;
 
   public DefaultMemberService(
       MemberRepository memberRepository,
       WorkspaceService workspaceService,
       EmailService emailService,
       TokenProvider tokenProvider,
-      IdEncoder idEncoder) {
+      IdEncoder idEncoder,
+      SubscribeInfoService subscribeInfoService) {
     this.memberRepository = memberRepository;
     this.workspaceService = workspaceService;
     this.emailService = emailService;
     this.tokenProvider = tokenProvider;
     this.idEncoder = idEncoder;
+    this.subscribeInfoService = subscribeInfoService;
   }
 
   @Override
@@ -148,7 +154,27 @@ public class DefaultMemberService implements MemberService {
 
   @Override
   public List<MemberResponse> getAllFromChannel(Member member, String encodedChannelId) {
-    return null;
+    Assert.notNull(member, "Member must be provided");
+    Assert.isTrue(isNotBlank(encodedChannelId), "EncodedChannelId must be provided");
+
+    final long channelId = idEncoder.decode(encodedChannelId);
+    Assert.isTrue(!isNotPossibleToAccessChannel(member, channelId), CHANNEL_NOT_ACCESS.getMsg());
+
+    return subscribeInfoService.findAllByChannelId(channelId)
+        .stream()
+        .map((subscribeInfo -> subscribeInfo.getMember()))
+        .map((m) -> MemberResponse.builder()
+            .encodedMemberId(idEncoder.encode(m.getId(), m.getType()))
+            .email(m.getEmail())
+            .name(m.getName())
+            .displayName(m.getDisplayName())
+            .role(m.getRole())
+            .build())
+        .collect(Collectors.toList());
+  }
+
+  private boolean isNotPossibleToAccessChannel(Member member, long channelId) {
+    return !subscribeInfoService.isExistsByMemberAndChannelId(member, channelId);
   }
 
   @Override
