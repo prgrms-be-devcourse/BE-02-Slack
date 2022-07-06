@@ -164,7 +164,7 @@ public class DefaultMemberService implements MemberService {
         .stream()
         .map((subscribeInfo -> subscribeInfo.getMember()))
         .map((m) -> MemberResponse.builder()
-            .encodedMemberId(idEncoder.encode(m.getId()))
+            .encodedMemberId(idEncoder.encode(m.getId(), m.getType()))
             .email(m.getEmail())
             .name(m.getName())
             .displayName(m.getDisplayName())
