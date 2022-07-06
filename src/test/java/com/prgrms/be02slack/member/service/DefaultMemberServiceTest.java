@@ -6,8 +6,10 @@ import static org.mockito.BDDMockito.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+
+import javax.mail.MessagingException;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -16,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -23,14 +26,17 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import com.prgrms.be02slack.channel.controller.dto.ChannelResponse;
+import com.prgrms.be02slack.channel.controller.dto.InviteRequest;
 import com.prgrms.be02slack.channel.entity.Channel;
+import com.prgrms.be02slack.channel.service.ChannelService;
+import com.prgrms.be02slack.common.dto.AuthResponse;
 import com.prgrms.be02slack.common.enums.EntityIdType;
 import com.prgrms.be02slack.common.exception.NotFoundException;
 import com.prgrms.be02slack.common.util.IdEncoder;
 import com.prgrms.be02slack.email.service.EmailService;
 import com.prgrms.be02slack.member.controller.dto.MemberResponse;
 import com.prgrms.be02slack.member.controller.dto.VerificationRequest;
-import com.prgrms.be02slack.common.dto.AuthResponse;
 import com.prgrms.be02slack.member.entity.Member;
 import com.prgrms.be02slack.member.entity.Role;
 import com.prgrms.be02slack.member.repository.MemberRepository;
@@ -48,6 +54,9 @@ class DefaultMemberServiceTest {
 
   @Mock
   WorkspaceService workspaceService;
+
+  @Mock
+  ChannelService channelService;
 
   @Mock
   EmailService emailService;
@@ -85,7 +94,7 @@ class DefaultMemberServiceTest {
         when(repository.findByEmailAndWorkspace(email, findWorkspace)).thenReturn(Optional.empty());
 
         Assertions.assertThatThrownBy(() -> memberService.findByEmailAndWorkspaceKey(email, key))
-            .isInstanceOf(NotFoundException.class);
+                  .isInstanceOf(NotFoundException.class);
       }
     }
 
@@ -100,7 +109,7 @@ class DefaultMemberServiceTest {
       void ItThrowIllegalArgumentException(String key) {
         final String email = "test@test.com";
         Assertions.assertThatThrownBy(() -> memberService.findByEmailAndWorkspaceKey(email, key))
-            .isInstanceOf(IllegalArgumentException.class);
+                  .isInstanceOf(IllegalArgumentException.class);
       }
     }
 
@@ -115,7 +124,7 @@ class DefaultMemberServiceTest {
       void ItThrowIllegalArgumentException(String email) {
         final String key = "AAAADB24";
         Assertions.assertThatThrownBy(() -> memberService.findByEmailAndWorkspaceKey(email, key))
-            .isInstanceOf(IllegalArgumentException.class);
+                  .isInstanceOf(IllegalArgumentException.class);
       }
     }
 
@@ -131,11 +140,11 @@ class DefaultMemberServiceTest {
 
         final var findWorkspace = new Workspace("test", "test");
         final var savedMember = Member.builder().name("test")
-            .workspace(findWorkspace)
-            .email(savedEmail)
-            .displayName("test")
-            .role(Role.ROLE_USER)
-            .build();
+                                      .workspace(findWorkspace)
+                                      .email(savedEmail)
+                                      .displayName("test")
+                                      .role(Role.ROLE_USER)
+                                      .build();
 
         given(workspaceService.findByKey(anyString())).willReturn(findWorkspace);
         given(repository.findByEmailAndWorkspace(anyString(), any(Workspace.class)))
@@ -167,8 +176,8 @@ class DefaultMemberServiceTest {
 
         //then
         Assertions.assertThatThrownBy(
-                () -> memberService.isDuplicateName(null, channelName))
-            .isInstanceOf(IllegalArgumentException.class);
+                      () -> memberService.isDuplicateName(null, channelName))
+                  .isInstanceOf(IllegalArgumentException.class);
       }
     }
 
@@ -186,8 +195,8 @@ class DefaultMemberServiceTest {
 
         //then
         Assertions.assertThatThrownBy(
-                () -> memberService.isDuplicateName(validWorkspaceId, channelName))
-            .isInstanceOf(IllegalArgumentException.class);
+                      () -> memberService.isDuplicateName(validWorkspaceId, channelName))
+                  .isInstanceOf(IllegalArgumentException.class);
       }
     }
 
@@ -203,8 +212,8 @@ class DefaultMemberServiceTest {
         final String validChannelName = "hello";
         final Optional<Member> member = Optional.of(
             Member.builder()
-                .name("test")
-                .build()
+                  .name("test")
+                  .build()
         );
 
         when(repository.findByNameAndWorkspace_Id(any(), any())).thenReturn(member);
@@ -249,7 +258,7 @@ class DefaultMemberServiceTest {
       @DisplayName("IllegalArgumentException 에러를 발생시킨다.")
       void ItResponseIllegalArgumentException() {
         assertThrows(IllegalArgumentException.class,
-            () -> memberService.verify(null));
+                     () -> memberService.verify(null));
       }
     }
 
@@ -265,12 +274,12 @@ class DefaultMemberServiceTest {
             new VerificationRequest("test@test.com", "test");
         final Workspace workspace = Workspace.createDefaultWorkspace();
         final Member member = Member.builder()
-            .email("test@test.com")
-            .name("test")
-            .displayName("test")
-            .role(Role.ROLE_OWNER)
-            .workspace(workspace)
-            .build();
+                                    .email("test@test.com")
+                                    .name("test")
+                                    .displayName("test")
+                                    .role(Role.ROLE_OWNER)
+                                    .workspace(workspace)
+                                    .build();
         final AuthResponse verificationResponse =
             new AuthResponse("testToken");
 
@@ -303,12 +312,12 @@ class DefaultMemberServiceTest {
             new VerificationRequest("test@test.com", "test");
         final Workspace workspace = Workspace.createDefaultWorkspace();
         final Member member = Member.builder()
-            .email("test@test.com")
-            .name("test")
-            .displayName("test")
-            .role(Role.ROLE_OWNER)
-            .workspace(workspace)
-            .build();
+                                    .email("test@test.com")
+                                    .name("test")
+                                    .displayName("test")
+                                    .role(Role.ROLE_OWNER)
+                                    .workspace(workspace)
+                                    .build();
         final AuthResponse verificationResponse = new AuthResponse("testToken");
 
         doNothing().when(emailService).verifyCode(verificationRequest);
@@ -371,19 +380,19 @@ class DefaultMemberServiceTest {
         final String encodedWorkspaceId = "TESTID";
         final Workspace workspace = Workspace.createDefaultWorkspace();
         final Member member = Member.builder()
-            .email(email)
-            .name("test")
-            .displayName("test")
-            .role(Role.ROLE_OWNER)
-            .workspace(workspace)
-            .build();
+                                    .email(email)
+                                    .name("test")
+                                    .displayName("test")
+                                    .role(Role.ROLE_OWNER)
+                                    .workspace(workspace)
+                                    .build();
         final AuthResponse verificationResponse = new AuthResponse("testToken");
         doReturn(member).when(memberService).findByEmailAndWorkspaceKey(anyString(), anyString());
         given(tokenProvider.createMemberToken(anyString(), anyString())).willReturn("testToken");
 
         //when
         Member member1 = memberService.findByEmailAndWorkspaceKey(email,
-            encodedWorkspaceId);
+                                                                  encodedWorkspaceId);
         final AuthResponse response = memberService.enterWorkspace(email, encodedWorkspaceId);
 
         //then
@@ -413,7 +422,7 @@ class DefaultMemberServiceTest {
         when(repository.findByNameAndWorkspace_Id(name, decodedId)).thenReturn(Optional.empty());
 
         Assertions.assertThatThrownBy(() -> memberService.findByNameAndWorkspaceKey(name, key))
-            .isInstanceOf(NotFoundException.class);
+                  .isInstanceOf(NotFoundException.class);
       }
     }
 
@@ -428,7 +437,7 @@ class DefaultMemberServiceTest {
       void ItThrowIllegalArgumentException(String key) {
         final String name = "testName";
         Assertions.assertThatThrownBy(() -> memberService.findByNameAndWorkspaceKey(name, key))
-            .isInstanceOf(IllegalArgumentException.class);
+                  .isInstanceOf(IllegalArgumentException.class);
       }
     }
 
@@ -443,7 +452,7 @@ class DefaultMemberServiceTest {
       void ItThrowIllegalArgumentException(String name) {
         final String key = "AAAADB24";
         Assertions.assertThatThrownBy(() -> memberService.findByNameAndWorkspaceKey(name, key))
-            .isInstanceOf(IllegalArgumentException.class);
+                  .isInstanceOf(IllegalArgumentException.class);
       }
     }
 
@@ -460,11 +469,11 @@ class DefaultMemberServiceTest {
 
         final var findWorkspace = new Workspace("test", "test");
         final var savedMember = Member.builder().name(savedName)
-            .workspace(findWorkspace)
-            .email("test@gmail.com")
-            .displayName("test")
-            .role(Role.ROLE_USER)
-            .build();
+                                      .workspace(findWorkspace)
+                                      .email("test@gmail.com")
+                                      .displayName("test")
+                                      .role(Role.ROLE_USER)
+                                      .build();
 
         given(idEncoder.decode(anyString())).willReturn(decodedId);
         given(repository.findByNameAndWorkspace_Id(anyString(), anyLong()))
@@ -494,7 +503,7 @@ class DefaultMemberServiceTest {
       void ItThrowIllegalArgumentException(String key) {
         String name = "testName";
         Assertions.assertThatThrownBy(() -> memberService.isExistsByNameAndWorkspaceKey(name, key))
-            .isInstanceOf(IllegalArgumentException.class);
+                  .isInstanceOf(IllegalArgumentException.class);
       }
     }
 
@@ -509,7 +518,7 @@ class DefaultMemberServiceTest {
       void ItThrowIllegalArgumentException(String name) {
         String key = "AAAADB24";
         Assertions.assertThatThrownBy(() -> memberService.isExistsByNameAndWorkspaceKey(name, key))
-            .isInstanceOf(IllegalArgumentException.class);
+                  .isInstanceOf(IllegalArgumentException.class);
       }
     }
 
@@ -579,8 +588,8 @@ class DefaultMemberServiceTest {
       void ItThrowIllegalArgumentException(String key) {
         String email = "test@gmail.com";
         Assertions.assertThatThrownBy(
-                () -> memberService.isExistsByEmailAndWorkspaceKey(email, key))
-            .isInstanceOf(IllegalArgumentException.class);
+                      () -> memberService.isExistsByEmailAndWorkspaceKey(email, key))
+                  .isInstanceOf(IllegalArgumentException.class);
       }
     }
 
@@ -595,8 +604,8 @@ class DefaultMemberServiceTest {
       void ItThrowIllegalArgumentException(String email) {
         String key = "AAAADB24";
         Assertions.assertThatThrownBy(
-                () -> memberService.isExistsByEmailAndWorkspaceKey(email, key))
-            .isInstanceOf(IllegalArgumentException.class);
+                      () -> memberService.isExistsByEmailAndWorkspaceKey(email, key))
+                  .isInstanceOf(IllegalArgumentException.class);
       }
     }
 
@@ -682,12 +691,12 @@ class DefaultMemberServiceTest {
         final Workspace workspace = Workspace.createDefaultWorkspace();
         ReflectionTestUtils.setField(workspace, "id", 1L);
         final Member member = Member.builder()
-            .email("test@test.com")
-            .name("test")
-            .displayName("test")
-            .role(Role.ROLE_USER)
-            .workspace(workspace)
-            .build();
+                                    .email("test@test.com")
+                                    .name("test")
+                                    .displayName("test")
+                                    .role(Role.ROLE_USER)
+                                    .workspace(workspace)
+                                    .build();
         ReflectionTestUtils.setField(member, "id", 1L);
 
         //when, then
@@ -707,16 +716,17 @@ class DefaultMemberServiceTest {
         final Workspace workspace = Workspace.createDefaultWorkspace();
         ReflectionTestUtils.setField(workspace, "id", 1L);
         final Member member = Member.builder()
-            .email("test@test.com")
-            .name("test")
-            .displayName("test")
-            .role(Role.ROLE_USER)
-            .workspace(workspace)
-            .build();
+                                    .email("test@test.com")
+                                    .name("test")
+                                    .displayName("test")
+                                    .role(Role.ROLE_USER)
+                                    .workspace(workspace)
+                                    .build();
         ReflectionTestUtils.setField(member, "id", 1L);
         final String encodedMemberId = "TESTID";
         given(idEncoder.decode(anyString())).willReturn(1L);
-        given(repository.findByIdAndWorkspace_id(anyLong(), anyLong())).willReturn(Optional.empty());
+        given(repository.findByIdAndWorkspace_id(anyLong(), anyLong())).willReturn(
+            Optional.empty());
 
         //when, then
         assertThrows(NotFoundException.class, () ->
@@ -735,23 +745,24 @@ class DefaultMemberServiceTest {
         final Workspace workspace = Workspace.createDefaultWorkspace();
         ReflectionTestUtils.setField(workspace, "id", 1L);
         final Member member = Member.builder()
-            .email("test@test.com")
-            .name("test")
-            .displayName("test")
-            .role(Role.ROLE_USER)
-            .workspace(workspace)
-            .build();
+                                    .email("test@test.com")
+                                    .name("test")
+                                    .displayName("test")
+                                    .role(Role.ROLE_USER)
+                                    .workspace(workspace)
+                                    .build();
         ReflectionTestUtils.setField(member, "id", 1L);
         final String encodedMemberId = "TESTID";
         final MemberResponse memberResponse = MemberResponse.builder()
-            .encodedMemberId("TESTID")
-            .email("test@test.com")
-            .name("test")
-            .displayName("test")
-            .role(Role.ROLE_USER)
-            .build();
+                                                            .encodedMemberId("TESTID")
+                                                            .email("test@test.com")
+                                                            .name("test")
+                                                            .displayName("test")
+                                                            .role(Role.ROLE_USER)
+                                                            .build();
         given(idEncoder.decode(anyString())).willReturn(1L);
-        given(repository.findByIdAndWorkspace_id(anyLong(), anyLong())).willReturn(Optional.of(member));
+        given(repository.findByIdAndWorkspace_id(anyLong(), anyLong())).willReturn(
+            Optional.of(member));
 
         //when
         final MemberResponse foundMemberResponse = memberService.getOne(member, encodedMemberId);
@@ -761,6 +772,7 @@ class DefaultMemberServiceTest {
       }
     }
   }
+
   @Nested
   @DisplayName("FindAllByWorkspaceId 메서드는")
   class DescribeFindAllByWorkspaceId {
@@ -817,17 +829,16 @@ class DefaultMemberServiceTest {
         final var numOfMembers = 5;
         for (long i = 0; i < numOfMembers; i++) {
           final var newMember = Member.builder()
-                                      .name("test"+i)
+                                      .name("test" + i)
                                       .workspace(findWorkspace)
-                                      .email("email"+i+"@test.com")
-                                      .displayName("test"+i)
+                                      .email("email" + i + "@test.com")
+                                      .displayName("test" + i)
                                       .role(Role.ROLE_USER)
                                       .build();
-          ReflectionTestUtils.setField(newMember,"id", i);
+          ReflectionTestUtils.setField(newMember, "id", i);
           membersList.add(newMember);
           given(idEncoder.encode(i, EntityIdType.MEMBER)).willReturn("test"+i);
         }
-
 
         given(idEncoder.decode(anyString())).willReturn(workspaceId);
         given(repository.findAllByWorkspace_id(anyLong())).willReturn(membersList);
@@ -932,12 +943,12 @@ class DefaultMemberServiceTest {
             .build();
         ReflectionTestUtils.setField(member, "id", 1L);
         final Channel channel = Channel.builder()
-            .name("testChannel1")
-            .description("channel")
-            .isPrivate(false)
-            .workspace(workspace)
-            .owner(member)
-            .build();
+                                       .name("testChannel1")
+                                       .description("channel")
+                                       .isPrivate(false)
+                                       .workspace(workspace)
+                                       .owner(member)
+                                       .build();
         ReflectionTestUtils.setField(channel, "id", 1L);
         final List<SubscribeInfo> subscribeInfos = List.of(SubscribeInfo.subscribe(channel, member));
         final String encodedChannelId = "TESTID";
@@ -967,6 +978,117 @@ class DefaultMemberServiceTest {
         verify(subscribeInfoService).findAllByChannelId(anyLong());
         verify(idEncoder).encode(anyLong(), any());
         assertThat(foundMemberResponseList).usingRecursiveComparison().isEqualTo(memberResponseList);
+      }
+    }
+  }
+
+  @Nested
+  @DisplayName("inviteMember 메서드는")
+  class DescribeInviteMember {
+    private final String encodedWorkspaceId = "existEncodedWorkspaceId";
+    private final String recipientEmail = "test@test.com";
+
+    private final Member sender = new Member.Builder().name("test")
+                                                      .role(Role.ROLE_USER)
+                                                      .displayName("test1")
+                                                      .email("test@test.com")
+                                                      .build();
+
+    private final InviteRequest inviteRequest = new InviteRequest(Set.of(recipientEmail),
+                                                                  sender.getName());
+
+    @Nested
+    @DisplayName("초대를 요청하는 멤버가 null인 경우")
+    class ContextWithNullMember {
+
+      @ParameterizedTest
+      @NullSource
+      @DisplayName("IllegalArgumentException 예외를 발생시킨다.")
+      void ItThrowIllegalArgumentException(Member nullSender) {
+        //when, then
+        Assertions.assertThatThrownBy(
+                      () -> memberService.inviteMember(nullSender, encodedWorkspaceId, inviteRequest))
+                  .isInstanceOf(IllegalArgumentException.class);
+      }
+    }
+
+    @Nested
+    @DisplayName("워크스페이스 아이디 값을 null 또는 비어있는 인자로 받으면")
+    class ContextWithNullAndEmptyWorkspaceId {
+
+      @ParameterizedTest
+      @NullAndEmptySource
+      @ValueSource(strings = {"\t", "\n"})
+      @DisplayName("IllegalArgumentException 을 반환한다.")
+      void ItThrowIllegalArgumentException(String emptyWorkspaceId) {
+        Assertions.assertThatThrownBy(
+                      () -> memberService.inviteMember(sender, emptyWorkspaceId, inviteRequest))
+                  .isInstanceOf(IllegalArgumentException.class);
+      }
+    }
+
+    @Nested
+    @DisplayName("초대 요청이 null인 경우")
+    class ContextWithNullInviteRequest {
+
+      @ParameterizedTest
+      @NullSource
+      @DisplayName("IllegalArgumentException 을 반환한다.")
+      void ItThrowIllegalArgumentException(InviteRequest nullInviteRequest) {
+        Assertions
+            .assertThatThrownBy(
+                () -> memberService.inviteMember(sender, encodedWorkspaceId, nullInviteRequest))
+            .isInstanceOf(IllegalArgumentException.class);
+      }
+    }
+
+    @Nested
+    @DisplayName("sender가 속한 워크스페이스와 초대하는 워크스페이스가 다르면")
+    class ContextWithNotMatchWorkspaceOfSenderAndPathVariable {
+
+      @Test
+      @DisplayName("해당 멤버 리스트를 반환한다")
+      void ItThrowIllegalArgumentException() {
+        //given
+        final var senderWorkspace = new Workspace("senderWorksapce");
+        ReflectionTestUtils.setField(senderWorkspace, "id", 1L);
+        ReflectionTestUtils.setField(sender, "workspace", senderWorkspace);
+
+        given(idEncoder.decode(encodedWorkspaceId)).willReturn(2L);
+
+        //when, then
+        Assertions.assertThatThrownBy(
+                      () -> memberService.inviteMember(sender, encodedWorkspaceId, inviteRequest))
+                  .isInstanceOf(IllegalArgumentException.class);
+      }
+    }
+
+    @Nested
+    @DisplayName("인자가 정상적으로 입력될 경우")
+    class ContextWithValidArguments {
+
+      @Test
+      @DisplayName("채널 서비스의 초대 함수를 호출한다.")
+      void ItCallInviteFunctionOfChannelService() throws MessagingException, MessagingException {
+        //given
+        final var senderWorkspace = new Workspace("senderWorksapce");
+        ReflectionTestUtils.setField(senderWorkspace, "id", 1L);
+        ReflectionTestUtils.setField(sender, "workspace", senderWorkspace);
+        given(idEncoder.decode(encodedWorkspaceId)).willReturn(1L);
+
+        final var defaultChannelId = "channelId";
+        final var defaultChannelResponse = new ChannelResponse(defaultChannelId,
+                                                               "test",
+                                                               false);
+        given(channelService.findAllByMember(any())).willReturn(List.of(defaultChannelResponse));
+
+        //when
+        memberService.inviteMember(sender, encodedWorkspaceId, inviteRequest);
+
+        //then
+        verify(channelService).invite(encodedWorkspaceId,
+                                      defaultChannelId,
+                                      inviteRequest);
       }
     }
   }

@@ -8,6 +8,7 @@ import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -27,6 +28,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.prgrms.be02slack.channel.controller.dto.InviteRequest;
 import com.prgrms.be02slack.common.dto.AuthResponse;
 import com.prgrms.be02slack.member.controller.dto.MemberResponse;
 import com.prgrms.be02slack.member.controller.dto.VerificationRequest;
@@ -73,8 +75,8 @@ public class MemberControllerTest extends ControllerSetUp {
         //when
         final MockHttpServletRequestBuilder request =
             RestDocumentationRequestBuilders.post(API_URL + VERIFY_URI)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody);
+                                            .contentType(MediaType.APPLICATION_JSON)
+                                            .content(requestBody);
 
         final ResultActions response = mockMvc.perform(request);
 
@@ -99,8 +101,8 @@ public class MemberControllerTest extends ControllerSetUp {
         //when
         final MockHttpServletRequestBuilder request =
             RestDocumentationRequestBuilders.post(API_URL + VERIFY_URI)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody);
+                                            .contentType(MediaType.APPLICATION_JSON)
+                                            .content(requestBody);
 
         final ResultActions response = mockMvc.perform(request);
 
@@ -126,8 +128,8 @@ public class MemberControllerTest extends ControllerSetUp {
         //when
         final MockHttpServletRequestBuilder request =
             RestDocumentationRequestBuilders.post(API_URL + VERIFY_URI)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody);
+                                            .contentType(MediaType.APPLICATION_JSON)
+                                            .content(requestBody);
 
         final ResultActions response = mockMvc.perform(request);
 
@@ -153,28 +155,30 @@ public class MemberControllerTest extends ControllerSetUp {
         //when
         final MockHttpServletRequestBuilder request =
             RestDocumentationRequestBuilders.post(API_URL + VERIFY_URI)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody);
+                                            .contentType(MediaType.APPLICATION_JSON)
+                                            .content(requestBody);
 
         final ResultActions response = mockMvc.perform(request);
 
         //then
         response.andExpect(status().isOk())
-            .andDo(document("Verify email",
-                preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint()),
-                requestFields(
-                    fieldWithPath("email")
-                        .type(JsonFieldType.STRING)
-                        .description("이메일명"),
-                    fieldWithPath("verificationCode")
-                        .type(JsonFieldType.STRING)
-                        .description("인증 코드")
-                ),
-                responseFields(
-                    fieldWithPath("token").type(JsonFieldType.STRING).description("토큰"),
-                    fieldWithPath("tokenType").type(JsonFieldType.STRING).description("토큰 타입")
-                )));
+                .andDo(document("Verify email",
+                                preprocessRequest(prettyPrint()),
+                                preprocessResponse(prettyPrint()),
+                                requestFields(
+                                    fieldWithPath("email")
+                                        .type(JsonFieldType.STRING)
+                                        .description("이메일명"),
+                                    fieldWithPath("verificationCode")
+                                        .type(JsonFieldType.STRING)
+                                        .description("인증 코드")
+                                ),
+                                responseFields(
+                                    fieldWithPath("token").type(JsonFieldType.STRING)
+                                                          .description("토큰"),
+                                    fieldWithPath("tokenType").type(JsonFieldType.STRING)
+                                                              .description("토큰 타입")
+                                )));
       }
     }
   }
@@ -200,27 +204,27 @@ public class MemberControllerTest extends ControllerSetUp {
         //when
         final MockHttpServletRequestBuilder request =
             RestDocumentationRequestBuilders.post(ENTER_URI, encodedWorkspaceId)
-                .contentType(MediaType.APPLICATION_JSON);
+                                            .contentType(MediaType.APPLICATION_JSON);
 
         final ResultActions response = mockMvc.perform(request);
 
         //then
         response.andExpect(status().isOk())
-            .andDo(document("Enter workspace",
-                preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint()),
-                pathParameters(
-                    parameterWithName("encodedWorkspaceId")
-                        .description("인코딩된 워크스페이스 id")
-                ),
-                responseFields(
-                    fieldWithPath("token")
-                        .type(JsonFieldType.STRING)
-                        .description("토큰"),
-                    fieldWithPath("tokenType")
-                        .type(JsonFieldType.STRING)
-                        .description("토큰 타입")
-                )));
+                .andDo(document("Enter workspace",
+                                preprocessRequest(prettyPrint()),
+                                preprocessResponse(prettyPrint()),
+                                pathParameters(
+                                    parameterWithName("encodedWorkspaceId")
+                                        .description("인코딩된 워크스페이스 id")
+                                ),
+                                responseFields(
+                                    fieldWithPath("token")
+                                        .type(JsonFieldType.STRING)
+                                        .description("토큰"),
+                                    fieldWithPath("tokenType")
+                                        .type(JsonFieldType.STRING)
+                                        .description("토큰 타입")
+                                )));
       }
     }
   }
@@ -242,12 +246,12 @@ public class MemberControllerTest extends ControllerSetUp {
         //given
         final String encodedMemberId = "TESTID";
         final MemberResponse memberResponse = MemberResponse.builder()
-            .encodedMemberId("TESTID")
-            .email("test@test.com")
-            .name("test")
-            .displayName("test")
-            .role(Role.ROLE_USER)
-            .build();
+                                                            .encodedMemberId("TESTID")
+                                                            .email("test@test.com")
+                                                            .name("test")
+                                                            .displayName("test")
+                                                            .role(Role.ROLE_USER)
+                                                            .build();
         given(memberService.getOne(any(Member.class), anyString())).willReturn(memberResponse);
 
         //when
@@ -259,25 +263,31 @@ public class MemberControllerTest extends ControllerSetUp {
         //then
         verify(memberService).getOne(any(Member.class), anyString());
         response.andExpect(status().isOk())
-            .andExpect(jsonPath("encodedMemberId").value(memberResponse.getEncodedMemberId()))
-            .andExpect(jsonPath("email").value(memberResponse.getEmail()))
-            .andExpect(jsonPath("name").value(memberResponse.getName()))
-            .andExpect(jsonPath("displayName").value(memberResponse.getDisplayName()))
-            .andExpect(jsonPath("role").value(memberResponse.getRole().name()))
-            .andDo(document("Get Member Info",
-                preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint()),
-                pathParameters(
-                    parameterWithName("encodedMemberId").description("Encoded Member Id")
-                ),
-                responseFields(
-                    fieldWithPath("encodedMemberId").type(JsonFieldType.STRING).description("인코딩된 멤버 id"),
-                    fieldWithPath("email").type(JsonFieldType.STRING).description("이메일"),
-                    fieldWithPath("name").type(JsonFieldType.STRING).description("이름"),
-                    fieldWithPath("displayName").type(JsonFieldType.STRING).description("보여지는 이름"),
-                    fieldWithPath("role").type(JsonFieldType.STRING).description("워크스페이스 내 역할")
-                )
-            ));
+                .andExpect(jsonPath("encodedMemberId").value(memberResponse.getEncodedMemberId()))
+                .andExpect(jsonPath("email").value(memberResponse.getEmail()))
+                .andExpect(jsonPath("name").value(memberResponse.getName()))
+                .andExpect(jsonPath("displayName").value(memberResponse.getDisplayName()))
+                .andExpect(jsonPath("role").value(memberResponse.getRole().name()))
+                .andDo(document("Get Member Info",
+                                preprocessRequest(prettyPrint()),
+                                preprocessResponse(prettyPrint()),
+                                pathParameters(
+                                    parameterWithName("encodedMemberId").description(
+                                        "Encoded Member Id")
+                                ),
+                                responseFields(
+                                    fieldWithPath("encodedMemberId").type(JsonFieldType.STRING)
+                                                                    .description("인코딩된 멤버 id"),
+                                    fieldWithPath("email").type(JsonFieldType.STRING)
+                                                          .description("이메일"),
+                                    fieldWithPath("name").type(JsonFieldType.STRING)
+                                                         .description("이름"),
+                                    fieldWithPath("displayName").type(JsonFieldType.STRING)
+                                                                .description("보여지는 이름"),
+                                    fieldWithPath("role").type(JsonFieldType.STRING)
+                                                         .description("워크스페이스 내 역할")
+                                )
+                ));
       }
     }
   }
@@ -299,14 +309,15 @@ public class MemberControllerTest extends ControllerSetUp {
         //given
         final String encodedChannelId = "TESTID";
         final MemberResponse memberResponse = MemberResponse.builder()
-            .encodedMemberId("TESTID")
-            .email("test@test.com")
-            .name("test")
-            .displayName("test")
-            .role(Role.ROLE_USER)
-            .build();
+                                                            .encodedMemberId("TESTID")
+                                                            .email("test@test.com")
+                                                            .name("test")
+                                                            .displayName("test")
+                                                            .role(Role.ROLE_USER)
+                                                            .build();
         final List<MemberResponse> memberResponseList = List.of(memberResponse);
-        given(memberService.getAllFromChannel(any(Member.class), anyString())).willReturn(memberResponseList);
+        given(memberService.getAllFromChannel(any(Member.class), anyString())).willReturn(
+            memberResponseList);
 
         //when
         final MockHttpServletRequestBuilder request =
@@ -317,20 +328,26 @@ public class MemberControllerTest extends ControllerSetUp {
         //then
         verify(memberService).getAllFromChannel(any(Member.class), anyString());
         response.andExpect(status().isOk())
-            .andDo(document("Get Member Infos From Channel",
-                preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint()),
-                pathParameters(
-                    parameterWithName("encodedChannelId").description("Encoded Channel Id")
-                ),
-                responseFields(
-                    fieldWithPath("[].encodedMemberId").type(JsonFieldType.STRING).description("인코딩된 멤버 id"),
-                    fieldWithPath("[].email").type(JsonFieldType.STRING).description("이메일"),
-                    fieldWithPath("[].name").type(JsonFieldType.STRING).description("이름"),
-                    fieldWithPath("[].displayName").type(JsonFieldType.STRING).description("보여지는 이름"),
-                    fieldWithPath("[].role").type(JsonFieldType.STRING).description("워크스페이스 내 역할")
-                )
-            ));
+                .andDo(document("Get Member Infos From Channel",
+                                preprocessRequest(prettyPrint()),
+                                preprocessResponse(prettyPrint()),
+                                pathParameters(
+                                    parameterWithName("encodedChannelId").description(
+                                        "Encoded Channel Id")
+                                ),
+                                responseFields(
+                                    fieldWithPath("[].encodedMemberId").type(JsonFieldType.STRING)
+                                                                       .description("인코딩된 멤버 id"),
+                                    fieldWithPath("[].email").type(JsonFieldType.STRING)
+                                                             .description("이메일"),
+                                    fieldWithPath("[].name").type(JsonFieldType.STRING)
+                                                            .description("이름"),
+                                    fieldWithPath("[].displayName").type(JsonFieldType.STRING)
+                                                                   .description("보여지는 이름"),
+                                    fieldWithPath("[].role").type(JsonFieldType.STRING)
+                                                            .description("워크스페이스 내 역할")
+                                )
+                ));
       }
     }
   }
@@ -374,18 +391,25 @@ public class MemberControllerTest extends ControllerSetUp {
                                 preprocessRequest(prettyPrint()),
                                 preprocessResponse(prettyPrint()),
                                 pathParameters(
-                                    parameterWithName("encodedWorkspaceId").description("Encoded Workspace Id")
+                                    parameterWithName("encodedWorkspaceId").description(
+                                        "Encoded Workspace Id")
                                 ),
                                 responseFields(
-                                    fieldWithPath("[].encodedMemberId").type(JsonFieldType.STRING).description("인코딩된 멤버 id"),
-                                    fieldWithPath("[].email").type(JsonFieldType.STRING).description("이메일"),
-                                    fieldWithPath("[].name").type(JsonFieldType.STRING).description("이름"),
-                                    fieldWithPath("[].displayName").type(JsonFieldType.STRING).description("보여지는 이름"),
-                                    fieldWithPath("[].role").type(JsonFieldType.STRING).description("워크스페이스 내 역할")
+                                    fieldWithPath("[].encodedMemberId").type(JsonFieldType.STRING)
+                                                                       .description("인코딩된 멤버 id"),
+                                    fieldWithPath("[].email").type(JsonFieldType.STRING)
+                                                             .description("이메일"),
+                                    fieldWithPath("[].name").type(JsonFieldType.STRING)
+                                                            .description("이름"),
+                                    fieldWithPath("[].displayName").type(JsonFieldType.STRING)
+                                                                   .description("보여지는 이름"),
+                                    fieldWithPath("[].role").type(JsonFieldType.STRING)
+                                                            .description("워크스페이스 내 역할")
                                 )
                 ));
       }
     }
+
     @Nested
     @DisplayName("존재하지 않는 워크스페이스 아이디 값이 전달되면")
     class ContextWithNotExistEncodedWorkspaceId {
@@ -407,6 +431,74 @@ public class MemberControllerTest extends ControllerSetUp {
 
         //then
         verify(memberService).findAllByWorkspaceId(anyString());
+        response.andExpect(status().isBadRequest());
+      }
+    }
+  }
+
+  @Nested
+  @DisplayName("inviteMember 메서드는")
+  @WithMockCustomLoginMember
+  class DescribeInviteMember {
+
+    private static final String API_URL = "/api/v1/workspaces/{encodedWorkspaceId}/members/invite";
+
+    @Nested
+    @DisplayName("정상적인 값들이 입력되면")
+    class ContextWithValidInput {
+
+      @Test
+      @DisplayName("memberService의 inviteMember 함수를 호출한다")
+      void ItResponseAllMembersInWorkspace() throws Exception {
+        //given
+        final String encodedWorkspaceId = "TESTID";
+
+        //when
+        final var inviteRequest = new InviteRequest(Set.of("recipentEmail@domain.com"),
+                                                    "SenderId");
+        final var requestBody = objectMapper.writeValueAsString(inviteRequest);
+        final MockHttpServletRequestBuilder request =
+            RestDocumentationRequestBuilders.post(API_URL, encodedWorkspaceId)
+                                            .contentType(MediaType.APPLICATION_JSON)
+                                            .content(requestBody);
+        ;
+
+        final ResultActions response = mockMvc.perform(request);
+
+        //then
+        verify(memberService).inviteMember(any(Member.class),
+                                           anyString(),
+                                           any(InviteRequest.class));
+        response.andExpect(status().isOk());
+      }
+    }
+
+    @Nested
+    @DisplayName("멤버와 같지 않은 워크스페이스 아이디 값이 전달되면")
+    class ContextWithNotExistOrNotMatchEncodedWorkspaceId {
+
+      @Test
+      @DisplayName("BadRequest로 응답한다.")
+      void ItResponseBadRequest() throws Exception {
+        //given
+        final var encodedWorkspaceId = "TESTID";
+
+        doThrow(IllegalArgumentException.class).when(memberService).inviteMember(any(),
+                                                                                 anyString(),
+                                                                                 any());
+        //when
+        final var inviteRequest = new InviteRequest(Set.of("recipentEmail@domain.com"),
+                                                    "SenderId");
+        final var requestBody = objectMapper.writeValueAsString(inviteRequest);
+        final MockHttpServletRequestBuilder request =
+            RestDocumentationRequestBuilders.post(API_URL, encodedWorkspaceId)
+                                            .contentType(MediaType.APPLICATION_JSON)
+                                            .content(requestBody);
+
+        final ResultActions response = mockMvc.perform(request);
+
+        //then
+        verify(memberService).inviteMember(any(Member.class), anyString(), any());
         response.andExpect(status().isBadRequest());
       }
     }
