@@ -98,7 +98,7 @@ class DefaultMessageServiceTest {
     }
 
     @Nested
-    @DisplayName("encodedWorkspaceId 가 빈값이면")
+    @DisplayName("encodedChannelId 가 빈값이면")
     class ContextWithBlankChannelId {
 
       @ParameterizedTest
