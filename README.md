@@ -3,7 +3,7 @@
 협업 메신저 Slack을 클론코딩한 프로젝트 입니다
 
 
-## 레이팀 소개   
+## 😈레이팀 소개   
 
 <table>
   <tr>
@@ -49,13 +49,20 @@
   </tr>
 </table>
 
-## 프로젝트 기간  
+## 💡프로젝트 소개
+
+[프로젝트 기획] (https://www.notion.so/backend-devcourse/2-7277b683010f4b6ca5c285212689df30)
+
+### 프로젝트 기간
 
 - 기획 및 설계 : 22.06.15 ~ 22.06.19
 - 프로젝트 구현 : 22.06.20 ~ 07.07
 - 버그 수정 및 리팩토링 : 22.07.08 ~ 
 
-## 기술 스택
+### 프로젝트 기획, 설명
+
+
+## 🛠️기술 스택
    
 ### 개발
 - `java : 11 `   
@@ -70,5 +77,4 @@
 - `notion`   
 
 ## ERD
-#### [ERD] (https://www.notion.so/backend-devcourse/ERD-f84462a040ac447fa7152aa5640e967f) 
-
+<center><img src="https://user-images.githubusercontent.com/57293011/177763419-7734b867-e37f-4d1f-9e26-129a8648df46.png" width="650" height="650"></center>
