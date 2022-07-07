@@ -74,5 +74,8 @@
 - `slack`   
 - `notion`   
 
-## ERD
+## 🧬ERD
 <center><img src="https://user-images.githubusercontent.com/57293011/177763419-7734b867-e37f-4d1f-9e26-129a8648df46.png" width="650" height="650"></center>
+
+## 👟회고   
+<a href="https://www.notion.so/backend-devcourse/2-4a3e2b7c735944d79d9d69b576441606" target="_blank">2차 팀 프로젝트 회고</a>  
