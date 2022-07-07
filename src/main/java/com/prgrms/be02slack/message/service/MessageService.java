@@ -5,5 +5,6 @@ import com.prgrms.be02slack.message.entity.Message;
 
 public interface MessageService {
 
-  Message sendMessage(Member member, String encodedChannelId, String content);
+  Message sendMessage(Member member, String encodedWorkspaceId, String encodedChannelId,
+      String content);
 }
