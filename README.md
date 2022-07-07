@@ -51,7 +51,8 @@
 
 ## 💡프로젝트 소개
 
-[프로젝트 기획] (https://www.notion.so/backend-devcourse/2-7277b683010f4b6ca5c285212689df30)
+<a href="https://www.notion.so/backend-devcourse/2-7277b683010f4b6ca5c285212689df30" target="_blank">프로젝트 기획</a>
+<a href="https://https://www.notion.so/backend-devcourse/2-a4c4a7d244fe486393fe1dd276273945" target="_blank">프로젝트 계획, 목적</a>  
 
 ### 프로젝트 기간
 
