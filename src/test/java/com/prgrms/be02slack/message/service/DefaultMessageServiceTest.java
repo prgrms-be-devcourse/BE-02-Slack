@@ -15,23 +15,33 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.prgrms.be02slack.channel.entity.Channel;
+import com.prgrms.be02slack.channel.service.ChannelService;
 import com.prgrms.be02slack.member.entity.Member;
 import com.prgrms.be02slack.member.entity.Role;
 import com.prgrms.be02slack.member.service.MemberService;
 import com.prgrms.be02slack.message.entity.Message;
 import com.prgrms.be02slack.message.repository.MessageRepository;
+import com.prgrms.be02slack.subscribeInfo.service.SubscribeInfoService;
 import com.prgrms.be02slack.workspace.entity.Workspace;
 
 @ExtendWith(MockitoExtension.class)
 class DefaultMessageServiceTest {
 
   private static Member testMember;
+  private static Channel testChannel;
 
   @Mock
   private MessageRepository messageRepository;
 
   @Mock
   private MemberService memberService;
+
+  @Mock
+  private ChannelService channelService;
+
+  @Mock
+  private SubscribeInfoService subscribeInfoService;
 
   @InjectMocks
   private DefaultMessageService messageService;
@@ -45,6 +55,14 @@ class DefaultMessageServiceTest {
         .displayName("test")
         .role(Role.ROLE_USER)
         .workspace(testWorkspace)
+        .build();
+
+    testChannel = Channel.builder()
+        .name("test")
+        .owner(testMember)
+        .isPrivate(false)
+        .workspace(testWorkspace)
+        .description("test")
         .build();
   }
 
@@ -62,6 +80,9 @@ class DefaultMessageServiceTest {
         //given
         given(memberService.findByEmailAndWorkspaceKey(anyString(), anyString()))
             .willReturn(testMember);
+        given(channelService.findByKey(anyString())).willReturn(testChannel);
+        given(subscribeInfoService.isExistsByChannelAndMemberEmail(any(Channel.class), anyString()))
+            .willReturn(true);
 
         //when
         messageService.sendMessage(testMember, "TEST", "TEST", "testContent");
