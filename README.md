@@ -50,10 +50,6 @@
 </table>
 
 ## 💡프로젝트 소개
-
-<a href="https://www.notion.so/backend-devcourse/2-7277b683010f4b6ca5c285212689df30" target="_blank">프로젝트 기획</a>   
-<a href="https://www.notion.so/backend-devcourse/2-a4c4a7d244fe486393fe1dd276273945" target="_blank">프로젝트 계획, 목적</a>  
-
 ### 프로젝트 기간
 
 - 기획 및 설계 : 22.06.15 ~ 22.06.19
@@ -61,7 +57,8 @@
 - 버그 수정 및 리팩토링 : 22.07.08 ~ 
 
 ### 프로젝트 기획, 설명
-
+<a href="https://www.notion.so/backend-devcourse/2-7277b683010f4b6ca5c285212689df30" target="_blank">프로젝트 기획</a>   
+<a href="https://www.notion.so/backend-devcourse/2-a4c4a7d244fe486393fe1dd276273945" target="_blank">프로젝트 계획, 목적</a>  
 
 ## 🛠️기술 스택
    
