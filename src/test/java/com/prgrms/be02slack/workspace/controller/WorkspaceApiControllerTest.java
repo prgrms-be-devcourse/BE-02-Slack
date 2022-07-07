@@ -18,13 +18,10 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.MockBeans;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
@@ -32,19 +29,17 @@ import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.prgrms.be02slack.common.configuration.security.SecurityConfig;
+import com.prgrms.be02slack.util.ControllerSetUp;
+import com.prgrms.be02slack.util.WithMockCustomLoginMember;
+import com.prgrms.be02slack.util.WithMockCustomLoginOwner;
+import com.prgrms.be02slack.util.WithMockCustomLoginUser;
 import com.prgrms.be02slack.workspace.entity.Workspace;
 import com.prgrms.be02slack.workspace.service.WorkspaceService;
 
-@WebMvcTest(
-    controllers = WorkspaceApiController.class,
-    excludeAutoConfiguration = SecurityAutoConfiguration.class,
-    excludeFilters = {
-        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SecurityConfig.class)
-    })
+@WebMvcTest(controllers = WorkspaceApiController.class)
 @MockBeans({@MockBean(JpaMetamodelMappingContext.class)})
 @AutoConfigureRestDocs
-class WorkspaceApiControllerTest {
+class WorkspaceApiControllerTest extends ControllerSetUp {
 
   private static final String API_URL = "/api/v1/workspaces";
 
@@ -85,6 +80,7 @@ class WorkspaceApiControllerTest {
 
   @Nested
   @DisplayName("update 메서드는")
+  @WithMockCustomLoginOwner
   class DescribeUpdate {
 
     @Nested
