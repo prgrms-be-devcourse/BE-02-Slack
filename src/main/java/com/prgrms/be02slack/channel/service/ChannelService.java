@@ -29,5 +29,8 @@ public interface ChannelService {
   List<ChannelResponse> findAllByMember(Member member);
 
   void leave(String channelId, Member member);
+
+  void inviteMember(Member sender, String encodedWorkspaceId, InviteRequest inviteRequest) throws
+      MessagingException;
 }
 

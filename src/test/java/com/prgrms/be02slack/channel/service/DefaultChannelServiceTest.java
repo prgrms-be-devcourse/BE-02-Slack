@@ -11,10 +11,11 @@ import java.util.Set;
 
 import javax.mail.MessagingException;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.NullSource;
@@ -31,6 +32,7 @@ import com.prgrms.be02slack.channel.entity.Channel;
 import com.prgrms.be02slack.channel.exception.NameDuplicateException;
 import com.prgrms.be02slack.channel.repository.ChannelRepository;
 import com.prgrms.be02slack.common.dto.AuthResponse;
+import com.prgrms.be02slack.common.enums.EntityIdType;
 import com.prgrms.be02slack.common.exception.NotFoundException;
 import com.prgrms.be02slack.common.util.IdEncoder;
 import com.prgrms.be02slack.email.controller.dto.EmailRequest;
@@ -79,12 +81,12 @@ class DefaultChannelServiceTest {
     void ItSavesChannelThenReturnsEncodedId() {
       //given
       ChannelSaveRequest channelSaveRequest = new ChannelSaveRequest("testName", "testDescription",
-          false);
+                                                                     false);
       Channel channel = Channel.builder()
-          .name(channelSaveRequest.getName())
-          .description(channelSaveRequest.getDescription())
-          .isPrivate(channelSaveRequest.isPrivate())
-          .build();
+                               .name(channelSaveRequest.getName())
+                               .description(channelSaveRequest.getDescription())
+                               .isPrivate(channelSaveRequest.isPrivate())
+                               .build();
       ReflectionTestUtils.setField(channel, "id", 1L);
 
       given(idEncoder.decode(anyString()))
@@ -119,7 +121,7 @@ class DefaultChannelServiceTest {
       @DisplayName("IllegalArgumentException 에러를 발생시킨다")
       void ItThrowsIllegalArgumentException() {
         assertThrows(IllegalArgumentException.class,
-            () -> defaultChannelService.create("workspaceId", null));
+                     () -> defaultChannelService.create("workspaceId", null));
       }
     }
 
@@ -132,15 +134,15 @@ class DefaultChannelServiceTest {
       void ItThrowsNotfoundException() {
         //given
         ChannelSaveRequest channelSaveRequest = new ChannelSaveRequest("testName",
-            "testDescription",
-            false);
+                                                                       "testDescription",
+                                                                       false);
 
         given(defaultWorkspaceService.findByKey(anyString()))
             .willThrow(NotFoundException.class);
 
         //when, then
         assertThrows(NotFoundException.class,
-            () -> defaultChannelService.create("workspaceId", channelSaveRequest));
+                     () -> defaultChannelService.create("workspaceId", channelSaveRequest));
       }
     }
 
@@ -153,8 +155,8 @@ class DefaultChannelServiceTest {
       void ItThrowsNameDuplicateException() {
         //given
         ChannelSaveRequest channelSaveRequest = new ChannelSaveRequest("testName",
-            "testDescription",
-            false);
+                                                                       "testDescription",
+                                                                       false);
 
         given(idEncoder.decode(anyString()))
             .willReturn(1L);
@@ -165,7 +167,7 @@ class DefaultChannelServiceTest {
 
         //when, then
         assertThrows(NameDuplicateException.class,
-            () -> defaultChannelService.create("workspaceId", channelSaveRequest));
+                     () -> defaultChannelService.create("workspaceId", channelSaveRequest));
       }
     }
 
@@ -178,8 +180,8 @@ class DefaultChannelServiceTest {
       void ItThrowsNameDuplicateException() {
         //given
         ChannelSaveRequest channelSaveRequest = new ChannelSaveRequest("testName",
-            "testDescription",
-            false);
+                                                                       "testDescription",
+                                                                       false);
 
         given(idEncoder.decode(anyString()))
             .willReturn(1L);
@@ -192,7 +194,7 @@ class DefaultChannelServiceTest {
 
         //when, then
         assertThrows(NameDuplicateException.class,
-            () -> defaultChannelService.create("workspaceId", channelSaveRequest));
+                     () -> defaultChannelService.create("workspaceId", channelSaveRequest));
       }
     }
   }
@@ -210,21 +212,21 @@ class DefaultChannelServiceTest {
         String workspaceId = "workspaceId";
         String channelId = "channelId";
         InviteRequest inviteRequest = new InviteRequest(Set.of("test@naver.com"),
-            "senderName");
+                                                        "senderName");
         Workspace workspace = Workspace.createDefaultWorkspace();
         Member member = Member.builder()
-            .name("testName")
-            .displayName("testName")
-            .workspace(workspace)
-            .role(Role.ROLE_USER)
-            .email("test@gmail.com")
-            .build();
+                              .name("testName")
+                              .displayName("testName")
+                              .workspace(workspace)
+                              .role(Role.ROLE_USER)
+                              .email("test@gmail.com")
+                              .build();
         Channel channel = Channel.builder()
-            .name("testName")
-            .workspace(workspace)
-            .owner(member)
-            .isPrivate(false)
-            .build();
+                                 .name("testName")
+                                 .workspace(workspace)
+                                 .owner(member)
+                                 .isPrivate(false)
+                                 .build();
 
         Long decodedWorkspace = 123L;
         given(idEncoder.decode(anyString()))
@@ -263,21 +265,21 @@ class DefaultChannelServiceTest {
         String workspaceId = "workspaceId";
         String channelId = "channelId";
         InviteRequest inviteRequest = new InviteRequest(Set.of("test@naver.com"),
-            "senderName");
+                                                        "senderName");
         Workspace workspace = Workspace.createDefaultWorkspace();
         Member member = Member.builder()
-            .name("testName")
-            .displayName("testName")
-            .workspace(workspace)
-            .role(Role.ROLE_USER)
-            .email("test@gmail.com")
-            .build();
+                              .name("testName")
+                              .displayName("testName")
+                              .workspace(workspace)
+                              .role(Role.ROLE_USER)
+                              .email("test@gmail.com")
+                              .build();
         Channel channel = Channel.builder()
-            .name("testName")
-            .workspace(workspace)
-            .owner(member)
-            .isPrivate(false)
-            .build();
+                                 .name("testName")
+                                 .workspace(workspace)
+                                 .owner(member)
+                                 .isPrivate(false)
+                                 .build();
 
         Long decodedWorkspace = 123L;
         given(idEncoder.decode(anyString()))
@@ -293,7 +295,7 @@ class DefaultChannelServiceTest {
 
         //when, then
         assertThrows(IllegalArgumentException.class,
-            () -> defaultChannelService.invite(workspaceId, channelId, inviteRequest));
+                     () -> defaultChannelService.invite(workspaceId, channelId, inviteRequest));
       }
     }
 
@@ -307,21 +309,21 @@ class DefaultChannelServiceTest {
         String workspaceId = "workspaceId";
         String channelId = "channelId";
         InviteRequest inviteRequest = new InviteRequest(Set.of("test@naver.com"),
-            "senderName");
+                                                        "senderName");
         Workspace workspace = Workspace.createDefaultWorkspace();
         Member member = Member.builder()
-            .name("testName")
-            .displayName("testName")
-            .workspace(workspace)
-            .role(Role.ROLE_USER)
-            .email("test@gmail.com")
-            .build();
+                              .name("testName")
+                              .displayName("testName")
+                              .workspace(workspace)
+                              .role(Role.ROLE_USER)
+                              .email("test@gmail.com")
+                              .build();
         Channel channel = Channel.builder()
-            .name("testName")
-            .workspace(workspace)
-            .owner(member)
-            .isPrivate(false)
-            .build();
+                                 .name("testName")
+                                 .workspace(workspace)
+                                 .owner(member)
+                                 .isPrivate(false)
+                                 .build();
 
         Long decodedWorkspace = 123L;
         given(idEncoder.decode(anyString()))
@@ -341,7 +343,7 @@ class DefaultChannelServiceTest {
         //then
         verify(tokenProvider).createLoginToken(anyString());
         verify(emailService).sendInviteMail(any(EmailRequest.class), anyString(), anyString(),
-            anyString(), anyString(), anyString());
+                                            anyString(), anyString(), anyString());
       }
     }
 
@@ -355,21 +357,21 @@ class DefaultChannelServiceTest {
         String workspaceId = "workspaceId";
         String channelId = "channelId";
         InviteRequest inviteRequest = new InviteRequest(Set.of("testName"),
-            "senderName");
+                                                        "senderName");
         Workspace workspace = Workspace.createDefaultWorkspace();
         Member member = Member.builder()
-            .name("testName")
-            .displayName("testName")
-            .workspace(workspace)
-            .role(Role.ROLE_USER)
-            .email("test@gmail.com")
-            .build();
+                              .name("testName")
+                              .displayName("testName")
+                              .workspace(workspace)
+                              .role(Role.ROLE_USER)
+                              .email("test@gmail.com")
+                              .build();
         Channel channel = Channel.builder()
-            .name("testName")
-            .workspace(workspace)
-            .owner(member)
-            .isPrivate(false)
-            .build();
+                                 .name("testName")
+                                 .workspace(workspace)
+                                 .owner(member)
+                                 .isPrivate(false)
+                                 .build();
 
         Long decodedWorkspace = 123L;
         given(idEncoder.decode(anyString()))
@@ -394,7 +396,7 @@ class DefaultChannelServiceTest {
         verify(defaultWorkspaceService).findByKey(anyString());
         verify(defaultMemberService).isExistsByNameAndWorkspaceKey(anyString(), anyString());
         verify(subscribeInfoService).isExistsByChannelAndMemberName(any(Channel.class),
-            anyString());
+                                                                    anyString());
         verify(defaultMemberService).findByNameAndWorkspaceKey(anyString(), anyString());
         verify(subscribeInfoService).subscribe(any(Channel.class), any(Member.class));
       }
@@ -410,21 +412,21 @@ class DefaultChannelServiceTest {
         String workspaceId = "workspaceId";
         String channelId = "channelId";
         InviteRequest inviteRequest = new InviteRequest(Set.of("testName"),
-            "senderName");
+                                                        "senderName");
         Workspace workspace = Workspace.createDefaultWorkspace();
         Member member = Member.builder()
-            .name("testName")
-            .displayName("testName")
-            .workspace(workspace)
-            .role(Role.ROLE_USER)
-            .email("test@gmail.com")
-            .build();
+                              .name("testName")
+                              .displayName("testName")
+                              .workspace(workspace)
+                              .role(Role.ROLE_USER)
+                              .email("test@gmail.com")
+                              .build();
         Channel channel = Channel.builder()
-            .name("testName")
-            .workspace(workspace)
-            .owner(member)
-            .isPrivate(false)
-            .build();
+                                 .name("testName")
+                                 .workspace(workspace)
+                                 .owner(member)
+                                 .isPrivate(false)
+                                 .build();
 
         Long decodedWorkspace = 123L;
         given(idEncoder.decode(anyString()))
@@ -440,7 +442,7 @@ class DefaultChannelServiceTest {
 
         //when, then
         assertThrows(IllegalArgumentException.class,
-            () -> defaultChannelService.invite(workspaceId, channelId, inviteRequest));
+                     () -> defaultChannelService.invite(workspaceId, channelId, inviteRequest));
       }
     }
 
@@ -454,21 +456,21 @@ class DefaultChannelServiceTest {
         String workspaceId = "workspaceId";
         String channelId = "channelId";
         InviteRequest inviteRequest = new InviteRequest(Set.of("testName"),
-            "senderName");
+                                                        "senderName");
         Workspace workspace = Workspace.createDefaultWorkspace();
         Member member = Member.builder()
-            .name("testName")
-            .displayName("testName")
-            .workspace(workspace)
-            .role(Role.ROLE_USER)
-            .email("test@gmail.com")
-            .build();
+                              .name("testName")
+                              .displayName("testName")
+                              .workspace(workspace)
+                              .role(Role.ROLE_USER)
+                              .email("test@gmail.com")
+                              .build();
         Channel channel = Channel.builder()
-            .name("testName")
-            .workspace(workspace)
-            .owner(member)
-            .isPrivate(false)
-            .build();
+                                 .name("testName")
+                                 .workspace(workspace)
+                                 .owner(member)
+                                 .isPrivate(false)
+                                 .build();
 
         Long decodedWorkspace = 123L;
         given(idEncoder.decode(anyString()))
@@ -482,7 +484,7 @@ class DefaultChannelServiceTest {
 
         //when, then
         assertThrows(IllegalArgumentException.class,
-            () -> defaultChannelService.invite(workspaceId, channelId, inviteRequest));
+                     () -> defaultChannelService.invite(workspaceId, channelId, inviteRequest));
       }
     }
 
@@ -500,7 +502,7 @@ class DefaultChannelServiceTest {
 
         //when,then
         assertThrows(IllegalArgumentException.class,
-            () -> defaultChannelService.invite(workspaceId, "channelId", inviteRequest));
+                     () -> defaultChannelService.invite(workspaceId, "channelId", inviteRequest));
       }
     }
 
@@ -518,7 +520,7 @@ class DefaultChannelServiceTest {
 
         //when,then
         assertThrows(IllegalArgumentException.class,
-            () -> defaultChannelService.invite("workspaceId", channelId, inviteRequest));
+                     () -> defaultChannelService.invite("workspaceId", channelId, inviteRequest));
       }
     }
 
@@ -533,7 +535,7 @@ class DefaultChannelServiceTest {
         //given
         //when,then
         assertThrows(IllegalArgumentException.class,
-            () -> defaultChannelService.invite("workspaceId", "channelId", inviteRequest));
+                     () -> defaultChannelService.invite("workspaceId", "channelId", inviteRequest));
       }
     }
 
@@ -547,9 +549,9 @@ class DefaultChannelServiceTest {
         //given
         Long workspaceId = 123L;
         Channel channel = Channel.builder()
-            .name("testName")
-            .isPrivate(false)
-            .build();
+                                 .name("testName")
+                                 .isPrivate(false)
+                                 .build();
         InviteRequest inviteRequest = new InviteRequest(new HashSet<>(), "senderName");
         given(idEncoder.decode(anyString()))
             .willReturn(workspaceId);
@@ -560,7 +562,7 @@ class DefaultChannelServiceTest {
 
         //when, then
         assertThrows(NotFoundException.class,
-            () -> defaultChannelService.invite("workspaceId", "channelId", inviteRequest));
+                     () -> defaultChannelService.invite("workspaceId", "channelId", inviteRequest));
       }
     }
 
@@ -581,7 +583,7 @@ class DefaultChannelServiceTest {
 
         //when, then
         assertThrows(NotFoundException.class,
-            () -> defaultChannelService.invite("workspaceId", "channelId", inviteRequest));
+                     () -> defaultChannelService.invite("workspaceId", "channelId", inviteRequest));
       }
     }
   }
@@ -601,14 +603,14 @@ class DefaultChannelServiceTest {
         String email = "test@gmail.com";
         String memberToken = "loginToken";
         Channel channel = Channel.builder()
-            .name("testName")
-            .isPrivate(false)
-            .build();
+                                 .name("testName")
+                                 .isPrivate(false)
+                                 .build();
         Member member = Member.builder()
-            .name("testName")
-            .displayName("testName")
-            .role(Role.ROLE_USER)
-            .build();
+                              .name("testName")
+                              .displayName("testName")
+                              .role(Role.ROLE_USER)
+                              .build();
 
         given(defaultWorkspaceService.findByKey(anyString()))
             .willReturn(Workspace.createDefaultWorkspace());
@@ -621,14 +623,14 @@ class DefaultChannelServiceTest {
         given(tokenProvider.getEmailFromToken(anyString()))
             .willReturn(email);
         given(defaultMemberService.save(anyString(), anyString(), any(Role.class), anyString(),
-            anyString()))
+                                        anyString()))
             .willReturn(member);
         given(tokenProvider.createMemberToken(anyString(), anyString()))
             .willReturn(memberToken);
 
         //when
         AuthResponse authResponse = defaultChannelService.participate("workspaceId", "channelId",
-            "token");
+                                                                      "token");
 
         //then
         verify(defaultWorkspaceService).findByKey(anyString());
@@ -637,7 +639,7 @@ class DefaultChannelServiceTest {
         verify(tokenProvider).validateToken(anyString());
         verify(tokenProvider).getEmailFromToken(anyString());
         verify(defaultMemberService).save(anyString(), anyString(), any(Role.class), anyString(),
-            anyString());
+                                          anyString());
         verify(subscribeInfoService).subscribe(any(Channel.class), any(Member.class));
         verify(tokenProvider).createMemberToken(anyString(), anyString());
         assertThat(authResponse.getToken()).isEqualTo(memberToken);
@@ -656,7 +658,7 @@ class DefaultChannelServiceTest {
         //given
         //when,then
         assertThrows(IllegalArgumentException.class,
-            () -> defaultChannelService.participate(workspaceId, "channelId", "token"));
+                     () -> defaultChannelService.participate(workspaceId, "channelId", "token"));
       }
     }
 
@@ -672,7 +674,7 @@ class DefaultChannelServiceTest {
         //given
         //when,then
         assertThrows(IllegalArgumentException.class,
-            () -> defaultChannelService.participate("workspaceId", channelId, "token"));
+                     () -> defaultChannelService.participate("workspaceId", channelId, "token"));
       }
     }
 
@@ -688,7 +690,7 @@ class DefaultChannelServiceTest {
         //given
         //when,then
         assertThrows(IllegalArgumentException.class,
-            () -> defaultChannelService.participate("workspaceId", "channelId", token));
+                     () -> defaultChannelService.participate("workspaceId", "channelId", token));
       }
     }
 
@@ -705,7 +707,7 @@ class DefaultChannelServiceTest {
 
         //when, then
         assertThrows(NotFoundException.class,
-            () -> defaultChannelService.participate("workspaceId", "channelId", "token"));
+                     () -> defaultChannelService.participate("workspaceId", "channelId", "token"));
       }
     }
 
@@ -726,7 +728,7 @@ class DefaultChannelServiceTest {
 
         //when, then
         assertThrows(NotFoundException.class,
-            () -> defaultChannelService.participate("workspaceId", "channelId", "token"));
+                     () -> defaultChannelService.participate("workspaceId", "channelId", "token"));
       }
     }
 
@@ -740,9 +742,9 @@ class DefaultChannelServiceTest {
         //given
         Long workspaceId = 123L;
         Channel channel = Channel.builder()
-            .name("testName")
-            .isPrivate(false)
-            .build();
+                                 .name("testName")
+                                 .isPrivate(false)
+                                 .build();
 
         given(defaultWorkspaceService.findByKey(anyString()))
             .willReturn(Workspace.createDefaultWorkspace());
@@ -755,7 +757,7 @@ class DefaultChannelServiceTest {
 
         //when, then
         assertThrows(IllegalArgumentException.class,
-            () -> defaultChannelService.participate("workspaceId", "channelId", "token"));
+                     () -> defaultChannelService.participate("workspaceId", "channelId", "token"));
       }
     }
   }
@@ -770,9 +772,9 @@ class DefaultChannelServiceTest {
       String encodedId = "encodedId";
       Long decodedId = 123L;
       Channel foundChannel = Channel.builder()
-          .name("testName")
-          .isPrivate(false)
-          .build();
+                                    .name("testName")
+                                    .isPrivate(false)
+                                    .build();
 
       given(idEncoder.decode(anyString()))
           .willReturn(decodedId);
@@ -799,7 +801,7 @@ class DefaultChannelServiceTest {
         //given
         //when, then
         assertThrows(IllegalArgumentException.class,
-            () -> defaultChannelService.findByKey(encodedId));
+                     () -> defaultChannelService.findByKey(encodedId));
       }
     }
 
@@ -820,7 +822,7 @@ class DefaultChannelServiceTest {
 
         //when, then
         assertThrows(NotFoundException.class,
-            () -> defaultChannelService.findByKey(encodedId));
+                     () -> defaultChannelService.findByKey(encodedId));
       }
     }
   }
@@ -835,18 +837,18 @@ class DefaultChannelServiceTest {
       //given
       Workspace workspace = Workspace.createDefaultWorkspace();
       Member member = Member.builder()
-          .name("testName")
-          .role(Role.ROLE_USER)
-          .displayName("testDisplayName")
-          .workspace(workspace)
-          .build();
+                            .name("testName")
+                            .role(Role.ROLE_USER)
+                            .displayName("testDisplayName")
+                            .workspace(workspace)
+                            .build();
       Channel channel = Channel.builder()
-          .name("testChannel1")
-          .description("channel")
-          .isPrivate(false)
-          .workspace(workspace)
-          .owner(member)
-          .build();
+                               .name("testChannel1")
+                               .description("channel")
+                               .isPrivate(false)
+                               .workspace(workspace)
+                               .owner(member)
+                               .build();
       ReflectionTestUtils.setField(channel, "id", 1L);
       List<SubscribeInfo> subscribeInfos = List.of(SubscribeInfo.subscribe(channel, member));
       List<Channel> subscribedChannels = List.of(channel);
@@ -878,7 +880,7 @@ class DefaultChannelServiceTest {
         //given
         //when,then
         assertThrows(IllegalArgumentException.class,
-            () -> defaultChannelService.findAllByMember(null));
+                     () -> defaultChannelService.findAllByMember(null));
       }
     }
   }
@@ -894,16 +896,16 @@ class DefaultChannelServiceTest {
       Long decodedChannelId = 123L;
 
       Member member = Member.builder()
-          .name("testName")
-          .displayName("testName")
-          .email("test@gmail.com")
-          .role(Role.ROLE_USER)
-          .build();
+                            .name("testName")
+                            .displayName("testName")
+                            .email("test@gmail.com")
+                            .role(Role.ROLE_USER)
+                            .build();
       Channel channel = Channel.builder()
-          .name("testName")
-          .description("testDescription")
-          .isPrivate(false)
-          .build();
+                               .name("testName")
+                               .description("testDescription")
+                               .isPrivate(false)
+                               .build();
 
       given(idEncoder.decode(anyString()))
           .willReturn(decodedChannelId);
@@ -929,15 +931,15 @@ class DefaultChannelServiceTest {
       void ItThrowsIllegalArgumentException(String encodedChannelId) {
         //given
         Member member = Member.builder()
-            .name("testName")
-            .displayName("testName")
-            .email("test@gmail.com")
-            .role(Role.ROLE_USER)
-            .build();
+                              .name("testName")
+                              .displayName("testName")
+                              .email("test@gmail.com")
+                              .role(Role.ROLE_USER)
+                              .build();
 
         //when, then
         assertThrows(IllegalArgumentException.class,
-            () -> defaultChannelService.leave(encodedChannelId, member));
+                     () -> defaultChannelService.leave(encodedChannelId, member));
       }
     }
 
@@ -952,7 +954,7 @@ class DefaultChannelServiceTest {
 
         //when, then
         assertThrows(IllegalArgumentException.class,
-            () -> defaultChannelService.leave(encodedChannelId, null));
+                     () -> defaultChannelService.leave(encodedChannelId, null));
       }
     }
 
@@ -966,11 +968,11 @@ class DefaultChannelServiceTest {
         String encodedChannelId = "encodedId";
         Long decodedChannelId = 123L;
         Member member = Member.builder()
-            .name("testName")
-            .displayName("testName")
-            .email("test@gmail.com")
-            .role(Role.ROLE_USER)
-            .build();
+                              .name("testName")
+                              .displayName("testName")
+                              .email("test@gmail.com")
+                              .role(Role.ROLE_USER)
+                              .build();
 
         given(idEncoder.decode(anyString()))
             .willReturn(decodedChannelId);
@@ -979,7 +981,7 @@ class DefaultChannelServiceTest {
 
         //when, then
         assertThrows(NotFoundException.class,
-            () -> defaultChannelService.leave(encodedChannelId, member));
+                     () -> defaultChannelService.leave(encodedChannelId, member));
       }
     }
 
@@ -994,16 +996,16 @@ class DefaultChannelServiceTest {
         Long decodedChannelId = 123L;
 
         Member member = Member.builder()
-            .name("testName")
-            .displayName("testName")
-            .email("test@gmail.com")
-            .role(Role.ROLE_USER)
-            .build();
+                              .name("testName")
+                              .displayName("testName")
+                              .email("test@gmail.com")
+                              .role(Role.ROLE_USER)
+                              .build();
         Channel channel = Channel.builder()
-            .name("testName")
-            .description("testDescription")
-            .isPrivate(false)
-            .build();
+                                 .name("testName")
+                                 .description("testDescription")
+                                 .isPrivate(false)
+                                 .build();
 
         given(idEncoder.decode(anyString()))
             .willReturn(decodedChannelId);
@@ -1015,8 +1017,137 @@ class DefaultChannelServiceTest {
 
         //when, then
         assertThrows(NotFoundException.class,
-            () -> defaultChannelService.leave(encodedChannelId, member));
+                     () -> defaultChannelService.leave(encodedChannelId, member));
       }
     }
   }
+
+  @Nested
+  @DisplayName("inviteMember 메서드는")
+  class DescribeInviteMember {
+    private final String encodedWorkspaceId = "existEncodedWorkspaceId";
+    private final String recipientEmail = "test@test.com";
+
+    private final Member sender = new Member.Builder().name("test")
+                                                      .role(Role.ROLE_USER)
+                                                      .displayName("test1")
+                                                      .email("test@test.com")
+                                                      .build();
+
+    private final InviteRequest inviteRequest = new InviteRequest(Set.of(recipientEmail),
+                                                                  sender.getName());
+
+    @Nested
+    @DisplayName("초대를 요청하는 멤버가 null인 경우")
+    class ContextWithNullMember {
+
+      @ParameterizedTest
+      @NullSource
+      @DisplayName("IllegalArgumentException 예외를 발생시킨다.")
+      void ItThrowIllegalArgumentException(Member nullSender) {
+        //when, then
+        Assertions.assertThatThrownBy(
+                      () -> defaultChannelService.inviteMember(nullSender, encodedWorkspaceId, inviteRequest))
+                  .isInstanceOf(IllegalArgumentException.class);
+      }
+    }
+
+    @Nested
+    @DisplayName("워크스페이스 아이디 값을 null 또는 비어있는 인자로 받으면")
+    class ContextWithNullAndEmptyWorkspaceId {
+
+      @ParameterizedTest
+      @NullAndEmptySource
+      @ValueSource(strings = {"\t", "\n"})
+      @DisplayName("IllegalArgumentException 을 반환한다.")
+      void ItThrowIllegalArgumentException(String emptyWorkspaceId) {
+        Assertions.assertThatThrownBy(
+                      () -> defaultChannelService.inviteMember(sender, emptyWorkspaceId, inviteRequest))
+                  .isInstanceOf(IllegalArgumentException.class);
+      }
+    }
+
+    @Nested
+    @DisplayName("초대 요청이 null인 경우")
+    class ContextWithNullInviteRequest {
+
+      @ParameterizedTest
+      @NullSource
+      @DisplayName("IllegalArgumentException 을 반환한다.")
+      void ItThrowIllegalArgumentException(InviteRequest nullInviteRequest) {
+        Assertions
+            .assertThatThrownBy(
+                () -> defaultChannelService.inviteMember(sender, encodedWorkspaceId,
+                                                         nullInviteRequest))
+            .isInstanceOf(IllegalArgumentException.class);
+      }
+    }
+
+    @Nested
+    @DisplayName("sender가 속한 워크스페이스와 초대하는 워크스페이스가 다르면")
+    class ContextWithNotMatchWorkspaceOfSenderAndPathVariable {
+
+      @Test
+      @DisplayName("IllegalArgumentException 을 반환한다.")
+      void ItThrowIllegalArgumentException() {
+        //given
+        final var senderWorkspace = new Workspace("senderWorksapce");
+        ReflectionTestUtils.setField(senderWorkspace, "id", 1L);
+        ReflectionTestUtils.setField(sender, "workspace", senderWorkspace);
+
+        given(idEncoder.decode(anyString())).willReturn(2L);
+
+        //when, then
+        Assertions.assertThatThrownBy(
+                      () -> defaultChannelService.inviteMember(sender,
+                                                               encodedWorkspaceId,
+                                                               inviteRequest))
+                  .isInstanceOf(IllegalArgumentException.class);
+      }
+    }
+
+    @Nested
+    @DisplayName("인자가 정상적으로 입력될 경우")
+    class ContextWithValidArguments {
+
+      @Test
+      @DisplayName("이메일 서비스의 초대 메일 송부 함수를 호출한다.")
+      void ItCallInviteFunctionOfChannelService() throws MessagingException {
+        //given
+        final var senderWorkspace = new Workspace("senderWorkspace");
+        ReflectionTestUtils.setField(senderWorkspace, "id", 1L);
+        ReflectionTestUtils.setField(sender, "workspace", senderWorkspace);
+        given(idEncoder.decode(encodedWorkspaceId)).willReturn(1L);
+
+        final var defaultChannel = Channel.builder()
+                                          .workspace(senderWorkspace)
+                                          .name("defaultChannel")
+                                          .isPrivate(false)
+                                          .build();
+        final var defaultChannelId = 1L;
+        ReflectionTestUtils.setField(defaultChannel, "id", defaultChannelId);
+        final var defaultEncodedChannelId = "channelId";
+        final var subscribeInto = SubscribeInfo.subscribe(defaultChannel, sender);
+        given(subscribeInfoService.findAllByMember(any(Member.class)))
+            .willReturn(List.of(subscribeInto));
+
+        given(idEncoder.encode(anyLong(), any(EntityIdType.class))).willReturn(
+            defaultEncodedChannelId);
+
+        given(channelRepository.findById(anyLong())).willReturn(Optional.of(defaultChannel));
+
+        given(defaultWorkspaceService.findByKey(anyString())).willReturn(senderWorkspace);
+
+        given(tokenProvider.createLoginToken(anyString())).willReturn("token");
+
+        //when
+        defaultChannelService.inviteMember(sender, encodedWorkspaceId, inviteRequest);
+
+        //then
+        verify(emailService).sendInviteMail(any(), anyString(), anyString(), anyString(),
+                                            anyString(), anyString());
+      }
+    }
+  }
+
 }
