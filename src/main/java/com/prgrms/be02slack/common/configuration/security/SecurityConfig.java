@@ -66,6 +66,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
           .hasRole(OWNER)
         .antMatchers(HttpMethod.POST, "/api/v1/workspaces/{encodedWorkspaceId}/members/invite")
           .hasAnyRole(USER, OWNER)
+        .antMatchers("/api/v1/workspaces/{encodedWorkspaceId}/channels/{encodedChannelId}/participate")
+          .hasAnyRole(GUEST)
         .antMatchers("/api/v1/workspaces/{encodedWorkspaceId}/channels/**")
           .hasAnyRole(USER, OWNER)
           .anyRequest().permitAll()

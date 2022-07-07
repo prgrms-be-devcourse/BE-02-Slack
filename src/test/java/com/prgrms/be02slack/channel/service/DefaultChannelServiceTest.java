@@ -80,6 +80,12 @@ class DefaultChannelServiceTest {
     @DisplayName("Channel 을 저장하고 인코딩된 id를 반환한다")
     void ItSavesChannelThenReturnsEncodedId() {
       //given
+      Member member = Member.builder()
+                            .name("testName")
+                            .displayName("testName")
+                            .email("test@gmail.com")
+                            .role(Role.ROLE_USER)
+                            .build();
       ChannelSaveRequest channelSaveRequest = new ChannelSaveRequest("testName", "testDescription",
                                                                      false);
       Channel channel = Channel.builder()
@@ -103,14 +109,37 @@ class DefaultChannelServiceTest {
           .willReturn("encodedTestId");
 
       //when
-      String encodedChannelId = defaultChannelService.create("workspaceId", channelSaveRequest);
+      String encodedChannelId = defaultChannelService.create(member, "workspaceId",
+          channelSaveRequest);
 
       //then
-      verify(idEncoder).decode(anyString());
       verify(defaultWorkspaceService).findByKey(anyString());
+      verify(idEncoder).decode(anyString());
+      verify(channelRepository).existsByWorkspace_IdAndName(anyLong(), anyString());
+      verify(defaultMemberService).isDuplicateName(anyLong(), anyString());
       verify(channelRepository).save(any(Channel.class));
       verify(idEncoder).encode(anyLong(), any());
+      verify(subscribeInfoService).subscribe(any(Channel.class), any(Member.class));
       assertThat(encodedChannelId).isNotBlank();
+    }
+
+    @Nested
+    @DisplayName("member 파라미터에 null 값이 전달되면")
+    class ContextWithMemberNull {
+
+      @Test
+      @DisplayName("IllegalArgumentException 에러를 발생시킨다")
+      void ItThrowsIllegalArgumentException() {
+        //given
+        String workspaceId = "workspaceId";
+        ChannelSaveRequest channelSaveRequest = new ChannelSaveRequest("testName",
+            "testDescription",
+            false);
+
+        //when,then
+        assertThrows(IllegalArgumentException.class,
+            () -> defaultChannelService.create(null, workspaceId, channelSaveRequest));
+      }
     }
 
     @Nested
@@ -120,8 +149,18 @@ class DefaultChannelServiceTest {
       @Test
       @DisplayName("IllegalArgumentException 에러를 발생시킨다")
       void ItThrowsIllegalArgumentException() {
+        //given
+        Member member = Member.builder()
+                              .name("testName")
+                              .displayName("testName")
+                              .email("test@gmail.com")
+                              .role(Role.ROLE_USER)
+                              .build();
+        String workspaceId = "workspaceId";
+
+        //when,then
         assertThrows(IllegalArgumentException.class,
-                     () -> defaultChannelService.create("workspaceId", null));
+            () -> defaultChannelService.create(member, workspaceId, null));
       }
     }
 
@@ -133,6 +172,13 @@ class DefaultChannelServiceTest {
       @DisplayName("NotFoundException 에러를 발생시킨다")
       void ItThrowsNotfoundException() {
         //given
+        Member member = Member.builder()
+                              .name("testName")
+                              .displayName("testName")
+                              .email("test@gmail.com")
+                              .role(Role.ROLE_USER)
+                              .build();
+        String workspaceId = "workspaceId";
         ChannelSaveRequest channelSaveRequest = new ChannelSaveRequest("testName",
                                                                        "testDescription",
                                                                        false);
@@ -142,7 +188,7 @@ class DefaultChannelServiceTest {
 
         //when, then
         assertThrows(NotFoundException.class,
-                     () -> defaultChannelService.create("workspaceId", channelSaveRequest));
+            () -> defaultChannelService.create(member, workspaceId, channelSaveRequest));
       }
     }
 
@@ -154,6 +200,13 @@ class DefaultChannelServiceTest {
       @DisplayName("NameDuplicateException 에러를 발생시킨다")
       void ItThrowsNameDuplicateException() {
         //given
+        Member member = Member.builder()
+                              .name("testName")
+                              .displayName("testName")
+                              .email("test@gmail.com")
+                              .role(Role.ROLE_USER)
+                              .build();
+        String workspaceId = "workspaceId";
         ChannelSaveRequest channelSaveRequest = new ChannelSaveRequest("testName",
                                                                        "testDescription",
                                                                        false);
@@ -167,7 +220,7 @@ class DefaultChannelServiceTest {
 
         //when, then
         assertThrows(NameDuplicateException.class,
-                     () -> defaultChannelService.create("workspaceId", channelSaveRequest));
+            () -> defaultChannelService.create(member, workspaceId, channelSaveRequest));
       }
     }
 
@@ -179,14 +232,21 @@ class DefaultChannelServiceTest {
       @DisplayName("NameDuplicateException 에러를 발생시킨다")
       void ItThrowsNameDuplicateException() {
         //given
+        Member member = Member.builder()
+                              .name("testName")
+                              .displayName("testName")
+                              .email("test@gmail.com")
+                              .role(Role.ROLE_USER)
+                              .build();
+        String workspaceId = "workspaceId";
         ChannelSaveRequest channelSaveRequest = new ChannelSaveRequest("testName",
                                                                        "testDescription",
                                                                        false);
 
-        given(idEncoder.decode(anyString()))
-            .willReturn(1L);
         given(defaultWorkspaceService.findByKey(anyString()))
             .willReturn(Workspace.createDefaultWorkspace());
+        given(idEncoder.decode(anyString()))
+            .willReturn(1L);
         given(channelRepository.existsByWorkspace_IdAndName(anyLong(), anyString()))
             .willReturn(false);
         given(defaultMemberService.isDuplicateName(anyLong(), anyString()))
@@ -194,7 +254,7 @@ class DefaultChannelServiceTest {
 
         //when, then
         assertThrows(NameDuplicateException.class,
-                     () -> defaultChannelService.create("workspaceId", channelSaveRequest));
+            () -> defaultChannelService.create(member, workspaceId, channelSaveRequest));
       }
     }
   }

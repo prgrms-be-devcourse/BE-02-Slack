@@ -12,7 +12,9 @@ import com.prgrms.be02slack.common.dto.AuthResponse;
 import com.prgrms.be02slack.member.entity.Member;
 
 public interface ChannelService {
-  String create(String workspaceId,
+  String create(
+      Member member,
+      String workspaceId,
       ChannelSaveRequest channelSaveRequest);
 
   void invite(String workspaceId,

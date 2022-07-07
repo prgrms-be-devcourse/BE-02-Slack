@@ -41,6 +41,7 @@ import com.prgrms.be02slack.common.dto.AuthResponse;
 import com.prgrms.be02slack.member.entity.Member;
 import com.prgrms.be02slack.util.ControllerSetUp;
 import com.prgrms.be02slack.util.WithMockCustomLoginMember;
+import com.prgrms.be02slack.util.WithMockCustomLoginUser;
 
 @WithMockCustomLoginMember
 @WebMvcTest(
@@ -103,7 +104,7 @@ class ChannelApiControllerTest extends ControllerSetUp {
       @DisplayName("인코딩된 id를 응답한다")
       void ItResponseOk() throws Exception {
         //given
-        given(channelService.create(anyString(), any(ChannelSaveRequest.class)))
+        given(channelService.create(any(Member.class), anyString(), any(ChannelSaveRequest.class)))
             .willReturn("testId");
 
         HashMap<String, Object> requestMap = new HashMap<>();
@@ -122,7 +123,8 @@ class ChannelApiControllerTest extends ControllerSetUp {
         ResultActions response = mockMvc.perform(request);
 
         //then
-        verify(channelService).create(anyString(), any(ChannelSaveRequest.class));
+        verify(channelService).create(any(Member.class), anyString(),
+            any(ChannelSaveRequest.class));
         response.andExpect(status().isOk())
             .andDo(document("Create channel",
                 pathParameters(
@@ -187,7 +189,7 @@ class ChannelApiControllerTest extends ControllerSetUp {
 
         String requestBody = objectMapper.writeValueAsString(requestMap);
 
-        given(channelService.create(anyString(), any(ChannelSaveRequest.class)))
+        given(channelService.create(any(Member.class), anyString(), any(ChannelSaveRequest.class)))
             .willThrow(new NameDuplicateException());
 
         //when
@@ -345,6 +347,7 @@ class ChannelApiControllerTest extends ControllerSetUp {
   }
 
   @Nested
+  @WithMockCustomLoginUser
   @DisplayName("participate 메서드는")
   class DescribeParticipate {
 
@@ -397,24 +400,16 @@ class ChannelApiControllerTest extends ControllerSetUp {
     @Nested
     @DisplayName("token 이 null 이거나 빈 값 또는 공백이라면")
     class ContextWithTokenBlank {
-
       @ParameterizedTest
       @ArgumentsSource(TokenSourceBlank.class)
       @DisplayName("BadRequest 를 응답한다")
       void ItResponseBadRequest(String token) throws Exception {
         //given
-        HashMap<String, Object> requestMap = new HashMap<>();
-        requestMap.put("token", token);
-
-        String requestBody = objectMapper.writeValueAsString(requestMap);
-
         //when
         MockHttpServletRequestBuilder request = RestDocumentationRequestBuilders.post(
-                API_URL + "/workspaces/{workspaceId}/channels/{channelId}/invite",
-                "workspaceId", "channelId"
-            )
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(requestBody);
+                API_URL + "/workspaces/{workspaceId}/channels/{channelId}/participate?token={token}",
+                "workspaceId", "channelId", token
+            );
 
         ResultActions response = mockMvc.perform(request);
 
@@ -490,7 +485,6 @@ class ChannelApiControllerTest extends ControllerSetUp {
       }
     }
   }
-
 
   @Nested
   @DisplayName("inviteMember 메서드는")
