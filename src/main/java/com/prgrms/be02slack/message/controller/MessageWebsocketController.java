@@ -32,17 +32,22 @@ public class MessageWebsocketController {
     this.messageService = messageService;
   }
 
-  @MessageMapping("/channel.{encodedChannelId}")
-  @SendTo("/topic/channel.{encodedChannelId}")
+  @MessageMapping("/workspace/{encodedWorkspaceId}/channel/{encodedChannelId}")
+  @SendTo("/topic/workspace/{encodedWorkspaceId}/channel/{encodedChannelId}")
   public MessageWebsocketResponse sendMessage(
+      @DestinationVariable String encodedWorkspaceId,
       @DestinationVariable String encodedChannelId,
       @Valid MessageWebsocketRequest channelMessageRequest,
       Principal principal
   ) {
     final var member = getMember(principal);
 
-    final var sendMessage = messageService.sendMessage(member, encodedChannelId,
-        channelMessageRequest.getContent());
+    final var sendMessage = messageService.sendMessage(
+        member,
+        encodedWorkspaceId,
+        encodedChannelId,
+        channelMessageRequest.getContent()
+    );
 
     return MessageWebsocketResponse.from(sendMessage);
   }
