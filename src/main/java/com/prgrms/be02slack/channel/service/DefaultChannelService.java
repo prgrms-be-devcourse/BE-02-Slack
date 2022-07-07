@@ -63,13 +63,12 @@ public class DefaultChannelService implements ChannelService {
     this.emailService = emailService;
   }
 
-  /**
-   * 1. 멤버(소유주) 정보 파라미터로 넘어오면 이후 처리 구현 필요
-   * 2. 테스트 수정 필요
-   */
   @Override
-  public String create(String workspaceId,
+  public String create(
+      Member member,
+      String workspaceId,
       ChannelSaveRequest channelSaveRequest) {
+    Assert.notNull(member, "Member must be provided");
     Assert.isTrue(isNotBlank(workspaceId), "WorkspaceId must be provided");
     Assert.notNull(channelSaveRequest, "ChannelSaveRequest must be provided");
 
@@ -78,16 +77,15 @@ public class DefaultChannelService implements ChannelService {
     long decodedWorkspaceId = idEncoder.decode(workspaceId);
     validateName(decodedWorkspaceId, channelSaveRequest.getName());
 
-    // 멤버 조회 로직 구현 필요
-
     Channel channel = Channel.builder()
         .name(channelSaveRequest.getName())
         .description(channelSaveRequest.getDescription())
         .isPrivate(channelSaveRequest.isPrivate())
         .workspace(workspace)
-        .owner(null) // <- 이 부분 수정 필요
+        .owner(member)
         .build();
     Channel savedChannel = channelRepository.save(channel);
+    subscribeInfoService.subscribe(channel, member);
 
     return idEncoder.encode(savedChannel.getId(), savedChannel.getType());
   }

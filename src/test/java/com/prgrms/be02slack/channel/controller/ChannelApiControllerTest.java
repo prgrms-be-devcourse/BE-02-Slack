@@ -103,7 +103,7 @@ class ChannelApiControllerTest extends ControllerSetUp {
       @DisplayName("인코딩된 id를 응답한다")
       void ItResponseOk() throws Exception {
         //given
-        given(channelService.create(anyString(), any(ChannelSaveRequest.class)))
+        given(channelService.create(any(Member.class), anyString(), any(ChannelSaveRequest.class)))
             .willReturn("testId");
 
         HashMap<String, Object> requestMap = new HashMap<>();
@@ -122,7 +122,8 @@ class ChannelApiControllerTest extends ControllerSetUp {
         ResultActions response = mockMvc.perform(request);
 
         //then
-        verify(channelService).create(anyString(), any(ChannelSaveRequest.class));
+        verify(channelService).create(any(Member.class), anyString(),
+            any(ChannelSaveRequest.class));
         response.andExpect(status().isOk())
             .andDo(document("Create channel",
                 pathParameters(
@@ -187,7 +188,7 @@ class ChannelApiControllerTest extends ControllerSetUp {
 
         String requestBody = objectMapper.writeValueAsString(requestMap);
 
-        given(channelService.create(anyString(), any(ChannelSaveRequest.class)))
+        given(channelService.create(any(Member.class), anyString(), any(ChannelSaveRequest.class)))
             .willThrow(new NameDuplicateException());
 
         //when
@@ -490,7 +491,6 @@ class ChannelApiControllerTest extends ControllerSetUp {
       }
     }
   }
-
 
   @Nested
   @DisplayName("inviteMember 메서드는")

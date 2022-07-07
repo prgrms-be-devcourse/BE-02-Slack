@@ -38,9 +38,10 @@ public class ChannelApiController {
 
   @PostMapping
   public String create(
+      @CurrentMember Member member,
       @PathVariable @NotBlank String workspaceId,
       @Valid @RequestBody ChannelSaveRequest channelSaveRequest) {
-    return channelService.create(workspaceId, channelSaveRequest);
+    return channelService.create(member, workspaceId, channelSaveRequest);
   }
 
   @PostMapping("{channelId}/invite")
