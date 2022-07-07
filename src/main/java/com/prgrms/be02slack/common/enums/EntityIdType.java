@@ -4,9 +4,10 @@ import java.util.Arrays;
 
 public enum EntityIdType {
   TEAM,
-  MEMBER,
+  USER,
   CHANNEL,
-  DMCHANNEL;
+  DMCHANNEL,
+  MESSAGE;
 
   public static String filter(EntityIdType type) {
     return Arrays.stream(EntityIdType.values())
