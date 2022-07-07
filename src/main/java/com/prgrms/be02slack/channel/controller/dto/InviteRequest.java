@@ -15,6 +15,8 @@ public class InviteRequest {
   @Size(min = 1, max = 80)
   private String sender;
 
+  protected InviteRequest() {}
+
   public InviteRequest(Set<String> inviteeInfos, String sender) {
     this.inviteeInfos = inviteeInfos;
     this.sender = sender;

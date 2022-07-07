@@ -825,7 +825,7 @@ class DefaultMemberServiceTest {
                                       .build();
           ReflectionTestUtils.setField(newMember,"id", i);
           membersList.add(newMember);
-          given(idEncoder.encode(i, EntityIdType.MEMBER)).willReturn("test"+i);
+          given(idEncoder.encode(i, EntityIdType.USER)).willReturn("test"+i);
         }
 
 

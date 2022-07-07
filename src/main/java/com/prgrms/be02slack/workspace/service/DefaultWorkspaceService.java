@@ -20,8 +20,10 @@ public class DefaultWorkspaceService implements WorkspaceService {
   private final IdEncoder idEncoder;
   private final WorkspaceRepository workspaceRepository;
 
-  public DefaultWorkspaceService(IdEncoder idEncoder,
-                                 WorkspaceRepository workspaceRepository) {
+  public DefaultWorkspaceService(
+      IdEncoder idEncoder,
+      WorkspaceRepository workspaceRepository
+  ) {
     this.idEncoder = idEncoder;
     this.workspaceRepository = workspaceRepository;
     ;
@@ -57,7 +59,7 @@ public class DefaultWorkspaceService implements WorkspaceService {
     final var id = idEncoder.decode(key);
 
     return workspaceRepository.findById(id)
-                              .orElseThrow(() -> new NotFoundException("Workspace not found"));
+        .orElseThrow(() -> new NotFoundException("Workspace not found"));
   }
 
   @Override

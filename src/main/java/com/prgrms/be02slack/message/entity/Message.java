@@ -10,12 +10,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.util.Assert;
 
 import com.prgrms.be02slack.common.entity.BaseTime;
+import com.prgrms.be02slack.common.enums.EntityIdType;
 import com.prgrms.be02slack.member.entity.Member;
 
 @Entity
@@ -36,6 +38,9 @@ public class Message extends BaseTime {
   @NotBlank
   @Column(length = 12000)
   private String content;
+
+  @Transient
+  private EntityIdType type = EntityIdType.MESSAGE;
 
   protected Message() {/*no-op*/}
 

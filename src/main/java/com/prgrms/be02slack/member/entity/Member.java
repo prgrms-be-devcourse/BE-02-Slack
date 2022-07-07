@@ -52,7 +52,7 @@ public class Member extends BaseTime {
   private Workspace workspace;
 
   @Transient
-  private EntityIdType type = EntityIdType.MEMBER;
+  private EntityIdType type = EntityIdType.USER;
 
   @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   private List<SubscribeInfo> subscribeInfos = new ArrayList<>();
