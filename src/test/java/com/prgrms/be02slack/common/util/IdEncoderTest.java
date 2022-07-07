@@ -37,24 +37,20 @@ class IdEncoderTest {
       @DisplayName("타입을 명시하고 해시 값을 반환한다")
       void ItReturnHashValue(long src) {
 
-        //given
-        final var channelType = "channel";
-        final var workspaceType = "workspace";
-        final var memberType = "member";
-        final var directMessageType = "DMChannel";
-
         //when
         final var encodedChannel = idEncoder.encode(src, EntityIdType.CHANNEL);
         final var encodedWorkspace = idEncoder.encode(src, EntityIdType.TEAM);
-        final var encodedMember = idEncoder.encode(src, EntityIdType.MEMBER);
+        final var encodedMember = idEncoder.encode(src, EntityIdType.USER);
         final var encodedDirectMessage = idEncoder.encode(src, EntityIdType.DMCHANNEL);
+        final var encodedMessage = idEncoder.encode(src, EntityIdType.MESSAGE);
         log.info(encodedChannel);
 
         //then
         Assertions.assertThat(encodedChannel.substring(0,1)).isEqualTo("C");
         Assertions.assertThat(encodedWorkspace.substring(0,1)).isEqualTo("T");
-        Assertions.assertThat(encodedMember.substring(0,1)).isEqualTo("M");
+        Assertions.assertThat(encodedMember.substring(0,1)).isEqualTo("U");
         Assertions.assertThat(encodedDirectMessage.substring(0,1)).isEqualTo("D");
+        Assertions.assertThat(encodedMessage.substring(0,1)).isEqualTo("M");
       }
     }
 
