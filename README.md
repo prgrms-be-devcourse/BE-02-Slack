@@ -79,3 +79,10 @@
 
 ## 👟회고   
 <a href="https://www.notion.so/backend-devcourse/2-4a3e2b7c735944d79d9d69b576441606" target="_blank">2차 팀 프로젝트 회고</a>  
+
+## JIRA link
+<a href="https://teamray.atlassian.net/jira/software/projects/XS2/boards/2/roadmap" target="_blank">TeamRay Jira</a>  
+
+## 팀 프로젝트 노션 링크
+<a href="https://www.notion.so/backend-devcourse/06b833ea895a465691457835708a0a51" target="_blank">2차 팀 프로젝트 슬랙 클론 </a>
+
