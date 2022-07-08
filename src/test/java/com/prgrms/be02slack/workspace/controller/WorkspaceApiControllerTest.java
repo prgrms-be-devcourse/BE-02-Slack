@@ -1,7 +1,9 @@
 package com.prgrms.be02slack.workspace.controller;
 
 import static org.mockito.Mockito.*;
+import static org.springframework.restdocs.headers.HeaderDocumentation.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -100,6 +102,7 @@ class WorkspaceApiControllerTest extends ControllerSetUp {
         //when
         final var request =
             RestDocumentationRequestBuilders.put(API_URL + "/{key}", workspaceKey)
+                .header("Authorization", "Bearer Token")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody);
 
@@ -109,6 +112,11 @@ class WorkspaceApiControllerTest extends ControllerSetUp {
         verify(workspaceService).update(anyString(), any(Workspace.class));
         response.andExpect(status().isOk())
             .andDo(document("Update workspace",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                requestHeaders(
+                    headerWithName("Authorization")
+                        .description("Member Token")),
                 pathParameters(
                     parameterWithName("key").description("workspace key")
                 ),

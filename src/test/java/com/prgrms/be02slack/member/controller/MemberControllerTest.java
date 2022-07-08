@@ -1,6 +1,7 @@
 package com.prgrms.be02slack.member.controller;
 
 import static org.mockito.BDDMockito.*;
+import static org.springframework.restdocs.headers.HeaderDocumentation.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
@@ -200,6 +201,7 @@ public class MemberControllerTest extends ControllerSetUp {
         //when
         final MockHttpServletRequestBuilder request =
             RestDocumentationRequestBuilders.post(ENTER_URI, encodedWorkspaceId)
+                .header("Authorization", "Bearer Token")
                 .contentType(MediaType.APPLICATION_JSON);
 
         final ResultActions response = mockMvc.perform(request);
@@ -209,6 +211,9 @@ public class MemberControllerTest extends ControllerSetUp {
             .andDo(document("Enter workspace",
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
+                requestHeaders(
+                    headerWithName("Authorization")
+                        .description("Login Token")),
                 pathParameters(
                     parameterWithName("encodedWorkspaceId")
                         .description("인코딩된 워크스페이스 id")
@@ -252,7 +257,8 @@ public class MemberControllerTest extends ControllerSetUp {
 
         //when
         final MockHttpServletRequestBuilder request =
-            RestDocumentationRequestBuilders.get(GET_ONE_URI, encodedMemberId);
+            RestDocumentationRequestBuilders.get(GET_ONE_URI, encodedMemberId)
+                .header("Authorization", "Bearer Token");
 
         final ResultActions response = mockMvc.perform(request);
 
@@ -267,6 +273,9 @@ public class MemberControllerTest extends ControllerSetUp {
             .andDo(document("Get Member Info",
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
+                requestHeaders(
+                    headerWithName("Authorization")
+                        .description("Member Token")),
                 pathParameters(
                     parameterWithName("encodedMemberId").description("Encoded Member Id")
                 ),
@@ -310,7 +319,8 @@ public class MemberControllerTest extends ControllerSetUp {
 
         //when
         final MockHttpServletRequestBuilder request =
-            RestDocumentationRequestBuilders.get(GET_ALL_URI, encodedChannelId);
+            RestDocumentationRequestBuilders.get(GET_ALL_URI, encodedChannelId)
+                .header("Authorization", "Bearer Token");
 
         final ResultActions response = mockMvc.perform(request);
 
@@ -320,6 +330,9 @@ public class MemberControllerTest extends ControllerSetUp {
             .andDo(document("Get Member Infos From Channel",
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
+                requestHeaders(
+                    headerWithName("Authorization")
+                        .description("Member Token")),
                 pathParameters(
                     parameterWithName("encodedChannelId").description("Encoded Channel Id")
                 ),
@@ -363,7 +376,8 @@ public class MemberControllerTest extends ControllerSetUp {
 
         //when
         final MockHttpServletRequestBuilder request =
-            RestDocumentationRequestBuilders.get(API_URL, encodedWorkspaceId);
+            RestDocumentationRequestBuilders.get(API_URL, encodedWorkspaceId)
+                .header("Authorization", "Bearer Token");
 
         final ResultActions response = mockMvc.perform(request);
 
@@ -373,6 +387,9 @@ public class MemberControllerTest extends ControllerSetUp {
                 .andDo(document("Get Members in Workspace",
                                 preprocessRequest(prettyPrint()),
                                 preprocessResponse(prettyPrint()),
+                                requestHeaders(
+                                    headerWithName("Authorization")
+                                      .description("Member Token")),
                                 pathParameters(
                                     parameterWithName("encodedWorkspaceId").description("Encoded Workspace Id")
                                 ),
