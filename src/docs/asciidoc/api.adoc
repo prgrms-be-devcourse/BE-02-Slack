@@ -1,0 +1,143 @@
+ifndef::snippets[]
+:snippets: ../../../build/generated-snippets
+endif::[]
+= TEAM RAY SLACK
+:toc: left
+:toclevels: 4
+:sectlinks:
+
+== Email
+=== Send email
+==== Request
+include::{snippets}/Send email/http-request.adoc[]
+include::{snippets}/Send email/request-fields.adoc[]
+==== Response
+include::{snippets}/Send email/http-response.adoc[]
+
+== Member
+=== Verify email
+==== Request
+include::{snippets}/Verify email/http-request.adoc[]
+include::{snippets}/Verify email/request-fields.adoc[]
+==== Response
+include::{snippets}/Verify email/http-response.adoc[]
+
+=== Enter workspace
+==== Request
+include::{snippets}/Enter workspace/http-request.adoc[]
+include::{snippets}/Enter workspace/request-headers.adoc[]
+include::{snippets}/Enter workspace/path-parameters.adoc[]
+==== Response
+include::{snippets}/Enter workspace/http-response.adoc[]
+
+=== Get Member Info
+==== Request
+include::{snippets}/Get Member Info/http-request.adoc[]
+include::{snippets}/Get Member Info/request-headers.adoc[]
+include::{snippets}/Get Member Info/path-parameters.adoc[]
+==== Response
+include::{snippets}/Get Member Info/http-response.adoc[]
+==== Fields
+include::{snippets}/Get Member Info/response-fields.adoc[]
+
+=== Get Member Infos From Channel
+==== Request
+include::{snippets}/Get Member Infos From Channel/http-request.adoc[]
+include::{snippets}/Get Member Infos From Channel/request-headers.adoc[]
+include::{snippets}/Get Member Infos From Channel/path-parameters.adoc[]
+==== Response
+include::{snippets}/Get Member Infos From Channel/http-response.adoc[]
+==== Fields
+include::{snippets}/Get Member Infos From Channel/response-fields.adoc[]
+
+=== Get Members in Workspace
+==== Request
+include::{snippets}/Get Members in Workspace/http-request.adoc[]
+include::{snippets}/Get Members in Workspace/request-headers.adoc[]
+include::{snippets}/Get Members in Workspace/path-parameters.adoc[]
+==== Response
+include::{snippets}/Get Members in Workspace/http-response.adoc[]
+==== Fields
+include::{snippets}/Get Members in Workspace/response-fields.adoc[]
+
+== Channel
+=== Create channel
+==== Request
+include::{snippets}/Create channel/http-request.adoc[]
+include::{snippets}/Create channel/request-headers.adoc[]
+include::{snippets}/Create channel/path-parameters.adoc[]
+include::{snippets}/Create channel/request-fields.adoc[]
+==== Response
+include::{snippets}/Create channel/http-response.adoc[]
+
+=== Invite new Member
+==== Request
+include::{snippets}/Invite new Member/http-request.adoc[]
+include::{snippets}/Invite new Member/request-headers.adoc[]
+include::{snippets}/Invite new Member/path-parameters.adoc[]
+include::{snippets}/Invite new Member/request-fields.adoc[]
+==== Response
+include::{snippets}/Invite new Member/http-response.adoc[]
+
+=== Invite to channel
+==== Request
+include::{snippets}/Invite to channel/http-request.adoc[]
+include::{snippets}/Invite to channel/request-headers.adoc[]
+include::{snippets}/Invite to channel/path-parameters.adoc[]
+include::{snippets}/Invite to channel/request-fields.adoc[]
+==== Response
+include::{snippets}/Invite to channel/http-response.adoc[]
+
+=== Participate to channel
+==== Request
+include::{snippets}/Participate to channel/http-request.adoc[]
+include::{snippets}/Participate to channel/path-parameters.adoc[]
+include::{snippets}/Participate to channel/request-fields.adoc[]
+==== Response
+include::{snippets}/Participate to channel/http-response.adoc[]
+
+=== Look up channel
+==== Request
+include::{snippets}/Look up channel/http-request.adoc[]
+include::{snippets}/Look up channel/request-headers.adoc[]
+include::{snippets}/Look up channel/path-parameters.adoc[]
+==== Response
+include::{snippets}/Look up channel/http-response.adoc[]
+==== Fields
+include::{snippets}/Look up channel/response-fields.adoc[]
+
+=== Leave channel
+==== Request
+include::{snippets}/Leave channel/http-request.adoc[]
+include::{snippets}/Look up channel/request-headers.adoc[]
+include::{snippets}/Leave channel/path-parameters.adoc[]
+==== Response
+include::{snippets}/Leave channel/http-response.adoc[]
+
+== Workspace
+=== Update workspace
+==== Request
+include::{snippets}/Update workspace/http-request.adoc[]
+include::{snippets}/Update workspace/request-headers.adoc[]
+include::{snippets}/Update workspace/path-parameters.adoc[]
+include::{snippets}/Update workspace/request-fields.adoc[]
+==== Response
+include::{snippets}/Update workspace/http-response.adoc[]
+
+== DirectMessageChannel
+=== Create DirectMessageChannel
+==== Request
+include::{snippets}/Create DirectMessageChannel/http-request.adoc[]
+include::{snippets}/Create DirectMessageChannel/request-headers.adoc[]
+include::{snippets}/Create DirectMessageChannel/request-parameters.adoc[]
+==== Response
+include::{snippets}/Create DirectMessageChannel/http-response.adoc[]
+
+=== Get DirectMessageChannels
+==== Request
+include::{snippets}/Get DirectMessageChannels/http-request.adoc[]
+include::{snippets}/Get DirectMessageChannels/request-headers.adoc[]
+==== Response
+include::{snippets}/Get DirectMessageChannels/http-response.adoc[]
+==== Fields
+include::{snippets}/Get DirectMessageChannels/response-fields.adoc[]

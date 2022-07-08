@@ -1,7 +1,9 @@
 package com.prgrms.be02slack.channel.controller;
 
 import static org.mockito.BDDMockito.*;
+import static org.springframework.restdocs.headers.HeaderDocumentation.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -117,6 +119,7 @@ class ChannelApiControllerTest extends ControllerSetUp {
         //when
         MockHttpServletRequestBuilder request = RestDocumentationRequestBuilders.post(
                 API_URL + "workspaces/{workspaceId}/channels", "testWorkspaceId")
+            .header("Authorization", "Bearer Token")
             .contentType(MediaType.APPLICATION_JSON)
             .content(requestBody);
 
@@ -127,6 +130,11 @@ class ChannelApiControllerTest extends ControllerSetUp {
             any(ChannelSaveRequest.class));
         response.andExpect(status().isOk())
             .andDo(document("Create channel",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                requestHeaders(
+                    headerWithName("Authorization")
+                        .description("Member Token")),
                 pathParameters(
                     parameterWithName("workspaceId").description("workspace id")
                 ),
@@ -228,6 +236,7 @@ class ChannelApiControllerTest extends ControllerSetUp {
                 API_URL + "/workspaces/{workspaceId}/channels/{channelId}/invite",
                 "workspaceId", "channelId"
             )
+            .header("Authorization", "Bearer Token")
             .contentType(MediaType.APPLICATION_JSON)
             .content(requestBody);
 
@@ -237,6 +246,11 @@ class ChannelApiControllerTest extends ControllerSetUp {
         verify(channelService).invite(anyString(), anyString(), any(InviteRequest.class));
         response.andExpect(status().isOk())
             .andDo(document("Invite to channel",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                requestHeaders(
+                    headerWithName("Authorization")
+                        .description("Member Token")),
                 pathParameters(
                     parameterWithName("workspaceId").description("workspace id"),
                     parameterWithName("channelId").description("channel id")
@@ -434,7 +448,8 @@ class ChannelApiControllerTest extends ControllerSetUp {
       MockHttpServletRequestBuilder request = RestDocumentationRequestBuilders.get(
           API_URL + "/workspaces/{workspaceId}/channels",
           "workspaceId"
-      );
+      )
+          .header("Authorization", "Bearer Token");
 
       ResultActions response = mockMvc.perform(request);
 
@@ -442,6 +457,11 @@ class ChannelApiControllerTest extends ControllerSetUp {
       verify(channelService).findAllByMember(any(Member.class));
       response.andExpect(status().isOk())
           .andDo(document("Look up channel",
+              preprocessRequest(prettyPrint()),
+              preprocessResponse(prettyPrint()),
+              requestHeaders(
+                  headerWithName("Authorization")
+                      .description("Member Token")),
               pathParameters(
                   parameterWithName("workspaceId").description("workspace id")
               ),
@@ -470,7 +490,8 @@ class ChannelApiControllerTest extends ControllerSetUp {
         MockHttpServletRequestBuilder request = RestDocumentationRequestBuilders.post(
             API_URL + "/workspaces/{workspaceId}/channels/{channelId}/leave",
             "workspaceId", "channelId"
-        );
+        )
+            .header("Authorization", "Bearer Token");
 
         ResultActions response = mockMvc.perform(request);
 
@@ -478,6 +499,11 @@ class ChannelApiControllerTest extends ControllerSetUp {
         verify(channelService).leave(anyString(), any(Member.class));
         response.andExpect(status().isOk())
             .andDo(document("Leave channel",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                requestHeaders(
+                    headerWithName("Authorization")
+                        .description("Member Token")),
                 pathParameters(
                     parameterWithName("workspaceId").description("workspace id"),
                     parameterWithName("channelId").description("channel id")
@@ -509,6 +535,7 @@ class ChannelApiControllerTest extends ControllerSetUp {
             RestDocumentationRequestBuilders.post(API_URL +
                                                       "/workspaces/{workspaceId}/channels/invite",
                                                   encodedWorkspaceId)
+                                            .header("Authorization", "Bearer Token")
                                             .contentType(MediaType.APPLICATION_JSON)
                                             .content(requestBody);
         ;
@@ -523,6 +550,11 @@ class ChannelApiControllerTest extends ControllerSetUp {
                 .andDo(
                     document(
                         "Invite new Member",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestHeaders(
+                            headerWithName("Authorization")
+                                .description("Member Token")),
                         pathParameters(
                             parameterWithName("workspaceId").description("encoded workspace id")
                         ),

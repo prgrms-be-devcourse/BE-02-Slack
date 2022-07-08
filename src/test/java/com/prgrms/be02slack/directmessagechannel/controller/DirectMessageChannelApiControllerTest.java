@@ -2,6 +2,7 @@ package com.prgrms.be02slack.directmessagechannel.controller;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
+import static org.springframework.restdocs.headers.HeaderDocumentation.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
@@ -84,13 +85,19 @@ public class DirectMessageChannelApiControllerTest extends ControllerSetUp {
 
         //when
         final MockHttpServletRequestBuilder request =
-            RestDocumentationRequestBuilders.post(url);
+            RestDocumentationRequestBuilders.post(url)
+                .header("Authorization", "Bearer Token");
 
         final ResultActions response = mockMvc.perform(request);
         //then
         verify(directMessageChannelService).create(anyString(), anyString(), any());
         response.andExpect(status().isOk())
             .andDo(document("Create DirectMessageChannel",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                requestHeaders(
+                    headerWithName("Authorization")
+                        .description("Member Token")),
                 requestParameters(
                     parameterWithName("receiverEmail").description("receiver email")
                 )
@@ -198,7 +205,8 @@ public class DirectMessageChannelApiControllerTest extends ControllerSetUp {
 
         //when
         final MockHttpServletRequestBuilder request =
-            RestDocumentationRequestBuilders.get(DM_CHANNEL_URL);
+            RestDocumentationRequestBuilders.get(DM_CHANNEL_URL)
+                .header("Authorization", "Bearer Token");
 
         final ResultActions response = mockMvc.perform(request);
 
@@ -208,6 +216,9 @@ public class DirectMessageChannelApiControllerTest extends ControllerSetUp {
             .andDo(document("Get DirectMessageChannels",
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
+                requestHeaders(
+                    headerWithName("Authorization")
+                        .description("Member Token")),
                 responseFields(
                     fieldWithPath("[].memberName")
                         .type(JsonFieldType.STRING).description("상대 이름"),
